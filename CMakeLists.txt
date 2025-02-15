@@ -157,6 +157,6 @@ target_link_libraries(${EXECUTABLE_NAME} PUBLIC SDL3::SDL3 SDL3_image::SDL3_imag
 
 # Use only C flags for Debug builds
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -DDEBUG")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG")
 endif()
 

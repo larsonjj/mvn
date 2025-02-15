@@ -16,7 +16,6 @@ add_custom_command(TARGET ${EXECUTABLE_NAME} PRE_BUILD
 )
 
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Os")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1 -gsource-map -s ALLOW_MEMORY_GROWTH=1 -s MAXIMUM_MEMORY=1gb --preload-file assets/ --shell-file ../../src/minshell.html")
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES SUFFIX ".html")
 
@@ -29,4 +28,5 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
 else()
   # Set the asset path macro in release mode to a relative path that assumes the assets folder is in the same directory as the game executable and ensure SDL uses callbacks for main
   target_compile_definitions(${EXECUTABLE_NAME} PUBLIC ASSETS_PATH="./assets/")
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Os")
 endif()
