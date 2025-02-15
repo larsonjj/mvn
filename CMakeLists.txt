@@ -25,7 +25,6 @@ include(cmake/CPM.cmake)
 set(EXECUTABLE_NAME ${PROJECT_NAME})
 
 # Set C standard to c99
-add_definitions(-std=c99)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
