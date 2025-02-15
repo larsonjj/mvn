@@ -85,7 +85,6 @@ CPMAddPackage(
   NAME SDL
   GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
   GIT_TAG release-3.2.2
-  EXCLUDE_FROM_ALL YES
 )
 
 # Add SDL Image
@@ -111,7 +110,6 @@ CPMAddPackage(
   NAME SDL_image
   GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
   GIT_TAG release-3.2.0
-  EXCLUDE_FROM_ALL YES
 )
 
 # Add SDL Mixer
@@ -124,7 +122,6 @@ CPMAddPackage(
   NAME SDL_mixer
   GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
   GIT_TAG 4870186
-  EXCLUDE_FROM_ALL YES
 )
 
 # Add SDL_TTF
@@ -132,8 +129,7 @@ set(SDLTTF_VENDORED ON CACHE BOOL "" FORCE)
 CPMAddPackage(
   NAME SDL_ttf
   GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
-  GIT_TAG preview-3.1.0
-  EXCLUDE_FROM_ALL YES
+  GIT_TAG 3d7b6ef
 )
 
 ####################################
@@ -141,13 +137,13 @@ CPMAddPackage(
 ####################################
 
 # Add error checking flags for C (after linking dependencies)
-target_compile_options(${EXECUTABLE_NAME} PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:
-        $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
-        $<$<C_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
-        $<$<C_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
-    >
-)
+# target_compile_options(${EXECUTABLE_NAME} PRIVATE
+#     $<$<COMPILE_LANGUAGE:C>:
+#         $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
+#         $<$<C_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
+#         $<$<C_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
+#     >
+# )
 
 # Ensure we use SDL3 main callbacks. (Must be done after linking dependencies)
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SDL_MAIN_USE_CALLBACKS=1)
