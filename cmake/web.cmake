@@ -13,7 +13,7 @@ add_custom_command(TARGET ${EXECUTABLE_NAME} PRE_BUILD
 )
 
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
-SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Os")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Os -std=c99")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1 -gsource-map -s ALLOW_MEMORY_GROWTH=1 -s MAXIMUM_MEMORY=1gb -Os -Wall --preload-file assets/ --shell-file ../../src/minshell.html")
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES SUFFIX ".html")
 

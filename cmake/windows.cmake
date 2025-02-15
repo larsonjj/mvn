@@ -9,8 +9,8 @@ add_custom_command(TARGET ${EXECUTABLE_NAME} PRE_BUILD
     "$<TARGET_FILE_DIR:${EXECUTABLE_NAME}>/assets"
 )
 
-# Add std C and C++ libraries statically only on Windows
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc")
+# Add std C and C++ libraries
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 ### Visual C++ Compiler ###
 if(MSVC)
