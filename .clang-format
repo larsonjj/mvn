@@ -1,0 +1,10 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 100
+BreakBeforeBraces: Linux # Use Linux brace style (or choose Allman if you prefer)
+PointerAlignment: Right # Place pointer stars with the variable name
+DerivePointerAlignment: false # Do not adjust pointer alignment automatically
+IndentCaseLabels: true # Indent switch-case labels for readability
+AllowShortIfStatementsOnASingleLine: false
+SortIncludes: true # Preserve the order of your #include directives

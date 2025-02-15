@@ -1,0 +1,43 @@
+{
+  "buildType": {
+    "default": "debug",
+    "choices": {
+      "debug": {
+        "short": "Debug",
+        "long": "Build with debugging information",
+        "buildType": "Debug",
+        "settings": {
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
+          "CMAKE_BUILD_TYPE": "Debug"
+        }
+      },
+      "release": {
+        "short": "Release",
+        "long": "Build with optimizations and without debug information",
+        "buildType": "Release",
+        "settings": {
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
+          "CMAKE_BUILD_TYPE": "Release"
+        }
+      },
+      "minSizeRel": {
+        "short": "MinSizeRel",
+        "long": "Build with optimizations for code size",
+        "buildType": "MinSizeRel",
+        "settings": {
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
+          "CMAKE_BUILD_TYPE": "MinSizeRel"
+        }
+      },
+      "relWithDebInfo": {
+        "short": "RelWithDebInfo",
+        "long": "Build with optimizations and with debug information",
+        "buildType": "RelWithDebInfo",
+        "settings": {
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
+          "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+        }
+      }
+    }
+  }
+}

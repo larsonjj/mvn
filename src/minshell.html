@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <title>SDL web game</title>
+
+    <meta name="title" content="SDL web game">
+    <meta name="description" content="Web game created with sDL">
+    <meta name="keywords" content="games, html5, programming, C, C++, library, videogames">
+    <meta name="viewport" content="width=device-width">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://www.libsdl.org/favicon.ico">
+
+    <style>
+        body {
+            margin: 0px;
+            text-align: center;
+        }
+        canvas.emscripten { border: 0px none; background-color: black; }
+    </style>
+    </script>
+    </head>
+    <body>
+        <canvas class=emscripten id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas>
+        {{{ SCRIPT }}}
+    </body>
+</html>

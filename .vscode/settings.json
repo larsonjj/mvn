@@ -1,0 +1,10 @@
+{
+  "cmake.debugConfig": {
+    "args": ["--verbose", "true"]
+  },
+  "files.associations": {
+    "*.m": "c"
+  },
+  "cmake.buildDirectory": "${workspaceFolder}/build",
+  "clangd.arguments": ["--compile-commands-dir=build"]
+}
