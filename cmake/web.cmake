@@ -1,5 +1,5 @@
 # Set the C compiler to emcc
-set(CMAKE_C_COMPILER "emcc")
+# set(CMAKE_C_COMPILER "emcc")
 
 # Disable shared builds as we want a static binary
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
