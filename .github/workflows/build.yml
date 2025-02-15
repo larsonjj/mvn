@@ -30,11 +30,11 @@ jobs:
 
           cmake -DCMAKE_SYSTEM_NAME=${{ matrix.target }} -DCMAKE_SYSTEM_VERSION="10.0" -DCMAKE_SYSTEM_VERSION="10.0" -DCMAKE_EXE_LINKER_FLAGS="-Wl,--subsystem,windows -Wl,--entry,mainCRTStartup" -G Ninja ..
       - name: Build
-        run: cmake --build build --target sdl3_template --config Release
+        run: cmake --build build --target mvn --config Release
       - name: Upload Build
         uses: actions/upload-artifact@v4
         with:
-          name: sdl3_template-${{ matrix.target }}-${{ matrix.arch }}
+          name: mvn-${{ matrix.target }}-${{ matrix.arch }}
           path: |
             build/*.exe
             build/*.dll
@@ -74,7 +74,7 @@ jobs:
       - name: Upload Build
         uses: actions/upload-artifact@v4
         with:
-          name: sdl3_template-apple-${{ matrix.target }}
+          name: mvn-apple-${{ matrix.target }}
           path: |
             ./build/mac/*.dmg
   build-web:
@@ -102,7 +102,7 @@ jobs:
       - name: Prepare for upload
         run: |
           mkdir _site
-          mv build/web/sdl3_template.html _site/index.html
+          mv build/web/mvn.html _site/index.html
           mv build/web/sdl3_* _site/
           cp -R build/web/assets _site/
       - name: Fix permissions
