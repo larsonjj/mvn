@@ -10,7 +10,7 @@ project(mvn
   VERSION 0.1.0
   DESCRIPTION "Maven Game Engine"
   HOMEPAGE_URL "https://github.com/larsonjj/mvn"
-  LANGUAGES C
+  LANGUAGES C CXX
 )
 
 # Include CPack to package the project
@@ -25,9 +25,18 @@ include(cmake/CPM.cmake)
 set(EXECUTABLE_NAME ${PROJECT_NAME})
 
 # Set C standard to c99
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS ON)
+# set(CMAKE_C_STANDARD 99)
+# set(CMAKE_C_STANDARD_REQUIRED ON)
+# set(CMAKE_C_EXTENSIONS ON)
+
+# Set CPP standard to c++20
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+message(STATUS "Using C Compiler: ${CMAKE_C_COMPILER}")
+message(STATUS "Using C++ Compiler: ${CMAKE_CXX_COMPILER}")
+
 
 # Export compile commands for use with clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -44,7 +53,7 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Define PROJECT_SOURCES as a list of all source files
-file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
 
 ####################################
 # CPack
@@ -137,13 +146,21 @@ CPMAddPackage(
 ####################################
 
 # Add error checking flags for C (after linking dependencies)
-target_compile_options(${EXECUTABLE_NAME} PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:
-        $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
-        $<$<C_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
-        $<$<C_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
-    >
-)
+# target_compile_options(${EXECUTABLE_NAME} PRIVATE
+#     $<$<COMPILE_LANGUAGE:C>:
+#         $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
+#         $<$<C_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
+#         $<$<C_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
+#     >
+# )
+
+# target_compile_options(${EXECUTABLE_NAME} PRIVATE
+#     $<$<COMPILE_LANGUAGE:CXX>:
+#         $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+#         $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
+#         $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
+#     >
+# )
 
 # Ensure we use SDL3 main callbacks. (Must be done after linking dependencies)
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SDL_MAIN_USE_CALLBACKS=1)
@@ -153,6 +170,7 @@ target_link_libraries(${EXECUTABLE_NAME} PUBLIC SDL3::SDL3 SDL3_image::SDL3_imag
 
 # Use only C flags for Debug builds
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG")
+  # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
 endif()
 
