@@ -1,9 +1,9 @@
-# Disable shared builds as we want a static binary
-set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
-
 # Build universal binaries on Apple Silicon MacOS
 ## NOTE: This must be set before the project() call
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
+
+# Disable shared builds as we want a static binary
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 
 # Enable Objective-C language for Apple platforms
 # Needed for SDL_Image, SDL_TTF, and SDL_Mixer
@@ -33,7 +33,7 @@ set_target_properties(${EXECUTABLE_NAME} PROPERTIES
   MACOSX_BUNDLE_LONG_VERSION_STRING "${CMAKE_PROJECT_VERSION}"
   MACOSX_BUNDLE_COPYRIGHT "Copyright ©${CURRENTYEAR} ${AUTHOR_NAME} [${AUTHOR_EMAIL}]. All rights reserved."
   MACOSX_BUNDLE_INFO_STRING "${AUTHOR_WEBSITE}"
-  MACOSX_BUNDLE_GUI_IDENTIFIER "${AUTHOR_BUNDLE_ID}"
+  MACOSX_BUNDLE_GUI_IDENTIFIER ${AUTHOR_BUNDLE_ID}
   # MACOSX_BUNDLE_GUI_IDENTIFIER "$(PRODUCT_BUNDLE_IDENTIFIER)"
   # MACOSX_BUNDLE_ICON_FILE "assets/logo.png"
 
@@ -73,6 +73,7 @@ install(CODE "include(BundleUtilities)
 fixup_bundle(\"${APP}\" \"\" \"${DIRS}\")")
 
 set(CPACK_GENERATOR "DRAGNDROP")
+include(CPack)
 
 # Store source assets path
 set(SRC_ASSETS_PATH "${CMAKE_SOURCE_DIR}/assets")

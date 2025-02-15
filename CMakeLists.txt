@@ -13,30 +13,13 @@ project(mvn
   LANGUAGES C CXX
 )
 
-# Include CPack to package the project
-if(NOT CPACK_INCLUDED)
-    include(CPack)
-endif()
-
-# Add CPM.cmake to the project
 # Add CPM dependency
 include(cmake/CPM.cmake)
 
-set(EXECUTABLE_NAME ${PROJECT_NAME})
-
 # Set C standard to c99
-# set(CMAKE_C_STANDARD 99)
-# set(CMAKE_C_STANDARD_REQUIRED ON)
-# set(CMAKE_C_EXTENSIONS ON)
-
-# Set CPP standard to c++20
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-message(STATUS "Using C Compiler: ${CMAKE_C_COMPILER}")
-message(STATUS "Using C++ Compiler: ${CMAKE_CXX_COMPILER}")
-
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
 
 # Export compile commands for use with clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -53,7 +36,22 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Define PROJECT_SOURCES as a list of all source files
-file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
+
+####################################
+# Package info
+####################################
+set(EXECUTABLE_NAME ${PROJECT_NAME})
+
+message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
+message(STATUS "CMAKE_OBJC_FLAGS: " ${CMAKE_OBJC_FLAGS})
+
+# Author Information for bundling
+set(AUTHOR_NAME "John Doe")
+set(AUTHOR_EMAIL "john.doe@example.com")
+set(AUTHOR_WEBSITE "https://example.com")
+set(AUTHOR_BUNDLE_ID "com.example.${EXECUTABLE_NAME}")
+set(APP_DESCRIPTION "SDL template application")
 
 ####################################
 # CPack
@@ -74,10 +72,10 @@ set(CPACK_PACKAGE_CONTACT ${AUTHOR_EMAIL})
 ### Android ###
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
   include(cmake/macos.cmake)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-  include(cmake/web.cmake)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
   include(cmake/windows.cmake)
+elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+  include(cmake/web.cmake)
 else()
   message(FATAL_ERROR "Unsupported platform")
 endif()
@@ -94,6 +92,7 @@ CPMAddPackage(
   NAME SDL
   GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
   GIT_TAG release-3.2.4
+  EXCLUDE_FROM_ALL YES
 )
 
 # Add SDL Image
@@ -119,6 +118,7 @@ CPMAddPackage(
   NAME SDL_image
   GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
   GIT_TAG release-3.2.0
+  EXCLUDE_FROM_ALL YES
 )
 
 # Add SDL Mixer
@@ -130,7 +130,8 @@ set(SDLMIXER_OPUS OFF)
 CPMAddPackage(
   NAME SDL_mixer
   GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
-  GIT_TAG bc9c365
+  GIT_TAG 4870186
+  EXCLUDE_FROM_ALL YES
 )
 
 # Add SDL_TTF
@@ -138,7 +139,8 @@ set(SDLTTF_VENDORED ON CACHE BOOL "" FORCE)
 CPMAddPackage(
   NAME SDL_ttf
   GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
-  GIT_TAG 3d7b6ef
+  GIT_TAG preview-3.1.0
+  EXCLUDE_FROM_ALL YES
 )
 
 ####################################
@@ -154,14 +156,6 @@ CPMAddPackage(
 #     >
 # )
 
-# target_compile_options(${EXECUTABLE_NAME} PRIVATE
-#     $<$<COMPILE_LANGUAGE:CXX>:
-#         $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-#         $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
-#         $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
-#     >
-# )
-
 # Ensure we use SDL3 main callbacks. (Must be done after linking dependencies)
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SDL_MAIN_USE_CALLBACKS=1)
 
@@ -170,7 +164,5 @@ target_link_libraries(${EXECUTABLE_NAME} PUBLIC SDL3::SDL3 SDL3_image::SDL3_imag
 
 # Use only C flags for Debug builds
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
-  # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -DDEBUG")
 endif()
-
