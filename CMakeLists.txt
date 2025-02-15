@@ -84,7 +84,7 @@ set(SDL_SENSOR OFF CACHE BOOL "" FORCE)
 CPMAddPackage(
   NAME SDL
   GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-  GIT_TAG release-3.2.2
+  GIT_TAG release-3.2.4
 )
 
 # Add SDL Image
@@ -121,7 +121,7 @@ set(SDLMIXER_OPUS OFF)
 CPMAddPackage(
   NAME SDL_mixer
   GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
-  GIT_TAG 4870186
+  GIT_TAG bc9c365
 )
 
 # Add SDL_TTF
@@ -137,13 +137,13 @@ CPMAddPackage(
 ####################################
 
 # Add error checking flags for C (after linking dependencies)
-# target_compile_options(${EXECUTABLE_NAME} PRIVATE
-#     $<$<COMPILE_LANGUAGE:C>:
-#         $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
-#         $<$<C_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
-#         $<$<C_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
-#     >
-# )
+target_compile_options(${EXECUTABLE_NAME} PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:
+        $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
+        $<$<C_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
+        $<$<C_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
+    >
+)
 
 # Ensure we use SDL3 main callbacks. (Must be done after linking dependencies)
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SDL_MAIN_USE_CALLBACKS=1)

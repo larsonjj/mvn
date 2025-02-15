@@ -10,7 +10,7 @@ add_custom_command(TARGET ${EXECUTABLE_NAME} PRE_BUILD
 )
 
 # Add std C and C++ libraries
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc")
 
 ### Visual C++ Compiler ###
 if(MSVC)
