@@ -4,6 +4,7 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <flecs.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,7 +24,26 @@ typedef struct {
     float pixel_density;
     int app_quit;
     TTF_Font *font;
+    ecs_world_t *ecs_world;    // New: flecs world pointer
+    ecs_entity_t bunny_entity; // New: bunny entity handle
 } AppContext;
+
+typedef struct {
+    float x;
+    float y;
+} Position;
+
+ECS_COMPONENT_DECLARE(Position);
+
+void MoveSystem(ecs_iter_t *iter)
+{
+    Position *pos = ecs_field(iter, Position, 0);
+    for (int i = 0; i < iter->count; i++) {
+        // Example: move the bunny 0.1 unit to the right and 1 unit down per frame.
+        pos[i].x += 0.1F;
+        pos[i].y += 0.1F;
+    }
+}
 
 // Called at startup.
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
@@ -103,6 +123,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         fprintf(stderr, "TTF_OpenFont Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
+
     SDL_Color textColor = {255, 255, 255, 255};
     const char *message = "FPS: 60";
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, message, SDL_strlen(message), textColor);
@@ -110,10 +131,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         SDL_Log("Couldn't render text: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
-    if (!textSurface) {
-        fprintf(stderr, "TTF_RenderUTF8_Blended Error: %s\n", SDL_GetError());
-        return SDL_AppFail();
-    }
+
     SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer, textSurface);
     SDL_DestroySurface(textSurface);
     if (!text_texture) {
@@ -130,6 +148,29 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
     Mix_PlayMusic(music, -1); // Loop indefinitely
 
+    ecs_world_t *world = ecs_init(); // Create world
+    ECS_COMPONENT(world, Position);  // Register Position component
+
+    // Get window dimensions for initial bunny position.
+    int winW;
+    int winH;
+    SDL_GetWindowSize(window, &winW, &winH);
+
+    // Query bunny texture dimensions for centering.
+    float bunnyW;
+    float bunnyH;
+    if (!SDL_GetTextureSize(bunny_texture, &bunnyW, &bunnyH)) {
+        SDL_Log("SDL_GetTextureSize Error: %s", SDL_GetError());
+        return SDL_AppFail();
+    }
+
+    // Create the bunny entity with its position set to the center.
+    ecs_entity_t bunny_entity = ecs_new(world);
+    ecs_set(world, bunny_entity, Position, {2, 2});
+
+    // Register a MoveSystem that moves all Position components
+    ECS_SYSTEM(world, MoveSystem, EcsOnUpdate, Position);
+
     AppContext *app = malloc(sizeof(AppContext));
     if (!app) {
         return SDL_AppFail();
@@ -142,10 +183,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     app->pixel_density = pixel_density;
     app->app_quit = SDL_APP_CONTINUE;
     app->font = font;
+    app->ecs_world = world;           // Store flecs world.
+    app->bunny_entity = bunny_entity; // Store bunny entity.
 
     *appstate = app;
 
-    return SDL_APP_CONTINUE;
+    return app->app_quit;
 }
 
 // Called for each event.
@@ -164,6 +207,21 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 {
     AppContext *app = (AppContext *)appstate;
 
+    ECS_COMPONENT_DEFINE(app->ecs_world, Position);
+
+    // Capture high-resolution time stamp.
+    Uint64 now = SDL_GetPerformanceCounter();
+    static Uint64 last = 0;
+    if (last == 0) {
+        last = now;
+    }
+    // Compute delta time in seconds.
+    float deltaTime = (float)(now - last) / (float)SDL_GetPerformanceFrequency();
+    last = now;
+
+    // Run flecs systems (progress the ECS world).
+    ecs_progress(app->ecs_world, deltaTime);
+
     // Get window dimensions.
     int winW;
     int winH;
@@ -177,10 +235,18 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         return SDL_APP_FAILURE;
     }
 
+    // Retrieve the updated bunny position from the ECS.
+    // Get a read-only pointer to the Position component
+    const Position *pos = ecs_get(app->ecs_world, app->bunny_entity, Position);
+    if (!pos) {
+        SDL_Log("Could not get bunny Position");
+        return SDL_APP_FAILURE;
+    }
+
     // Compute destination rectangle to center the texture.
     SDL_FRect destRect;
-    destRect.x = ((float)winW - bunnyW) / 2.0F * app->pixel_density;
-    destRect.y = ((float)winH - bunnyH) / 2.0F * app->pixel_density;
+    destRect.x = pos->x * app->pixel_density;
+    destRect.y = pos->y * app->pixel_density;
     destRect.w = bunnyW;
     destRect.h = bunnyH;
 
@@ -204,6 +270,7 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
 
     AppContext *app = (AppContext *)appstate;
     if (app) {
+        ecs_fini(app->ecs_world);
         Mix_FreeMusic(app->music);
         SDL_DestroyTexture(app->bunny_texture);
         SDL_DestroyTexture(app->text_texture);

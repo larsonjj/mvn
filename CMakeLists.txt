@@ -139,6 +139,13 @@ CPMAddPackage(
   EXCLUDE_FROM_ALL YES
 )
 
+CPMAddPackage(
+  NAME flecs
+  GIT_REPOSITORY https://github.com/SanderMertens/flecs.git
+  GIT_TAG v4.0.4
+  EXCLUDE_FROM_ALL YES
+)
+
 ####################################
 # Platform Specific Configuration
 ####################################
@@ -171,7 +178,7 @@ target_compile_options(${EXECUTABLE_NAME} PRIVATE
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SDL_MAIN_USE_CALLBACKS=1)
 
 # Link dependencies
-target_link_libraries(${EXECUTABLE_NAME} PUBLIC SDL3::SDL3 SDL3_image::SDL3_image SDL3_mixer::SDL3_mixer SDL3_ttf::SDL3_ttf)
+target_link_libraries(${EXECUTABLE_NAME} PUBLIC SDL3::SDL3 SDL3_image::SDL3_image SDL3_mixer::SDL3_mixer SDL3_ttf::SDL3_ttf flecs::flecs_static)
 
 # Use only C flags for Debug builds
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
