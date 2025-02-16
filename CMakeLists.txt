@@ -8,9 +8,9 @@ cmake_minimum_required(VERSION 3.22.1)
 # Declare the project name, version, description, and languages used.
 project(mvn
   VERSION 0.1.0
-  DESCRIPTION "Maven Game Engine"
+  DESCRIPTION "SDL3 Template"
   HOMEPAGE_URL "https://github.com/larsonjj/mvn"
-  LANGUAGES C CXX
+  LANGUAGES C
 )
 
 # Add CPM dependency
@@ -24,6 +24,8 @@ set(CMAKE_C_EXTENSIONS ON)
 # Export compile commands for use with clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "Suppress developer warnings" FORCE)
+
 # Ensure that the dynamic library goes into the build directory automatically.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
@@ -31,9 +33,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 # Disable installing to system directories.
 set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
-# Instructs CMake to organize targets and projects into folders when generating IDE project files (such as Visual Studio solutions or Xcode projects).
-# This makes the project structure cleaner and easier to navigate in IDEs that support folder organization.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+# if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+#   # Build universal binaries on Apple Silicon MacOS
+#   ## NOTE: This must be set before the project() call
+#   set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
+# endif()
 
 # Define PROJECT_SOURCES as a list of all source files
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
@@ -41,17 +47,21 @@ file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/s
 ####################################
 # Package info
 ####################################
+
+
 set(EXECUTABLE_NAME ${PROJECT_NAME})
 
-message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
-message(STATUS "CMAKE_OBJC_FLAGS: " ${CMAKE_OBJC_FLAGS})
+if (APPLE OR EMSCRIPTEN)
+  # Disable shared builds as we want a static binary
+  set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+endif()
 
 # Author Information for bundling
 set(AUTHOR_NAME "John Doe")
 set(AUTHOR_EMAIL "john.doe@example.com")
 set(AUTHOR_WEBSITE "https://example.com")
 set(AUTHOR_BUNDLE_ID "com.example.${EXECUTABLE_NAME}")
-set(APP_DESCRIPTION "MVN game")
+set(APP_DESCRIPTION "SDL template application")
 
 ####################################
 # CPack
@@ -63,22 +73,9 @@ set(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}" "${PROJECT_NAME}" "ALL" "
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+
 set(CPACK_PACKAGE_CONTACT ${AUTHOR_EMAIL})
-
-####################################
-# Platform Specific Configuration
-####################################
-
-### Android ###
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  include(cmake/macos.cmake)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-  include(cmake/windows.cmake)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-  include(cmake/web.cmake)
-else()
-  message(FATAL_ERROR "Unsupported platform")
-endif()
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${AUTHOR_NAME})
 
 ####################################
 # Load Dependencies
@@ -91,7 +88,7 @@ set(SDL_SENSOR OFF CACHE BOOL "" FORCE)
 CPMAddPackage(
   NAME SDL
   GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-  GIT_TAG release-3.2.4
+  GIT_TAG release-3.2.2
   EXCLUDE_FROM_ALL YES
 )
 
@@ -144,6 +141,21 @@ CPMAddPackage(
 )
 
 ####################################
+# Platform Specific Configuration
+####################################
+
+### Android ###
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  include(cmake/macos.cmake)
+elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  include(cmake/windows.cmake)
+elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+  include(cmake/web.cmake)
+else()
+  message(FATAL_ERROR "Unsupported platform")
+endif()
+
+####################################
 # Target Configuration
 ####################################
 
@@ -166,3 +178,6 @@ target_link_libraries(${EXECUTABLE_NAME} PUBLIC SDL3::SDL3 SDL3_image::SDL3_imag
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -DDEBUG")
 endif()
+
+message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
+message(STATUS "CMAKE_OBJC_FLAGS: " ${CMAKE_OBJC_FLAGS})
