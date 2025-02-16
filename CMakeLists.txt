@@ -76,7 +76,7 @@ set(SDL_SENSOR OFF CACHE BOOL "" FORCE)
 CPMAddPackage(
   NAME SDL
   GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-  GIT_TAG release-3.2.2
+  GIT_TAG release-3.2.4
   EXCLUDE_FROM_ALL YES
 )
 
