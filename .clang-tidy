@@ -8,7 +8,8 @@ Checks: >
   -cppcoreguidelines-*,
   -clang-analyzer-cplusplus*,
   -hicpp-*,
-  -cert-*
+  -cert-*,
+  -readability-magic-numbers
 WarningsAsErrors: ""
 HeaderFilterRegex: ".*"
 AnalyzeTemporaryDtors: false

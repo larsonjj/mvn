@@ -1,9 +1,3 @@
-# Disable shared builds as we want a static binary
-set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
-
-# Build universal binaries on Apple Silicon MacOS
-set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
-
 # Enable Objective-C language for Apple platforms
 # Needed for SDL_Image, SDL_TTF, and SDL_Mixer
 enable_language(OBJC)

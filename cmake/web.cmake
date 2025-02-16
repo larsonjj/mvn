@@ -1,6 +1,3 @@
-# Disable shared builds as we want a static binary
-set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
-
 # Set the executable name
 add_executable(${EXECUTABLE_NAME})
 
@@ -29,4 +26,5 @@ else()
   # Set the asset path macro in release mode to a relative path that assumes the assets folder is in the same directory as the game executable and ensure SDL uses callbacks for main
   target_compile_definitions(${EXECUTABLE_NAME} PUBLIC ASSETS_PATH="./assets/")
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Os")
+  # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os")
 endif()

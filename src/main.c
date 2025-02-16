@@ -1,3 +1,4 @@
+#include "SDL3/SDL_render.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -161,14 +162,34 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 // Called every frame.
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
-
     AppContext *app = (AppContext *)appstate;
 
-    // Set the background color to black.
-    SDL_SetRenderDrawColor(app->renderer, 0, 0, 0, 255);
+    // Get window dimensions.
+    int winW;
+    int winH;
+    SDL_GetWindowSize(app->window, &winW, &winH);
 
-    // Clear the screen.
+    // Query the bunny texture's width and height.
+    float bunnyW;
+    float bunnyH;
+    if (!SDL_GetTextureSize(app->bunny_texture, &bunnyW, &bunnyH)) {
+        SDL_Log("SDL_GetTextureSize Error: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    // Compute destination rectangle to center the texture.
+    SDL_FRect destRect;
+    destRect.x = ((float)winW - bunnyW) / 2.0F * app->pixel_density;
+    destRect.y = ((float)winH - bunnyH) / 2.0F * app->pixel_density;
+    destRect.w = bunnyW;
+    destRect.h = bunnyH;
+
+    // Clear the screen to black.
+    SDL_SetRenderDrawColor(app->renderer, 0, 0, 0, 255);
     SDL_RenderClear(app->renderer);
+
+    // Render the bunny texture at the computed rectangle.
+    SDL_RenderTexture(app->renderer, app->bunny_texture, NULL, &destRect);
 
     // Present the updated frame.
     SDL_RenderPresent(app->renderer);

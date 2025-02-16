@@ -77,21 +77,6 @@ set(CPACK_PACKAGE_CONTACT ${AUTHOR_EMAIL})
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${AUTHOR_NAME})
 
 ####################################
-# Platform Specific Configuration
-####################################
-
-### Android ###
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  include(cmake/macos.cmake)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-  include(cmake/windows.cmake)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-  include(cmake/web.cmake)
-else()
-  message(FATAL_ERROR "Unsupported platform")
-endif()
-
-####################################
 # Load Dependencies
 ####################################
 
@@ -153,6 +138,21 @@ CPMAddPackage(
   GIT_TAG preview-3.1.0
   EXCLUDE_FROM_ALL YES
 )
+
+####################################
+# Platform Specific Configuration
+####################################
+
+### Android ###
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  include(cmake/macos.cmake)
+elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  include(cmake/windows.cmake)
+elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+  include(cmake/web.cmake)
+else()
+  message(FATAL_ERROR "Unsupported platform")
+endif()
 
 ####################################
 # Target Configuration
