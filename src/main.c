@@ -1,7 +1,6 @@
 #include "SDL3/SDL_render.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <flecs.h>
@@ -33,15 +32,22 @@ typedef struct {
     float y;
 } Position;
 
+typedef struct {
+    float vx;
+    float vy;
+} Velocity;
+
 ECS_COMPONENT_DECLARE(Position);
+ECS_COMPONENT_DECLARE(Velocity);
 
 void MoveSystem(ecs_iter_t *iter)
 {
     Position *pos = ecs_field(iter, Position, 0);
+    Velocity *vel = ecs_field(iter, Velocity, 1);
     for (int i = 0; i < iter->count; i++) {
-        // Example: move the bunny 0.1 unit to the right and 1 unit down per frame.
-        pos[i].x += 0.1F;
-        pos[i].y += 0.1F;
+        // Update position using velocity and delta time.
+        pos[i].x += vel[i].vx * iter->delta_time;
+        pos[i].y += vel[i].vy * iter->delta_time;
     }
 }
 
@@ -150,6 +156,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     ecs_world_t *world = ecs_init(); // Create world
     ECS_COMPONENT(world, Position);  // Register Position component
+    ECS_COMPONENT(world, Velocity);  // Register Velocity component
 
     // Get window dimensions for initial bunny position.
     int winW;
@@ -164,12 +171,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_AppFail();
     }
 
-    // Create the bunny entity with its position set to the center.
+    // Create the bunny entity with its position set to the center and an initial velocity.
     ecs_entity_t bunny_entity = ecs_new(world);
-    ecs_set(world, bunny_entity, Position, {2, 2});
+    ecs_set(world, bunny_entity, Position, {10.0f, 10.0f});
+    // For example, set a velocity of 10 pixels/second in both x and y.
+    ecs_set(world, bunny_entity, Velocity, {10.0f, 10.0f});
 
-    // Register a MoveSystem that moves all Position components
-    ECS_SYSTEM(world, MoveSystem, EcsOnUpdate, Position);
+    // Register a MoveSystem that moves all Position components.
+    ECS_SYSTEM(world, MoveSystem, EcsOnUpdate, Position, Velocity);
 
     AppContext *app = malloc(sizeof(AppContext));
     if (!app) {
@@ -207,8 +216,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 {
     AppContext *app = (AppContext *)appstate;
 
-    ECS_COMPONENT_DEFINE(app->ecs_world, Position);
-
     // Capture high-resolution time stamp.
     Uint64 now = SDL_GetPerformanceCounter();
     static Uint64 last = 0;
@@ -219,7 +226,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     float deltaTime = (float)(now - last) / (float)SDL_GetPerformanceFrequency();
     last = now;
 
-    // Run flecs systems (progress the ECS world).
+    // Progress the ECS world with delta time.
     ecs_progress(app->ecs_world, deltaTime);
 
     // Get window dimensions.
@@ -238,9 +245,25 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     // Retrieve the updated bunny position from the ECS.
     // Get a read-only pointer to the Position component
     const Position *pos = ecs_get(app->ecs_world, app->bunny_entity, Position);
+    Velocity *vel = ecs_get_mut(app->ecs_world, app->bunny_entity, Velocity);
     if (!pos) {
         SDL_Log("Could not get bunny Position");
         return SDL_APP_FAILURE;
+    }
+    if (!vel) {
+        SDL_Log("Could not get bunny Velocity");
+        return SDL_APP_FAILURE;
+    }
+
+    // Check horizontal boundaries.
+    if (pos->x <= 0 || pos->x + bunnyW >= (float)winW) {
+        vel->vx = -vel->vx; // Reverse horizontal velocity.
+        ecs_modified(app->ecs_world, app->bunny_entity, Velocity);
+    }
+    // Check vertical boundaries.
+    if (pos->y <= 0 || pos->y + bunnyH >= (float)winH) {
+        vel->vy = -vel->vy; // Reverse vertical velocity.
+        ecs_modified(app->ecs_world, app->bunny_entity, Velocity);
     }
 
     // Compute destination rectangle to center the texture.
@@ -283,4 +306,43 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
     TTF_Quit();
     SDL_Quit();
     SDL_Log("Application quit successfully!");
+}
+
+int main(int argc, char *argv[])
+{
+    (void)argc;
+    (void)argv;
+
+    void *appstate = NULL;
+    // Initialize the application.
+    if (SDL_AppInit(&appstate, argc, argv) != SDL_APP_CONTINUE) {
+        SDL_Log("Failed to initialize the application.");
+        return EXIT_FAILURE;
+    }
+
+    AppContext *app = (AppContext *)appstate;
+    SDL_Event event;
+    bool running = true;
+    ECS_COMPONENT_DEFINE(app->ecs_world, Position);
+    ECS_COMPONENT_DEFINE(app->ecs_world, Velocity);
+
+    // Main loop.
+    while (running && app->app_quit == SDL_APP_CONTINUE) {
+        // Process all pending events.
+        while (SDL_PollEvent(&event)) {
+            if (SDL_AppEvent(appstate, &event) != SDL_APP_CONTINUE) {
+                running = false;
+                break;
+            }
+        }
+
+        // Update ECS and render frame.
+        if (SDL_AppIterate(appstate) != SDL_APP_CONTINUE) {
+            running = false;
+        }
+    }
+
+    // Clean up
+    SDL_AppQuit(appstate, app->app_quit);
+    return EXIT_SUCCESS;
 }
