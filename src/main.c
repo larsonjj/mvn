@@ -229,6 +229,22 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     // Progress the ECS world with delta time.
     ecs_progress(app->ecs_world, deltaTime);
 
+    // Poll mouse state to spawn new bunnies while left button is held.
+    float mouseX;
+    float mouseY;
+    Uint32 buttons = SDL_GetMouseState(&mouseX, &mouseY);
+    // Use a static timer to limit spawn rate.
+    static Uint32 lastSpawnTime = 0;
+    Uint32 currentTime = SDL_GetTicks(); // milliseconds
+    if ((buttons & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) && (currentTime - lastSpawnTime > 200)) {
+        // Create a new bunny entity at mouse position.
+        ecs_entity_t new_bunny = ecs_new(app->ecs_world);
+        ecs_set(app->ecs_world, new_bunny, Position, {(float)mouseX, (float)mouseY});
+        // Give it an initial velocity (adjust as needed).
+        ecs_set(app->ecs_world, new_bunny, Velocity, {100.0f, 100.0f});
+        lastSpawnTime = currentTime;
+    }
+
     // Get window dimensions.
     int winW;
     int winH;
@@ -255,30 +271,26 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         return SDL_APP_FAILURE;
     }
 
-    // Check horizontal boundaries.
-    if (pos->x <= 0 || pos->x + bunnyW >= (float)winW) {
-        vel->vx = -vel->vx; // Reverse horizontal velocity.
-        ecs_modified(app->ecs_world, app->bunny_entity, Velocity);
-    }
-    // Check vertical boundaries.
-    if (pos->y <= 0 || pos->y + bunnyH >= (float)winH) {
-        vel->vy = -vel->vy; // Reverse vertical velocity.
-        ecs_modified(app->ecs_world, app->bunny_entity, Velocity);
-    }
-
-    // Compute destination rectangle to center the texture.
-    SDL_FRect destRect;
-    destRect.x = pos->x * app->pixel_density;
-    destRect.y = pos->y * app->pixel_density;
-    destRect.w = bunnyW;
-    destRect.h = bunnyH;
-
     // Clear the screen to black.
     SDL_SetRenderDrawColor(app->renderer, 0, 0, 0, 255);
     SDL_RenderClear(app->renderer);
 
-    // Render the bunny texture at the computed rectangle.
-    SDL_RenderTexture(app->renderer, app->bunny_texture, NULL, &destRect);
+    // Create a query that selects all entities with a Position component.
+    ecs_query_t *query = ecs_query(app->ecs_world, {
+                                                       .terms = {{ecs_id(Position)}},
+                                                   });
+    ecs_iter_t iter = ecs_query_iter(app->ecs_world, query);
+    while (ecs_query_next(&iter)) {
+        Position *pos = ecs_field(&iter, Position, 0);
+        for (int i = 0; i < iter.count; i++) {
+            SDL_FRect destRect;
+            destRect.x = pos[i].x * app->pixel_density;
+            destRect.y = pos[i].y * app->pixel_density;
+            destRect.w = bunnyW;
+            destRect.h = bunnyH;
+            SDL_RenderTexture(app->renderer, app->bunny_texture, NULL, &destRect);
+        }
+    }
 
     // Present the updated frame.
     SDL_RenderPresent(app->renderer);
