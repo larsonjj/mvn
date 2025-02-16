@@ -35,6 +35,11 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+if (APPLE OR CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+  # Disable shared builds as we want a static binary
+  set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+endif()
+
 if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
   # Build universal binaries on Apple Silicon MacOS
   ## NOTE: This must be set before the project() call
