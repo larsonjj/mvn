@@ -35,16 +35,16 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if (APPLE OR CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-  # Disable shared builds as we want a static binary
-  set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
-endif()
+# if (APPLE OR CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+#   # Disable shared builds as we want a static binary
+#   set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+# endif()
 
-if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  # Build universal binaries on Apple Silicon MacOS
-  ## NOTE: This must be set before the project() call
-  set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
-endif()
+# if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+#   # Build universal binaries on Apple Silicon MacOS
+#   ## NOTE: This must be set before the project() call
+#   set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
+# endif()
 
 # Define PROJECT_SOURCES as a list of all source files
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
@@ -75,6 +75,21 @@ set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 
 set(CPACK_PACKAGE_CONTACT ${AUTHOR_EMAIL})
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${AUTHOR_NAME})
+
+####################################
+# Platform Specific Configuration
+####################################
+
+### Android ###
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  include(cmake/macos.cmake)
+elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  include(cmake/windows.cmake)
+elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+  include(cmake/web.cmake)
+else()
+  message(FATAL_ERROR "Unsupported platform")
+endif()
 
 ####################################
 # Load Dependencies
@@ -138,21 +153,6 @@ CPMAddPackage(
   GIT_TAG preview-3.1.0
   EXCLUDE_FROM_ALL YES
 )
-
-####################################
-# Platform Specific Configuration
-####################################
-
-### Android ###
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  include(cmake/macos.cmake)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-  include(cmake/windows.cmake)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-  include(cmake/web.cmake)
-else()
-  message(FATAL_ERROR "Unsupported platform")
-endif()
 
 ####################################
 # Target Configuration
