@@ -48,13 +48,7 @@ file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/s
 # Package info
 ####################################
 
-
 set(EXECUTABLE_NAME ${PROJECT_NAME})
-
-if (APPLE OR EMSCRIPTEN)
-  # Disable shared builds as we want a static binary
-  set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
-endif()
 
 # Author Information for bundling
 set(AUTHOR_NAME "John Doe")
@@ -160,13 +154,13 @@ endif()
 ####################################
 
 # Add error checking flags for C (after linking dependencies)
-# target_compile_options(${EXECUTABLE_NAME} PRIVATE
-#     $<$<COMPILE_LANGUAGE:C>:
-#         $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
-#         $<$<C_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
-#         $<$<C_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
-#     >
-# )
+target_compile_options(${EXECUTABLE_NAME} PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:
+        $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
+        $<$<C_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
+        $<$<C_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
+    >
+)
 
 # Ensure we use SDL3 main callbacks. (Must be done after linking dependencies)
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SDL_MAIN_USE_CALLBACKS=1)
