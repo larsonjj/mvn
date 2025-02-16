@@ -51,7 +51,7 @@ set(AUTHOR_NAME "John Doe")
 set(AUTHOR_EMAIL "john.doe@example.com")
 set(AUTHOR_WEBSITE "https://example.com")
 set(AUTHOR_BUNDLE_ID "com.example.${EXECUTABLE_NAME}")
-set(APP_DESCRIPTION "SDL template application")
+set(APP_DESCRIPTION "MVN game")
 
 ####################################
 # CPack
