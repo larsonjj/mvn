@@ -103,7 +103,7 @@ jobs:
         run: |
           mkdir _site
           mv build/web/mvn.html _site/index.html
-          mv build/web/sdl3_* _site/
+          mv build/web/mvn_* _site/
           cp -R build/web/assets _site/
       - name: Fix permissions
         run: |

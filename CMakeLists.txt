@@ -35,12 +35,6 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-#   # Build universal binaries on Apple Silicon MacOS
-#   ## NOTE: This must be set before the project() call
-#   set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
-# endif()
-
 # Define PROJECT_SOURCES as a list of all source files
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
 
