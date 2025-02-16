@@ -52,7 +52,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
 
     // Create a window.
-    SDL_Window *window = SDL_CreateWindow("Maven Game Engine", 352, 430,
+    const int window_width = 320;
+    const int window_height = 180;
+    SDL_Window *window = SDL_CreateWindow("Maven Game Engine", window_width, window_height,
                                           SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
     if (!window) {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
