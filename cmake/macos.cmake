@@ -1,7 +1,3 @@
-# Build universal binaries on Apple Silicon MacOS
-## NOTE: This must be set before the project() call
-set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
-
 # Disable shared builds as we want a static binary
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 

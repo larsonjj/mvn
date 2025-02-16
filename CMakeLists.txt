@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.22.1)
 # Declare the project name, version, description, and languages used.
 project(mvn
   VERSION 0.1.0
-  DESCRIPTION "SDL3 Template"
+  DESCRIPTION "Maven Game Engine"
   HOMEPAGE_URL "https://github.com/larsonjj/mvn"
   LANGUAGES C
 )
@@ -34,6 +34,12 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  # Build universal binaries on Apple Silicon MacOS
+  ## NOTE: This must be set before the project() call
+  set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
+endif()
 
 # Define PROJECT_SOURCES as a list of all source files
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
