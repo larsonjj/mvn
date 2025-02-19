@@ -19,9 +19,6 @@
         margin: 0px;
         text-align: center;
       }
-      div.emscripten_border { 
-        border: 1px solid black; 
-      }
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
       canvas.emscripten { 
         border: 0px none; 
@@ -30,9 +27,7 @@
     </style>
     </head>
     <body>
-      <div class="emscripten_border">
         <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
-      </div>
         <script type='text/javascript'>
           var canvasElement = document.getElementById('canvas');
     
