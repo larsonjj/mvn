@@ -26,14 +26,8 @@
         <canvas class=emscripten id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas>
         {{{ SCRIPT }}}
         <script>
-          // document.addEventListener("DOMContentLoaded", function() {
-          //   // Wait for module to be loaded. and then
-          //   var mod = window.mvn({ noInitialRun: false });
-          // });
-          setTimeout(function() {
-            // Wait for module to be loaded. and then
-            var mod = window.mvn({ noInitialRun: false });
-          }, 2000);
+          // Wait for module to be loaded. and then
+          const mod = await window.mvn({ noInitialRun: false });
         </script>
     </body>
 </html>
