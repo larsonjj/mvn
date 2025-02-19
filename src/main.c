@@ -1,6 +1,7 @@
 #include "SDL3/SDL_render.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <flecs.h>
@@ -214,7 +215,16 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 // Called every frame.
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
+
     AppContext *app = (AppContext *)appstate;
+
+    // Run one-time code (only once per application run).
+    static bool componentsDefined = false;
+    if (!componentsDefined) {
+        ECS_COMPONENT_DEFINE(app->ecs_world, Position);
+        ECS_COMPONENT_DEFINE(app->ecs_world, Velocity);
+        componentsDefined = true;
+    }
 
     // Capture high-resolution time stamp.
     Uint64 now = SDL_GetPerformanceCounter();
@@ -318,43 +328,4 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
     TTF_Quit();
     SDL_Quit();
     SDL_Log("Application quit successfully!");
-}
-
-int main(int argc, char *argv[])
-{
-    (void)argc;
-    (void)argv;
-
-    void *appstate = NULL;
-    // Initialize the application.
-    if (SDL_AppInit(&appstate, argc, argv) != SDL_APP_CONTINUE) {
-        SDL_Log("Failed to initialize the application.");
-        return EXIT_FAILURE;
-    }
-
-    AppContext *app = (AppContext *)appstate;
-    SDL_Event event;
-    bool running = true;
-    ECS_COMPONENT_DEFINE(app->ecs_world, Position);
-    ECS_COMPONENT_DEFINE(app->ecs_world, Velocity);
-
-    // Main loop.
-    while (running && app->app_quit == SDL_APP_CONTINUE) {
-        // Process all pending events.
-        while (SDL_PollEvent(&event)) {
-            if (SDL_AppEvent(appstate, &event) != SDL_APP_CONTINUE) {
-                running = false;
-                break;
-            }
-        }
-
-        // Update ECS and render frame.
-        if (SDL_AppIterate(appstate) != SDL_APP_CONTINUE) {
-            running = false;
-        }
-    }
-
-    // Clean up
-    SDL_AppQuit(appstate, app->app_quit);
-    return EXIT_SUCCESS;
 }
