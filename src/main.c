@@ -1,3 +1,8 @@
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
+#define SDL_MAIN_USE_CALLBACKS 1
+#endif
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
@@ -210,6 +215,9 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     AppContext *app = (AppContext *)appstate;
     if (event->type == SDL_EVENT_QUIT) {
         app->app_quit = SDL_APP_SUCCESS;
+#ifdef __EMSCRIPTEN__
+        emscripten_cancel_main_loop(); /* this should "kill" the app. */
+#endif
     }
 
     return app->app_quit;
@@ -338,3 +346,43 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
     SDL_Quit();
     SDL_Log("Application quit successfully!");
 }
+
+#ifdef __EMSCRIPTEN__
+void main_loop(void *appstate) { SDL_AppIterate(appstate); }
+
+int main(int argc, char *argv[])
+{
+    void *appstate = NULL;
+    if (SDL_AppInit(&appstate, argc, argv) != SDL_APP_CONTINUE) {
+        SDL_Log("Failed to initialize application.");
+        return EXIT_FAILURE;
+    }
+
+    AppContext *app = (AppContext *)appstate;
+
+#ifdef __EMSCRIPTEN__
+    // In Emscripten, set main loop callback.
+    emscripten_set_main_loop_arg(main_loop, appstate, 0, 1);
+#else
+    bool running = true;
+    SDL_Event event;
+    while (running && (app->app_quit == SDL_APP_CONTINUE)) {
+        // Process events.
+        while (SDL_PollEvent(&event)) {
+            if (SDL_AppEvent(appstate, &event) != SDL_APP_CONTINUE) {
+                running = false;
+                break;
+            }
+        }
+
+        // Update and render a frame.
+        if (SDL_AppIterate(appstate) != SDL_APP_CONTINUE) {
+            running = false;
+        }
+    }
+#endif
+
+    SDL_AppQuit(appstate, app->app_quit);
+    return EXIT_SUCCESS;
+}
+#endif

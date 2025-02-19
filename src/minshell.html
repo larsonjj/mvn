@@ -132,11 +132,14 @@
         </script>
         {{{ SCRIPT }}}
         <script>
-          // Start the module after the page has loaded
-          let module;
-          window.mvn().then(instance => {
-            module = instance;
-          });
+          setTimeout(() => {
+            // Start the module after the page has loaded
+            let module;
+            window.mvn().then(instance => {
+              module = instance;
+            });
+          }, 1000);
+          
         </script>
     </body>
 </html>
