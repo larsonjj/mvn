@@ -26,5 +26,8 @@
     <body>
         <canvas class=emscripten id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas>
         {{{ SCRIPT }}}
+        <script>
+          var mvnInstance = window.mvn({noInitialRun: true});
+        </script>
     </body>
 </html>

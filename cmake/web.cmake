@@ -13,7 +13,7 @@ add_custom_command(TARGET ${EXECUTABLE_NAME} PRE_BUILD
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc")
 
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1 -gsource-map -s ALLOW_MEMORY_GROWTH=1 -s EXPORTED_RUNTIME_METHODS=cwrap -s MODULARIZE=1 -s STACK_SIZE=1mb -s MAXIMUM_MEMORY=1gb --preload-file assets/ --shell-file ../../src/minshell.html")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1 -gsource-map -s ALLOW_MEMORY_GROWTH=1 -s EXPORTED_RUNTIME_METHODS=cwrap -s MODULARIZE=1 -s EXPORT_NAME='mvn' -s STACK_SIZE=1mb -s MAXIMUM_MEMORY=1gb --preload-file assets/ --shell-file ../../src/minshell.html")
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES SUFFIX ".html")
 
 # Store source assets path
