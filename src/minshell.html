@@ -97,7 +97,7 @@
             e.preventDefault();
           }, false);
     
-          var mvn = {
+          var Module = {
             print(...args) {
               // These replacements are necessary if you render to raw HTML
               //text = text.replace(/&/g, "&amp;");
@@ -113,13 +113,13 @@
             },
             canvas: canvasElement,
             setStatus(text) {
-              mvn.setStatus.last ??= { time: Date.now(), text: '' };
-              if (text === mvn.setStatus.last.text) return;
+              Module.setStatus.last ??= { time: Date.now(), text: '' };
+              if (text === Module.setStatus.last.text) return;
               var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
               var now = Date.now();
-              if (m && now - mvn.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
-              mvn.setStatus.last.time = now;
-              mvn.setStatus.last.text = text;
+              if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+              Module.setStatus.last.time = now;
+              Module.setStatus.last.text = text;
               if (m) {
                 text = m[1];
                 progressElement.value = parseInt(m[2])*100;
@@ -137,14 +137,14 @@
             totalDependencies: 0,
             monitorRunDependencies(left) {
               this.totalDependencies = Math.max(this.totalDependencies, left);
-              mvn.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+              Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
             }
           };
-          mvn.setStatus('Downloading...');
+          Module.setStatus('Downloading...');
           window.onerror = () => {
-            mvn.setStatus('Exception thrown, see JavaScript console');
+            Module.setStatus('Exception thrown, see JavaScript console');
             spinnerElement.style.display = 'none';
-            mvn.setStatus = (text) => {
+            Module.setStatus = (text) => {
               if (text) console.error('[post-exception status] ' + text);
             };
           };
