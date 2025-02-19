@@ -10,7 +10,7 @@ project(mvn
   VERSION 0.1.0
   DESCRIPTION "Maven Game Engine"
   HOMEPAGE_URL "https://github.com/larsonjj/mvn"
-  LANGUAGES C
+  LANGUAGES C CXX
 )
 
 # Add CPM dependency
@@ -20,6 +20,9 @@ include(cmake/CPM.cmake)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 # Export compile commands for use with clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -171,6 +174,13 @@ target_compile_options(${EXECUTABLE_NAME} PRIVATE
         $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
         $<$<C_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
         $<$<C_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
+        -Wno-missing-field-initializers
+    >
+    $<$<COMPILE_LANGUAGE:CXX>:
+        $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+        $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
+        $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Werror>
+        -Wno-missing-field-initializers
     >
 )
 

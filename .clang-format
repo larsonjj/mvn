@@ -8,3 +8,4 @@ DerivePointerAlignment: false # Do not adjust pointer alignment automatically
 IndentCaseLabels: true # Indent switch-case labels for readability
 AllowShortIfStatementsOnASingleLine: false
 SortIncludes: true # Preserve the order of your #include directives
+AlignAfterOpenBracket: BlockIndent # Do not align after open brackets
