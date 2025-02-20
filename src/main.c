@@ -15,6 +15,8 @@
 #include "SDL3/SDL_render.h"
 #include "SDL3_mixer/SDL_mixer.h"
 
+#define MAX_FILE_PATH_LENGTH 1024
+
 static int SDL_AppFail(void)
 {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Error %s", SDL_GetError());
@@ -64,18 +66,19 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     (void)argc;
     (void)argv;
 
+    // Initialize SDL for video and audio.
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
         fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
 
-    // Initialize TTF for text rendering.
+    // Initialize SDL_TTF for text rendering.
     if (!TTF_Init()) {
         SDL_Log("Couldn't initialize TTF: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
 
-    // Initialize audio.
+    // Initialize SDL_Mixer audio.
     SDL_AudioSpec spec;
     spec.freq = MIX_DEFAULT_FREQUENCY;
     spec.format = MIX_DEFAULT_FORMAT;
@@ -85,7 +88,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_AppFail();
     }
 
-    // Create a window.
+    // Create an initial window.
     const int window_width = 320;
     const int window_height = 180;
     SDL_Window *window = SDL_CreateWindow(
@@ -96,29 +99,28 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
+    // Get the pixel density of the window.
+    float pixel_density = SDL_GetWindowPixelDensity(window);
 
-    // Create a renderer.
+    // Create a standard renderer.
     SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
     if (!renderer) {
         fprintf(stderr, "SDL_CreateRenderer Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
 
-    // Get the pixel density of the window.
-    float pixel_density = SDL_GetWindowPixelDensity(window);
-
-    const char *basePath = SDL_GetBasePath();
-    if (!basePath) {
+    const char *assets_path = SDL_GetBasePath();
+    if (!assets_path) {
         return SDL_AppFail();
     }
-    char assets_path[512];
-    SDL_snprintf(assets_path, sizeof(assets_path), "%sassets/", basePath);
-    basePath = assets_path;
-    char combined_path[512];
+    char base_path[MAX_FILE_PATH_LENGTH];
+    SDL_snprintf(base_path, sizeof(base_path), "%sassets/", assets_path);
+    assets_path = base_path;
 
-    // Load the bunny image.
-    SDL_snprintf(combined_path, sizeof(combined_path), "%s%s", basePath, "bunny.png");
-    SDL_Surface *bunnySurface = IMG_Load(combined_path);
+    // Load the bunny image and create texture.
+    char bunny_path[MAX_FILE_PATH_LENGTH];
+    SDL_snprintf(bunny_path, sizeof(bunny_path), "%s%s", assets_path, "bunny.png");
+    SDL_Surface *bunnySurface = IMG_Load(bunny_path);
     if (!bunnySurface) {
         fprintf(stderr, "IMG_Load Error: %s\n", SDL_GetError());
         return SDL_AppFail();
@@ -131,14 +133,16 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
 
     // Load the font and create the text texture.
-    SDL_snprintf(combined_path, sizeof(combined_path), "%s%s", basePath, "monogram.ttf");
+    char font_path[MAX_FILE_PATH_LENGTH];
+    SDL_snprintf(font_path, sizeof(font_path), "%s%s", assets_path, "monogram.ttf");
     float ptsize = 32 * pixel_density;
-    TTF_Font *font = TTF_OpenFont(combined_path, ptsize);
+    TTF_Font *font = TTF_OpenFont(font_path, ptsize);
     if (!font) {
         fprintf(stderr, "TTF_OpenFont Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
 
+    // Render FPS text
     SDL_Color textColor = {255, 255, 255, 255};
     const char *message = "FPS: 60";
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, message, SDL_strlen(message), textColor);
@@ -146,7 +150,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         SDL_Log("Couldn't render text: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
-
     SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer, textSurface);
     SDL_DestroySurface(textSurface);
     if (!text_texture) {
@@ -154,9 +157,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_AppFail();
     }
 
-    SDL_snprintf(combined_path, sizeof(combined_path), "%s%s", basePath, "background.mp3");
     // Load and play background music in an infinite loop.
-    Mix_Music *music = Mix_LoadMUS(combined_path);
+    char music_path[MAX_FILE_PATH_LENGTH];
+    SDL_snprintf(music_path, sizeof(music_path), "%s%s", assets_path, "background.mp3");
+    Mix_Music *music = Mix_LoadMUS(music_path);
     if (!music) {
         fprintf(stderr, "Mix_LoadMUS Error: %s\n", SDL_GetError());
         return SDL_AppFail();
