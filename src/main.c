@@ -1,10 +1,10 @@
+#include <SDL3/SDL.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #else
 #define SDL_MAIN_USE_CALLBACKS 1
-#endif
-#include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#endif
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <flecs.h>
