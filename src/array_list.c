@@ -67,7 +67,7 @@ void *mvn__list_growf_(void *list, MVN_List_GrowParams params)
  * @param to_string Function that converts an element to a string
  * @return Newly allocated string with joined elements (caller must free)
  */
-char *mvn_list_join_str(
+char *mvn_list_join(
     const void *arr, size_t elem_size, const char *separator, char *(*to_string)(const void *elem)
 )
 {
@@ -221,13 +221,57 @@ char *mvn_list_join_double(double *list, const char *separator, int precision)
 }
 
 /**
+ * Convert a list of floats to a string with the given separator
+ *
+ * @param list Array of floats
+ * @param separator String to insert between elements
+ * @param precision Number of decimal places to show
+ * @return Newly allocated string with joined floats (caller must free)
+ */
+char *mvn_list_join_float(float *list, const char *separator, int precision)
+{
+    if (!list) {
+        return NULL;
+    }
+
+    size_t size = mvn_list_size(list);
+    if (size == 0) {
+        return strdup("");
+    }
+
+    // Format string for each float
+    char format[32];
+    sprintf(format, "%%.%df", precision);
+
+    // Calculate max needed space (20 chars per float + separators)
+    size_t sep_len = separator ? strlen(separator) : 0;
+    size_t buffer_size = size * 21 + (size - 1) * sep_len + 1;
+    char *result = (char *)malloc(buffer_size);
+    if (!result) {
+        return NULL;
+    }
+
+    char *cursor = result;
+    for (size_t i = 0; i < size; i++) {
+        cursor += sprintf(cursor, format, list[i]);
+
+        if (i < size - 1 && separator) {
+            memcpy(cursor, separator, sep_len);
+            cursor += sep_len;
+        }
+    }
+
+    return result;
+}
+
+/**
  * Convert a list of strings to a single string with the given separator
  *
  * @param list Array of strings (char*)
  * @param separator String to insert between elements
  * @return Newly allocated string with joined strings (caller must free)
  */
-char *mvn_list_join_str_array(char **list, const char *separator)
+char *mvn_list_join_str(char **list, const char *separator)
 {
     if (!list) {
         return NULL;

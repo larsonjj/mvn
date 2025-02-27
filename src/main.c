@@ -200,7 +200,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     char **list = NULL;
     mvn_list_push(list, "Hello");
     mvn_list_push(list, "World");
-    char *joined = mvn_list_join_str_array(list, " ");
+    char *joined = mvn_list_join_str(list, " ");
     printf("%s\n", joined);
     free(joined);
     mvn_list_free(list);

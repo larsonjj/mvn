@@ -393,12 +393,13 @@ void *mvn__list_growf_(void *list, MVN_List_GrowParams params);
     MVN_EXPR_END(result)
 
 /* Function declarations for utility functions */
-char *mvn_list_join_str(
+char *mvn_list_join(
     const void *arr, size_t elem_size, const char *separator, char *(*to_string)(const void *elem)
 );
 char *mvn_list_join_int(int *list, const char *separator);
 char *mvn_list_join_double(double *list, const char *separator, int precision);
-char *mvn_list_join_str_array(char **list, const char *separator);
+char *mvn_list_join_str(char **list, const char *separator);
+char *mvn_list_join_float(float *list, const char *separator, int precision);
 char **mvn_list_clone_strings(char **src);
 void mvn_list_free_strings(char **arr);
 
