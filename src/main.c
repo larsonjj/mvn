@@ -211,6 +211,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     mvn_hmap_set(hm, "key", value);
     int *retrieved_value = mvn_hmap_get(hm, "key");
     printf("Retrieved value: %d\n", *retrieved_value);
+    // Free the hashmap
+    mvn_hmap_free(hm);
 
     AppContext *app = malloc(sizeof(AppContext));
     if (!app) {
