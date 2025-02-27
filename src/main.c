@@ -1,3 +1,5 @@
+#include "array_list.h"
+#include "hashmap.h"
 #include <SDL3/SDL.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -192,6 +194,23 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     // Register a MoveSystem that moves all Position components.
     ECS_SYSTEM(world, MoveSystem, EcsOnUpdate, Position, Velocity);
+
+    // Use array_list to add 'Hello' and 'World' to a list. Then join them together again and print
+    // it out
+    char **list = NULL;
+    mvn_list_push(list, "Hello");
+    mvn_list_push(list, "World");
+    char *joined = mvn_list_join_str_array(list, " ");
+    printf("%s\n", joined);
+    free(joined);
+    mvn_list_free(list);
+
+    // Use a hashmap to store and retrieve a value by key then print it out
+    void *hm = NULL;
+    int value = 42;
+    mvn_hmap_set(hm, "key", value);
+    int *retrieved_value = mvn_hmap_get(hm, "key");
+    printf("Retrieved value: %d\n", *retrieved_value);
 
     AppContext *app = malloc(sizeof(AppContext));
     if (!app) {
