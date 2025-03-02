@@ -206,13 +206,35 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     mvn_list_free(list);
 
     // Use a hashmap to store and retrieve a value by key then print it out
-    void *hm = NULL;
-    int value = 42;
-    mvn_hmap_set(hm, "key", value);
-    int *retrieved_value = mvn_hmap_get(hm, "key");
-    printf("Retrieved value: %d\n", *retrieved_value);
-    // Free the hashmap
-    mvn_hmap_free(hm);
+    // void *hm = NULL;
+    // int value = 42;
+    // mvn_hmap_set(hm, "key", value);
+    // int *retrieved_value = mvn_hmap_get(hm, "key");
+    // printf("Retrieved value: %d\n", *retrieved_value);
+
+    // Create a typed hashmap (NULL initialization)
+    int *hm = NULL; // Initially NULL before first insert
+
+    // Insert key-value pairs using compound literals to store ints
+    mvn_hmap_set(hm, "key1", (int){42});
+    mvn_hmap_set(hm, "key2", (int){100});
+
+    // Retrieve values by key
+    int *value = mvn_hmap_get(hm, "key1");
+    if (value) {
+        printf("Value: %d\n", *value); // Outputs: Value: 42
+    }
+
+    // Check if a key exists
+    if (mvn_hmap_has(hm, "key2")) {
+        printf("Key2 exists\n");
+    }
+
+    // Get number of entries
+    size_t count = mvn_hmap_len(hm);
+
+    // Delete an entry
+    mvn_hmap_del(hm, "key1");
 
     AppContext *app = malloc(sizeof(AppContext));
     if (!app) {
