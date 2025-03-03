@@ -9,6 +9,9 @@ This document outlines coding standards for our project that uses C99 with C++20
 - Primary: C99
 - Compatibility: C++20
 - Compilation must succeed with both C and C++ compilers
+  - gcc
+  - clang
+  - MSVC
 
 ## Platforms supported
 
