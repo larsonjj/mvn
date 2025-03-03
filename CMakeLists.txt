@@ -138,7 +138,7 @@ set(SDLTTF_VENDORED ON CACHE BOOL "" FORCE)
 CPMAddPackage(
   NAME SDL_ttf
   GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
-  GIT_TAG prerelease-3.1.2
+  GIT_TAG release-3.2.0
   EXCLUDE_FROM_ALL YES
 )
 

@@ -236,6 +236,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     // Delete an entry
     mvn_hmap_del(hm, "key1");
 
+    // Add this before trying to free the hashmap
+    printf("About to free hashmap. Pointer: %p, Count: %zu\n", (void *)hm, mvn_hmap_len(hm));
+    mvn__hm_header *header = mvn__hm_header_of(hm);
+    printf("Header address: %p\n", (void *)header);
+    mvn_hmap_free(hm);
+
     AppContext *app = malloc(sizeof(AppContext));
     if (!app) {
         return SDL_AppFail();

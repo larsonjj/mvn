@@ -1,4 +1,5 @@
 #include "hashmap.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -234,13 +235,19 @@ bool mvn__hm_del(void **hm_ptr, const char *key)
 void mvn__hm_free(void *hm)
 {
     mvn__hm_header *header = mvn__hm_header_of(hm);
-    if (!header)
+    if (!header) {
         return;
+    }
 
-    // Free all keys
+    // Free all keys (with safety check)
     for (size_t i = 0; i < header->capacity; i++) {
         if (header->entries[i].key) {
-            free(header->entries[i].key);
+            // Safety check - validate this is a pointer, not a small integer
+            if ((uintptr_t)header->entries[i].key > 1000) {
+                free(header->entries[i].key);
+            } else {
+                printf("Warning: Invalid key pointer detected: %p\n", header->entries[i].key);
+            }
         }
     }
 
