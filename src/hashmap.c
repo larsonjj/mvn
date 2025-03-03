@@ -7,7 +7,8 @@
 uint32_t mvn__hash_string(const char *str)
 {
     uint32_t hash = MVN__FNV_OFFSET;
-    while (*str) {
+    while (*str)
+    {
         hash ^= (uint8_t)*str++;
         hash *= MVN__FNV_PRIME;
     }
@@ -33,17 +34,23 @@ mvn__hm_entry *mvn__hm_find_entry(mvn__hm_header *header, const char *key, uint3
     size_t index = hash & mask;
     mvn__hm_entry *tombstone = NULL;
 
-    for (;;) {
+    for (;;)
+    {
         mvn__hm_entry *entry = &header->entries[index];
 
-        if (!entry->key && !entry->is_present) {
+        if (!entry->key && !entry->is_present)
+        {
             // Empty entry
             return tombstone ? tombstone : entry;
-        } else if (!entry->key && entry->is_present) {
+        }
+        else if (!entry->key && entry->is_present)
+        {
             // We found a tombstone
             if (!tombstone)
                 tombstone = entry;
-        } else if (entry->hash == hash && strcmp(entry->key, key) == 0) {
+        }
+        else if (entry->hash == hash && strcmp(entry->key, key) == 0)
+        {
             // We found the key
             return entry;
         }
@@ -104,9 +111,11 @@ void mvn__hm_resize(void **hm_ptr, size_t new_capacity)
     void *new_map = (void *)((char *)new_header + sizeof(mvn__hm_header));
 
     // Rehash all existing entries
-    for (size_t i = 0; i < old_header->capacity; i++) {
+    for (size_t i = 0; i < old_header->capacity; i++)
+    {
         mvn__hm_entry *entry = &old_header->entries[i];
-        if (entry->key && entry->is_present) {
+        if (entry->key && entry->is_present)
+        {
             mvn__hm_entry *dest = mvn__hm_find_entry(new_header, entry->key, entry->hash);
 
             // Copy the entry
@@ -133,7 +142,8 @@ void mvn__hm_resize(void **hm_ptr, size_t new_capacity)
 void mvn__hm_set(void **hm_ptr, const char *key, void *value_ptr, size_t value_size)
 {
     mvn__hm_header *header = mvn__hm_header_of(*hm_ptr);
-    if (!header) {
+    if (!header)
+    {
         *hm_ptr = mvn__hm_new(value_size);
         header = mvn__hm_header_of(*hm_ptr);
         if (!header)
@@ -141,7 +151,8 @@ void mvn__hm_set(void **hm_ptr, const char *key, void *value_ptr, size_t value_s
     }
 
     // Check if we need to resize
-    if ((float)(header->count + 1) > (float)(header->capacity) * header->load_factor_threshold) {
+    if ((float)(header->count + 1) > (float)(header->capacity) * header->load_factor_threshold)
+    {
         mvn__hm_resize(hm_ptr, header->capacity * 2);
         header = mvn__hm_header_of(*hm_ptr);
     }
@@ -150,7 +161,8 @@ void mvn__hm_set(void **hm_ptr, const char *key, void *value_ptr, size_t value_s
     mvn__hm_entry *entry = mvn__hm_find_entry(header, key, hash);
 
     bool is_new_key = !entry->key;
-    if (is_new_key) {
+    if (is_new_key)
+    {
         // Copy the key
         int key_len = (int32_t)strlen(key) + 1;
         entry->key = (char *)malloc((size_t)key_len);
@@ -178,16 +190,18 @@ void *mvn__hm_get(void *hm, const char *key)
     size_t mask = header->capacity - 1;
     size_t index = hash & mask;
 
-    for (;;) {
+    for (;;)
+    {
         mvn__hm_entry *entry = &header->entries[index];
 
-        if (!entry->key && !entry->is_present) {
+        if (!entry->key && !entry->is_present)
+        {
             // Empty slot, key doesn't exist
             return NULL;
         }
 
-        if (entry->key && entry->is_present && entry->hash == hash &&
-            strcmp(entry->key, key) == 0) {
+        if (entry->key && entry->is_present && entry->hash == hash && strcmp(entry->key, key) == 0)
+        {
             // Found the key
             return mvn__hm_get_value_ptr(entry);
         }
@@ -208,16 +222,18 @@ bool mvn__hm_del(void **hm_ptr, const char *key)
     size_t mask = header->capacity - 1;
     size_t index = hash & mask;
 
-    for (;;) {
+    for (;;)
+    {
         mvn__hm_entry *entry = &header->entries[index];
 
-        if (!entry->key && !entry->is_present) {
+        if (!entry->key && !entry->is_present)
+        {
             // Empty slot, key doesn't exist
             return false;
         }
 
-        if (entry->key && entry->is_present && entry->hash == hash &&
-            strcmp(entry->key, key) == 0) {
+        if (entry->key && entry->is_present && entry->hash == hash && strcmp(entry->key, key) == 0)
+        {
             // Found the key, mark as deleted
             free(entry->key);
             entry->key = NULL;
@@ -235,17 +251,23 @@ bool mvn__hm_del(void **hm_ptr, const char *key)
 void mvn__hm_free(void *hm)
 {
     mvn__hm_header *header = mvn__hm_header_of(hm);
-    if (!header) {
+    if (!header)
+    {
         return;
     }
 
     // Free all keys (with safety check)
-    for (size_t i = 0; i < header->capacity; i++) {
-        if (header->entries[i].key) {
+    for (size_t i = 0; i < header->capacity; i++)
+    {
+        if (header->entries[i].key)
+        {
             // Safety check - validate this is a pointer, not a small integer
-            if ((uintptr_t)header->entries[i].key > 1000) {
+            if ((uintptr_t)header->entries[i].key > 1000)
+            {
                 free(header->entries[i].key);
-            } else {
+            }
+            else
+            {
                 printf("Warning: Invalid key pointer detected: %p\n", header->entries[i].key);
             }
         }
@@ -272,11 +294,13 @@ bool mvn__hm_next(mvn__hm_iter *iter, char **key_ptr, void **value_ptr)
         return false;
 
     // Find the next valid entry
-    while (iter->index < header->capacity) {
+    while (iter->index < header->capacity)
+    {
         mvn__hm_entry *entry = &header->entries[iter->index];
         iter->index++;
 
-        if (entry->key && entry->is_present) {
+        if (entry->key && entry->is_present)
+        {
             if (key_ptr)
                 *key_ptr = entry->key;
             if (value_ptr)
@@ -296,8 +320,10 @@ void mvn__hm_clear(void **hm_ptr)
         return;
 
     // Free all keys
-    for (size_t i = 0; i < header->capacity; i++) {
-        if (header->entries[i].key) {
+    for (size_t i = 0; i < header->capacity; i++)
+    {
+        if (header->entries[i].key)
+        {
             free(header->entries[i].key);
             header->entries[i].key = NULL;
             header->entries[i].is_present = false;

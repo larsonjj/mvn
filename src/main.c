@@ -25,7 +25,8 @@ static int SDL_AppFail(void)
     return SDL_APP_FAILURE;
 }
 
-typedef struct {
+typedef struct
+{
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Texture *bunny_texture;
@@ -38,12 +39,14 @@ typedef struct {
     ecs_entity_t bunny_entity; // New: bunny entity handle
 } AppContext;
 
-typedef struct {
+typedef struct
+{
     float x;
     float y;
 } Position;
 
-typedef struct {
+typedef struct
+{
     float vx;
     float vy;
 } Velocity;
@@ -55,7 +58,8 @@ void MoveSystem(ecs_iter_t *iter)
 {
     Position *pos = ecs_field(iter, Position, 0);
     Velocity *vel = ecs_field(iter, Velocity, 1);
-    for (int i = 0; i < iter->count; i++) {
+    for (int i = 0; i < iter->count; i++)
+    {
         // Update position using velocity and delta time.
         pos[i].x += vel[i].vx * iter->delta_time;
         pos[i].y += vel[i].vy * iter->delta_time;
@@ -69,13 +73,15 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     (void)argv;
 
     // Initialize SDL for video and audio.
-    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
+    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
+    {
         fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
 
     // Initialize SDL_TTF for text rendering.
-    if (!TTF_Init()) {
+    if (!TTF_Init())
+    {
         SDL_Log("Couldn't initialize TTF: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
@@ -85,7 +91,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     spec.freq = MIX_DEFAULT_FREQUENCY;
     spec.format = MIX_DEFAULT_FORMAT;
     spec.channels = MIX_DEFAULT_CHANNELS;
-    if (!Mix_OpenAudio(0, &spec)) {
+    if (!Mix_OpenAudio(0, &spec))
+    {
         SDL_Log("Couldn't open audio: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
@@ -97,7 +104,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         "Maven Game Engine", window_width, window_height,
         SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY
     );
-    if (!window) {
+    if (!window)
+    {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
@@ -106,13 +114,15 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     // Create a standard renderer.
     SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
-    if (!renderer) {
+    if (!renderer)
+    {
         fprintf(stderr, "SDL_CreateRenderer Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
 
     const char *assets_path = SDL_GetBasePath();
-    if (!assets_path) {
+    if (!assets_path)
+    {
         return SDL_AppFail();
     }
     char base_path[MAX_FILE_PATH_LENGTH];
@@ -123,13 +133,15 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     char bunny_path[MAX_FILE_PATH_LENGTH];
     SDL_snprintf(bunny_path, sizeof(bunny_path), "%s%s", assets_path, "bunny.png");
     SDL_Surface *bunnySurface = IMG_Load(bunny_path);
-    if (!bunnySurface) {
+    if (!bunnySurface)
+    {
         fprintf(stderr, "IMG_Load Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
     SDL_Texture *bunny_texture = SDL_CreateTextureFromSurface(renderer, bunnySurface);
     SDL_DestroySurface(bunnySurface);
-    if (!bunny_texture) {
+    if (!bunny_texture)
+    {
         fprintf(stderr, "SDL_CreateTextureFromSurface Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
@@ -139,7 +151,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     SDL_snprintf(font_path, sizeof(font_path), "%s%s", assets_path, "monogram.ttf");
     float ptsize = 32 * pixel_density;
     TTF_Font *font = TTF_OpenFont(font_path, ptsize);
-    if (!font) {
+    if (!font)
+    {
         fprintf(stderr, "TTF_OpenFont Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
@@ -148,13 +161,15 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     SDL_Color textColor = {255, 255, 255, 255};
     const char *message = "FPS: 60";
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, message, SDL_strlen(message), textColor);
-    if (!textSurface) {
+    if (!textSurface)
+    {
         SDL_Log("Couldn't render text: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
     SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer, textSurface);
     SDL_DestroySurface(textSurface);
-    if (!text_texture) {
+    if (!text_texture)
+    {
         fprintf(stderr, "SDL_CreateTextureFromSurface (text) Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
@@ -163,7 +178,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     char music_path[MAX_FILE_PATH_LENGTH];
     SDL_snprintf(music_path, sizeof(music_path), "%s%s", assets_path, "background.mp3");
     Mix_Music *music = Mix_LoadMUS(music_path);
-    if (!music) {
+    if (!music)
+    {
         fprintf(stderr, "Mix_LoadMUS Error: %s\n", SDL_GetError());
         return SDL_AppFail();
     }
@@ -181,7 +197,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     // Query bunny texture dimensions for centering.
     float bunnyW;
     float bunnyH;
-    if (!SDL_GetTextureSize(bunny_texture, &bunnyW, &bunnyH)) {
+    if (!SDL_GetTextureSize(bunny_texture, &bunnyW, &bunnyH))
+    {
         SDL_Log("SDL_GetTextureSize Error: %s", SDL_GetError());
         return SDL_AppFail();
     }
@@ -221,12 +238,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     // Retrieve values by key
     int *value = mvn_hmap_get(hm, "key1");
-    if (value) {
+    if (value)
+    {
         printf("Value: %d\n", *value); // Outputs: Value: 42
     }
 
     // Check if a key exists
-    if (mvn_hmap_has(hm, "key2")) {
+    if (mvn_hmap_has(hm, "key2"))
+    {
         printf("Key2 exists\n");
     }
 
@@ -240,10 +259,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     printf("About to free hashmap. Pointer: %p, Count: %zu\n", (void *)hm, mvn_hmap_len(hm));
     mvn__hm_header *header = mvn__hm_header_of(hm);
     printf("Header address: %p\n", (void *)header);
-    mvn_hmap_free(hm);
+    // mvn_hmap_free(hm);
 
     AppContext *app = malloc(sizeof(AppContext));
-    if (!app) {
+    if (!app)
+    {
         return SDL_AppFail();
     }
     app->window = window;
@@ -266,7 +286,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
     AppContext *app = (AppContext *)appstate;
-    if (event->type == SDL_EVENT_QUIT) {
+    if (event->type == SDL_EVENT_QUIT)
+    {
         app->app_quit = SDL_APP_SUCCESS;
 #ifdef __EMSCRIPTEN__
         emscripten_cancel_main_loop(); /* this should "kill" the app. */
@@ -283,7 +304,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     // Run one-time code (only once per application run).
     static bool componentsDefined = false;
-    if (!componentsDefined) {
+    if (!componentsDefined)
+    {
         ECS_COMPONENT_DEFINE(app->ecs_world, Position);
         ECS_COMPONENT_DEFINE(app->ecs_world, Velocity);
         componentsDefined = true;
@@ -292,7 +314,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     // Capture high-resolution time stamp.
     Uint64 now = SDL_GetPerformanceCounter();
     static Uint64 last = 0;
-    if (last == 0) {
+    if (last == 0)
+    {
         last = now;
     }
     // Compute delta time in seconds.
@@ -309,7 +332,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     // Use a static timer to limit spawn rate.
     static Uint32 lastSpawnTime = 0;
     Uint32 currentTime = SDL_GetTicks(); // milliseconds
-    if ((buttons & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) && (currentTime - lastSpawnTime > 200)) {
+    if ((buttons & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) && (currentTime - lastSpawnTime > 200))
+    {
         // Create a new bunny entity at mouse position.
         ecs_entity_t new_bunny = ecs_new(app->ecs_world);
         ecs_set(app->ecs_world, new_bunny, Position, {(float)mouseX, (float)mouseY});
@@ -326,7 +350,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     // Query the bunny texture's width and height.
     float bunnyW;
     float bunnyH;
-    if (!SDL_GetTextureSize(app->bunny_texture, &bunnyW, &bunnyH)) {
+    if (!SDL_GetTextureSize(app->bunny_texture, &bunnyW, &bunnyH))
+    {
         SDL_Log("SDL_GetTextureSize Error: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
@@ -335,11 +360,13 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     // Get a read-only pointer to the Position component
     const Position *pos = ecs_get(app->ecs_world, app->bunny_entity, Position);
     Velocity *vel = ecs_get_mut(app->ecs_world, app->bunny_entity, Velocity);
-    if (!pos) {
+    if (!pos)
+    {
         SDL_Log("Could not get bunny Position");
         return SDL_APP_FAILURE;
     }
-    if (!vel) {
+    if (!vel)
+    {
         SDL_Log("Could not get bunny Velocity");
         return SDL_APP_FAILURE;
     }
@@ -360,9 +387,11 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         }
     );
     ecs_iter_t iter = ecs_query_iter(app->ecs_world, query);
-    while (ecs_query_next(&iter)) {
+    while (ecs_query_next(&iter))
+    {
         Position *pos = ecs_field(&iter, Position, 0);
-        for (int i = 0; i < iter.count; i++) {
+        for (int i = 0; i < iter.count; i++)
+        {
             SDL_FRect destRect;
             destRect.x = pos[i].x * app->pixel_density;
             destRect.y = pos[i].y * app->pixel_density;
@@ -384,7 +413,8 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
     (void)result;
 
     AppContext *app = (AppContext *)appstate;
-    if (app) {
+    if (app)
+    {
         ecs_fini(app->ecs_world);
         Mix_FreeMusic(app->music);
         SDL_DestroyTexture(app->bunny_texture);
@@ -406,7 +436,8 @@ void main_loop(void *appstate) { SDL_AppIterate(appstate); }
 int main(int argc, char *argv[])
 {
     void *appstate = NULL;
-    if (SDL_AppInit(&appstate, argc, argv) != SDL_APP_CONTINUE) {
+    if (SDL_AppInit(&appstate, argc, argv) != SDL_APP_CONTINUE)
+    {
         SDL_Log("Failed to initialize application.");
         return EXIT_FAILURE;
     }
@@ -419,17 +450,21 @@ int main(int argc, char *argv[])
 #else
     bool running = true;
     SDL_Event event;
-    while (running && (app->app_quit == SDL_APP_CONTINUE)) {
+    while (running && (app->app_quit == SDL_APP_CONTINUE))
+    {
         // Process events.
-        while (SDL_PollEvent(&event)) {
-            if (SDL_AppEvent(appstate, &event) != SDL_APP_CONTINUE) {
+        while (SDL_PollEvent(&event))
+        {
+            if (SDL_AppEvent(appstate, &event) != SDL_APP_CONTINUE)
+            {
                 running = false;
                 break;
             }
         }
 
         // Update and render a frame.
-        if (SDL_AppIterate(appstate) != SDL_APP_CONTINUE) {
+        if (SDL_AppIterate(appstate) != SDL_APP_CONTINUE)
+        {
             running = false;
         }
     }

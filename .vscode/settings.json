@@ -6,5 +6,14 @@
     "*.m": "c"
   },
   "cmake.buildDirectory": "${workspaceFolder}/build",
-  "clangd.arguments": ["--compile-commands-dir=build"]
+  "clangd.arguments": ["--compile-commands-dir=build"],
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": "docs/code-style.md"
+    }
+  ],
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    "editor.formatOnSave": true
+  }
 }
