@@ -1,15 +1,47 @@
-Checks: >
-  clang-analyzer-*,
-  bugprone-*,
-  performance-*,
-  misc-*,
-  -modernize-*,
-  -cppcoreguidelines-*,
-  -clang-analyzer-cplusplus*,
-  -hicpp-*,
-  -cert-*,
-  -readability-magic-numbers
+---
+Checks: "-*,\
+  clang-analyzer-*,\
+  cert-*,\
+  bugprone-*,\
+  concurrency-*,\
+  misc-*,\
+  portability-*,\
+  openmp-*,\
+  readability-*,\
+  -google-readability-todo,\
+  -bugprone-easily-swappable-parameters,\
+  -readability-uppercase-literal-suffix,\
+  -readability-magic-numbers,\
+  -readability-function-cognitive-complexity"
 WarningsAsErrors: ""
-HeaderFilterRegex: ".*"
-AnalyzeTemporaryDtors: false
-FormatStyle: none
+CheckOptions:
+  - key: "bugprone-argument-comment.StrictMode"
+    value: "true"
+  - key: "bugprone-argument-comment.CommentBoolLiterals"
+    value: "true"
+  - key: "bugprone-misplaced-widening-cast.CheckImplicitCasts"
+    value: "true"
+  - key: "bugprone-sizeof-expression.WarnOnSizeOfIntegerExpression"
+    value: "true"
+  - key: "bugprone-suspicious-string-compare.WarnOnLogicalNotComparison"
+    value: "true"
+  - key: "readability-simplify-boolean-expr.ChainedConditionalReturn"
+    value: "true"
+  - key: "readability-simplify-boolean-expr.ChainedConditionalAssignment"
+    value: "true"
+  - key: "readability-else-after-return.WarnOnUnfixable"
+    value: "true"
+  - key: "readability-else-after-return.WarnOnConditionVariables"
+    value: "true"
+  - key: "readability-inconsistent-declaration-parameter-name.Strict"
+    value: "true"
+  - key: "readability-identifier-length.MinimumVariableNameLength"
+    value: "3"
+  - key: "readability-identifier-length.MinimumParameterNameLength"
+    value: "3"
+  - key: "readability-identifier-length.MinimumLoopCounterNameLength"
+    value: "1"
+  - key: "readability-identifier-length.IgnoredVariableNames"
+    value: "^[abijkxyz]$"
+  - key: "readability-identifier-length.IgnoredParameterNames"
+    value: "^[abijkxyz]$"

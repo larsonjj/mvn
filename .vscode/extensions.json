@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "ms-vscode.cpptools", // C/C++ language support
+    "llvm-vs-code-extensions.vscode-clangd", // Clangd language server (better intellisense)
+    "ms-vscode.cmake-tools", // CMake integration
+    "xaver.clang-format", // Clang-format integration
+    "DavidAnson.vscode-markdownlint" // Markdown linting
+  ],
+  "unwantedRecommendations": []
+}

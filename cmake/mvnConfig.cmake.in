@@ -1,0 +1,19 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Find SDL3 with the static component when this config is used
+find_dependency(SDL3 REQUIRED CONFIG COMPONENTS SDL3-static)
+
+# Find SDL_image with the static component when this config is used
+find_dependency(SDL_image REQUIRED CONFIG COMPONENTS SDL3_image-static)
+
+# Find SDL_ttf with the static component when this config is used
+find_dependency(SDL_ttf REQUIRED CONFIG COMPONENTS SDL3_ttf-static)
+
+# Find flecs
+find_dependency(SDL_ttf REQUIRED CONFIG COMPONENTS flecs)
+
+include("${CMAKE_CURRENT_LIST_DIR}/mvnTargets.cmake")
+
+check_required_components(mvn)

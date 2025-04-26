@@ -1,19 +1,42 @@
 {
-  "cmake.debugConfig": {
-    "args": ["--verbose", "true"]
-  },
   "files.associations": {
-    "*.m": "c"
+    "*.m": "c",
+    "LICENSE": "text"
   },
-  "cmake.buildDirectory": "${workspaceFolder}/build",
-  "clangd.arguments": ["--compile-commands-dir=build"],
+  "search.exclude": {
+    "build/": true
+  },
   "github.copilot.chat.codeGeneration.instructions": [
     {
+      "file": "README.md"
+    },
+    {
       "file": "docs/code-style.md"
+    },
+    {
+      "file": "docs/sdl3-migration.md"
+    },
+    {
+      "file": "docs/sdl3_image-migration.md"
+    },
+    {
+      "file": "docs/sdl3_ttf-migration.md"
+    },
+    {
+      "file": "docs/flecs4-migration.md"
     }
   ],
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
     "editor.formatOnSave": true
+  },
+  "cmake.configureOnOpen": true,
+  "cmake.preferredGenerators": ["Ninja", "Unix Makefiles", "MinGW Makefiles"],
+  "C_Cpp.default.cStandard": "c99",
+  "C_Cpp.default.cppStandard": "c++20",
+  "C_Cpp.files.exclude": {
+    "**/build": true,
+    "**/.vscode": true,
+    "**/.vs": true
   }
 }

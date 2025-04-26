@@ -1,0 +1,38 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  clang-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format
+
+      - name: Check formatting
+        run: |
+          find . \( -name "*.c" -o -name "*.h" \) -not -path "./build/*" -not -path "./_deps/*" | xargs clang-format -style=file -i
+          git diff --exit-code || (echo "Code formatting issues found. Run clang-format to fix." && exit 1)
+
+  clang-tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-tidy libgl1-mesa-dev xorg-dev
+
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Run clang-tidy
+        run: |
+          find source include examples -name "*.c" -o -name "*.h" | xargs clang-tidy -p build
