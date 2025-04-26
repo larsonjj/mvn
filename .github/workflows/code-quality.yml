@@ -10,7 +10,7 @@ jobs:
   clang-format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install clang-format
         run: sudo apt-get install -y clang-format
@@ -23,7 +23,7 @@ jobs:
   clang-tidy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -35,4 +35,4 @@ jobs:
 
       - name: Run clang-tidy
         run: |
-          find source include examples -name "*.c" -o -name "*.h" | xargs clang-tidy -p build
+          find source include examples -name "*.c" -o -name "*.h" | xargs clang-tidy -p build --config-file=.clang-tidy

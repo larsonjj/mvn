@@ -17,13 +17,21 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Dependencies (Ubuntu)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgl1-mesa-dev xorg-dev
+
+      - name: Start xvfb (Linux only)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          export DISPLAY=:99
+          nohup Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
       - name: Configure CMake
         run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DMVN_BUILD_TESTS=ON
@@ -33,4 +41,4 @@ jobs:
 
       - name: Test
         working-directory: ${{github.workspace}}/build
-        run: ctest -C ${{matrix.build_type}} --output-on-failure
+        run: ctest -C ${{matrix.build_type}} --output-on-failure -R mvn_test_all
