@@ -26,6 +26,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DMVN_BUILD_EXAMPLES=ON \
             -DMVN_BUILD_TESTS=OFF \
+            -DMVN_TEST_CI=ON \
             -DEMSCRIPTEN_SHELL_TEMPLATE="${{github.workspace}}/cmake/templates/minshell.html"
 
       - name: Build
