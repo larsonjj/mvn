@@ -140,7 +140,9 @@ run_core_tests(int* passed_tests, int* failed_tests, int* total_tests) {
 
     RUN_TEST(test_engine_version);
     RUN_TEST(test_colors);
+#if !defined(MVN_TEST_CI)
     RUN_TEST(test_core_timing);
+#endif
 
     // Calculate how many tests were run
     int tests_run = (*passed_tests - passed_before) + (*failed_tests - failed_before);

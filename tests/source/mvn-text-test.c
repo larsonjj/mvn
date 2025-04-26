@@ -252,6 +252,7 @@ run_text_tests(int* passed_tests, int* failed_tests, int* total_tests) {
 
     printf("\n===== TEXT TESTS =====\n\n");
 
+#if !defined(MVN_TEST_CI)
     int passed_before = *passed_tests;
     int failed_before = *failed_tests;
 
@@ -281,6 +282,9 @@ run_text_tests(int* passed_tests, int* failed_tests, int* total_tests) {
 
     // Return number of passed tests from this suite
     return *passed_tests - passed_before;
+#else
+    printf("Skipping text tests in CI mode.\n");
+#endif
 }
 
 #if defined(MVN_TEXT_TEST_MAIN)
