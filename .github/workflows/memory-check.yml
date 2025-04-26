@@ -24,11 +24,6 @@ jobs:
         run: cmake --build ${{github.workspace}}/build --config Debug
 
       - name: Run tests with Valgrind
-        working-directory: ${{github.workspace}}/build
+        working-directory: ${{github.workspace}}/build/tests
         run: |
-          cd tests
-          for test in mvn_*_test; do
-            if [ -x "$test" ]; then
-              valgrind --leak-check=full --error-exitcode=1 ./$test
-            fi
-          done
+          valgrind --leak-check=full --error-exitcode=1 ./mvn_test_all
