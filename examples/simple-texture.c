@@ -33,9 +33,6 @@
 
 #include "mvn/mvn.h" // IWYU pragma: keep
 
-/* Define asset directory */
-#define ASSET_DIR "assets/"
-
 /**
  * \brief           Main application entry point
  */
@@ -52,9 +49,9 @@ main(void) {
     mvn_string_t* version = mvn_get_engine_version();
     mvn_log_info("MVN Engine Version: %s", mvn_string_to_cstr(version));
 
-    /* Construct the file path using ASSET_DIR */
+    /* Construct the file path using assets_dir */
     char filepath[512];
-    SDL_snprintf(filepath, sizeof(filepath), "%s%s", ASSET_DIR, "char-1.png");
+    SDL_snprintf(filepath, sizeof(filepath), "%s/%s", ASSET_DIR, "char-1.png");
 
     // Load the char-1 image as a texture
     mvn_texture_t* char_tex1 = mvn_load_texture(mvn_get_renderer(), filepath);
@@ -63,14 +60,14 @@ main(void) {
         // Consider cleanup and returning 1 here or handling the missing texture in the draw loop
     }
 
-    SDL_snprintf(filepath, sizeof(filepath), "%s%s", ASSET_DIR, "char-2.png");
+    SDL_snprintf(filepath, sizeof(filepath), "%s/%s", ASSET_DIR, "char-2.png");
     mvn_texture_t* char_tex2 = mvn_load_texture(mvn_get_renderer(), filepath);
     if (!char_tex2) {
         mvn_log_error("Failed to load texture: %s", filepath);
         // Handle error
     }
 
-    SDL_snprintf(filepath, sizeof(filepath), "%s%s", ASSET_DIR, "char-3.png");
+    SDL_snprintf(filepath, sizeof(filepath), "%s/%s", ASSET_DIR, "char-3.png");
     mvn_texture_t* char_tex3 = mvn_load_texture(mvn_get_renderer(), filepath);
     if (!char_tex3) {
         mvn_log_error("Failed to load texture: %s", filepath);
