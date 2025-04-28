@@ -3,9 +3,10 @@
  * \brief           Implementation of dynamic array list for MVN game framework
  */
 
-#include "mvn/mvn-list.h"
 #include <SDL3/SDL.h>
+#include "mvn/mvn-list.h"
 #include "mvn/mvn-logger.h"
+#include "mvn/mvn-utils.h"
 
 /* Default initial capacity if none is specified */
 #define MVN_LIST_DEFAULT_CAPACITY  8

@@ -5,6 +5,7 @@
 
 #include "mvn/mvn-hashmap.h"
 #include "mvn/mvn-logger.h"
+#include "mvn/mvn-utils.h"
 
 /* Default initial capacity if none is specified */
 #define MVN_HMAP_DEFAULT_CAPACITY 16

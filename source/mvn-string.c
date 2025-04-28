@@ -3,10 +3,11 @@
  * \brief           Implementation of dynamic string for MVN game framework
  */
 
-#include "mvn/mvn-string.h"
 #include <SDL3/SDL.h>
 #include "mvn/mvn-list.h"
 #include "mvn/mvn-logger.h"
+#include "mvn/mvn-string.h"
+#include "mvn/mvn-utils.h"
 
 /* Default initial capacity if none is specified */
 #define MVN_STRING_DEFAULT_CAPACITY 16

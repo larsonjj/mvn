@@ -35,8 +35,6 @@
 #define MVN_FILE_H
 
 #include <SDL3/SDL.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include "mvn/mvn-string.h"
 
 #ifdef __cplusplus

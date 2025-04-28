@@ -7,7 +7,6 @@
 #define MVN_HASHMAP_H
 
 #include <SDL3/SDL.h>
-#include <stdbool.h>
 #include "mvn/mvn-list.h"
 
 #ifdef __cplusplus

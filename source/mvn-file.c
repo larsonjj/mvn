@@ -31,10 +31,11 @@
  * Author:          Jake Larson
  */
 
-#include "mvn/mvn-file.h"
 #include <SDL3/SDL.h>
+#include "mvn/mvn-file.h"
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-string.h"
+#include "mvn/mvn-utils.h"
 
 /**
  * \brief           Check if a file exists
