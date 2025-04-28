@@ -284,19 +284,21 @@ run_text_tests(int* passed_tests, int* failed_tests, int* total_tests) {
 
     // Return number of passed tests from this suite
     return *passed_tests - passed_before;
-#endif // MVN_TEST_CI}
+#endif // MVN_TEST_CI
+}
 
 #if defined(MVN_TEXT_TEST_MAIN)
-    int main(void) {
-        int passed = 0;
-        int failed = 0;
-        int total = 0;
+int
+main(void) {
+    int passed = 0;
+    int failed = 0;
+    int total = 0;
 
-        run_text_tests(&passed, &failed, &total);
+    run_text_tests(&passed, &failed, &total);
 
-        printf("\n===== TEXT TEST SUMMARY =====\n");
-        print_test_summary(total, passed, failed);
+    printf("\n===== TEXT TEST SUMMARY =====\n");
+    print_test_summary(total, passed, failed);
 
-        return (failed > 0) ? 1 : 0;
-    }
+    return (failed > 0) ? 1 : 0;
+}
 #endif
