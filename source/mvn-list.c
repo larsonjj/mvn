@@ -121,6 +121,12 @@ mvn_list_resize(mvn_list_t* list, size_t new_capacity) {
         return false;
     }
 
+    // Check for zero capacity
+    if (new_capacity == 0) {
+        mvn_log_error("Attempted to allocate zero capacity");
+        return false;
+    }
+
     /* Don't allow resizing smaller than current length */
     if (new_capacity < list->length) {
         new_capacity = list->length;
