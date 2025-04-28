@@ -7,7 +7,6 @@ Checks: "-*,\
   misc-*,\
   portability-*,\
   openmp-*,\
-  readability-*,\
   -google-readability-todo,\
   -bugprone-easily-swappable-parameters,\
   -readability-uppercase-literal-suffix,\
@@ -45,3 +44,6 @@ CheckOptions:
     value: "^[abijkxyz]$"
   - key: "readability-identifier-length.IgnoredParameterNames"
     value: "^[abijkxyz]$"
+Diagnostics:
+  ClangTidy:
+    FastCheckFilter: Strict
