@@ -44,6 +44,7 @@ set_target_properties(mvn_test_all PROPERTIES
 ##### TEST SUITE MACRO #####
 function(mvn_add_test_executable target source main_macro)
     add_executable(${target} ${source})
+    add_dependencies(${target} copy_test_assets)
     target_compile_definitions(${target} PRIVATE
         ASSET_DIR="${CMAKE_BINARY_DIR}/tests/assets"
         ${main_macro}

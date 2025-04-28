@@ -7,21 +7,22 @@ add_custom_target(copy_example_assets ALL
 )
 
 # Function to reduce redundancy for each example
-function(mvn_add_example exe_name source_file)
-    add_executable(${exe_name} ${source_file})
-    target_link_libraries(${exe_name} PRIVATE mvn SDL3::SDL3 SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf flecs)
-    target_compile_definitions(${exe_name} PRIVATE ASSET_DIR="${CMAKE_BINARY_DIR}/examples/assets")
-    set_target_properties(${exe_name} PROPERTIES
+function(mvn_add_example target source_file)
+    add_executable(${target} ${source_file})
+    add_dependencies(${target} copy_example_assets)
+    target_link_libraries(${target} PRIVATE mvn SDL3::SDL3 SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf flecs)
+    target_compile_definitions(${target} PRIVATE ASSET_DIR="${CMAKE_BINARY_DIR}/examples/assets")
+    set_target_properties(${target} PROPERTIES
         C_STANDARD 99
         C_STANDARD_REQUIRED ON
         C_EXTENSIONS OFF
     )
     if(EMSCRIPTEN)
-        target_link_options(${exe_name} PRIVATE
+        target_link_options(${target} PRIVATE
             "-sEXPORT_NAME=mvnGame"
             "-sASSERTIONS=1"
             "-sEXPORTED_RUNTIME_METHODS=FS"
-            "--preload-file ${EXAMPLE_ASSETS_DIR}@/assets"
+            "--preload-file ${ASSET_DIR}@/assets"
         )
     endif()
 endfunction()

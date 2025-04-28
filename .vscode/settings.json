@@ -39,6 +39,11 @@
     "**/.vscode": true,
     "**/.vs": true
   },
-  "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-  "clangd.arguments": ["--clang-tidy-config-file=.clang-tidy"]
+  "C_Cpp.codeAnalysis.clangTidy.enabled": false,
+  "C_Cpp.intelliSenseEngine": "disabled",
+  "clangd.arguments": [
+    "--header-insertion=never",
+    "--clang-tidy",
+    "--completion-style=detailed"
+  ]
 }
