@@ -4,7 +4,7 @@
  */
 
 #include "mvn/mvn-list.h"
-#include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL.h>
 #include "mvn/mvn-logger.h"
 
 /* Default initial capacity if none is specified */

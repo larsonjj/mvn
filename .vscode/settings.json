@@ -46,6 +46,7 @@
     "--compile-commands-dir=build",
     "--completion-style=detailed",
     "--enable-config",
-    "--clang-tidy"
+    "--clang-tidy",
+    "--clang-tidy-config-file=.clang-tidy"
   ]
 }

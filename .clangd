@@ -3,3 +3,7 @@ Diagnostics:
   MissingIncludes: None
 CompileFlags:
   CompilationDatabase: "build"
+  Add: [-Wno-unused-parameter]
+ClangTidy:
+  Add: true
+  ConfigFile: .clang-tidy
