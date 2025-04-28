@@ -38,5 +38,6 @@
     "**/build": true,
     "**/.vscode": true,
     "**/.vs": true
-  }
+  },
+  "C_Cpp.codeAnalysis.clangTidy.enabled": true
 }
