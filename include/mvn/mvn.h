@@ -34,7 +34,6 @@
 #ifndef MVN_H
 #define MVN_H
 
-#include <SDL3/SDL.h>
 #include "mvn/mvn-core.h" // IWYU pragma: keep
 
 #ifdef __cplusplus

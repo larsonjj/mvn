@@ -4,8 +4,7 @@
  */
 
 #include "mvn/mvn-string.h"
-#include <SDL3/SDL_stdinc.h>
-#include <ctype.h>
+#include <SDL3/SDL.h>
 #include "mvn/mvn-list.h"
 #include "mvn/mvn-logger.h"
 

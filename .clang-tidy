@@ -44,6 +44,3 @@ CheckOptions:
     value: "^[abijkxyz]$"
   - key: "readability-identifier-length.IgnoredParameterNames"
     value: "^[abijkxyz]$"
-Diagnostics:
-  ClangTidy:
-    FastCheckFilter: Strict

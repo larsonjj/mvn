@@ -34,10 +34,6 @@
 #include "mvn/mvn-text.h"
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 #include "mvn/mvn-core.h"
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-types.h"

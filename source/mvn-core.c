@@ -34,9 +34,6 @@
 #include "mvn/mvn-core.h"
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "mvn/mvn-file.h" // IWYU pragma: keep
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-string.h"

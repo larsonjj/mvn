@@ -36,8 +36,6 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include "mvn/mvn-types.h"
 
 #ifdef __cplusplus

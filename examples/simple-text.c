@@ -31,7 +31,6 @@
  * Author:          Jake Larson
  */
 
-#include "mvn/mvn-utils.h"
 #include "mvn/mvn.h" // IWYU pragma: keep
 
 int

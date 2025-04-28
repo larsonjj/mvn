@@ -35,7 +35,6 @@
 #define MVN_LOGGER_H
 
 #include <SDL3/SDL.h>
-#include <stdbool.h>
 #include "mvn/mvn-types.h" /* IWYU pragma: keep */
 
 #ifdef __cplusplus

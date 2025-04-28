@@ -45,6 +45,7 @@
     "--header-insertion=never",
     "--compile-commands-dir=build",
     "--completion-style=detailed",
+    "--enable-config",
     "--clang-tidy"
   ]
 }

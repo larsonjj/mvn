@@ -33,7 +33,6 @@
 
 #include "mvn/mvn-logger.h"
 #include <SDL3/SDL.h>
-#include <stdarg.h>
 
 /**
   * \brief           Initialize the MVN logger

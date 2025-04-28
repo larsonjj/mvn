@@ -7,8 +7,6 @@
 #define MVN_LIST_H
 
 #include <SDL3/SDL.h>
-#include <stdbool.h>
-#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {

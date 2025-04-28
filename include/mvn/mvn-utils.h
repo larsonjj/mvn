@@ -35,7 +35,6 @@
 #define MVN_UTILS_H
 
 #include <SDL3/SDL.h>
-#include <stdlib.h>
 #include "mvn/mvn-list.h"
 
 #ifdef __cplusplus
