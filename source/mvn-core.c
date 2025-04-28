@@ -43,14 +43,6 @@
 #include "mvn/mvn-types.h"
 #include "mvn/mvn-utils.h"
 
-#if defined(SDL_PLATFORM_WINDOWS)
-#include <windows.h>
-#else
-#include <errno.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#endif
-
 /* Static variables to hold the window and renderer */
 static mvn_window_t* window = NULL;
 static mvn_renderer_t* renderer = NULL;
