@@ -39,5 +39,6 @@
     "**/.vscode": true,
     "**/.vs": true
   },
-  "C_Cpp.codeAnalysis.clangTidy.enabled": true
+  "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+  "clangd.arguments": ["--clang-tidy-config-file=.clang-tidy"]
 }
