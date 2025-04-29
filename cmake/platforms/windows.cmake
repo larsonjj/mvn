@@ -1,6 +1,11 @@
 set(CMAKE_C_COMPILER cl)
 set(CMAKE_CXX_COMPILER cl)
 
+# Set C99 standard
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
 # Create link to compile_commands.json for clangd
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
     # Ensure the build directory exists at the root level

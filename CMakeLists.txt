@@ -12,11 +12,6 @@ project(mvn
     DESCRIPTION "MVN game framework library"
     LANGUAGES C)
 
-# Set C99 standard
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
-
 # Disable shared builds as we want a static binary
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 

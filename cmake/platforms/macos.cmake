@@ -2,6 +2,11 @@
 find_program(CLANG_COMPILER clang)
 find_program(CLANGPP_COMPILER clang++)
 
+# Set C99 standard
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
 # Use the found compilers or fall back to defaults
 if(CLANG_COMPILER)
     set(CMAKE_C_COMPILER "${CLANG_COMPILER}")
