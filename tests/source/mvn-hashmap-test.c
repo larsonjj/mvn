@@ -167,16 +167,17 @@ test_hashmap_keys_values(void) {
     // Verify all keys are present (order may vary)
     bool keys_found[5] = {false};
     for (size_t i = 0; i < mvn_list_length(key_list); i++) {
-        char** key_ptr = (char**)mvn_list_get(key_list, i);
+        char** key_ptr = MVN_LIST_GET(char*, key_list, i);
         TEST_ASSERT(key_ptr != NULL, "Failed to get key from list");
 
         const char* key = *key_ptr;
         for (int j = 0; j < 5; j++) {
-            if (strcmp(key, keys[j]) == 0) {
+            if (SDL_strcmp(key, keys[j]) == 0) {
                 keys_found[j] = true;
                 break;
             }
         }
+        MVN_FREE(*key_ptr); // Free the duplicated key string
     }
 
     for (int i = 0; i < 5; i++) {
@@ -191,7 +192,7 @@ test_hashmap_keys_values(void) {
     // Verify all values are present (order may vary)
     bool values_found[5] = {false};
     for (size_t i = 0; i < mvn_list_length(value_list); i++) {
-        int* value = (int*)mvn_list_get(value_list, i);
+        int* value = MVN_LIST_GET(int, value_list, i);
         TEST_ASSERT(value != NULL, "Failed to get value from list");
 
         for (int j = 0; j < 5; j++) {
