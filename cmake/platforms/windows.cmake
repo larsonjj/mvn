@@ -12,7 +12,7 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
     file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 
     # Only add the custom target if MVN_CI is NOT defined
-    if(NOT DEFINED MVN_CI)
+    if(DEFINED MVN_CI)
         add_custom_target(
             windows_create_compile_commands_link ALL
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
