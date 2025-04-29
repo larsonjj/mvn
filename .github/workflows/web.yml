@@ -17,22 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Emscripten SDK
-        run: |
-          git clone https://github.com/emscripten-core/emsdk.git
-          cd emsdk
-          ./emsdk install latest
-          ./emsdk activate latest
-
-      - name: Set up Emscripten environment
-        run: |
-          source emsdk/emsdk_env.sh
-          echo "EMSDK=$GITHUB_WORKSPACE/emsdk" >> $GITHUB_ENV
-          echo "$GITHUB_WORKSPACE/emsdk/upstream/emscripten" >> $GITHUB_PATH
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
 
       - name: Configure CMake
         run: |
-          source emsdk/emsdk_env.sh
           emcmake cmake -B ${{github.workspace}}/build-web \
             -DCMAKE_BUILD_TYPE=Release \
             -DMVN_BUILD_EXAMPLES=ON \
@@ -74,16 +63,16 @@ jobs:
           EOL
 
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: "dist"
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
 
   build-for-web:
     needs: build
