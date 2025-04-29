@@ -1,12 +1,9 @@
-##### ALL TESTS #####
+##### DEFINES #####
+if(MVN_CI)
+    add_compile_definitions(MVN_TEST_CI)
+endif()
 
-# Create a command to copy assets to the build directory
-add_custom_target(copy_test_assets ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/tests/assets
-            ${CMAKE_BINARY_DIR}/tests/assets
-    COMMENT "Copying assets directory to build folder"
-)
+##### ALL TESTS #####
 
 # Test executable
 add_executable(mvn_test_all
@@ -39,6 +36,15 @@ set_target_properties(mvn_test_all PROPERTIES
     C_STANDARD 99
     C_STANDARD_REQUIRED ON
     C_EXTENSIONS OFF
+)
+
+##### COPY ASSETS COMMAND #####
+# Create a command to copy assets to the build directory
+add_custom_target(copy_test_assets ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/tests/assets
+            ${CMAKE_BINARY_DIR}/tests/assets
+    COMMENT "Copying assets directory to build folder"
 )
 
 ##### TEST SUITE MACRO #####
