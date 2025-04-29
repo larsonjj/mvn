@@ -126,15 +126,6 @@ FetchContent_Declare(
 # Now make SDL3_ttf available after SDL3 is available and verified
 FetchContent_MakeAvailable(SDL3_ttf)
 
-# Flecs
-FetchContent_Declare(
-    flecs
-    GIT_REPOSITORY https://github.com/SanderMertens/flecs.git
-    GIT_TAG v4.0.5
-)
-# Now make Flecs available
-FetchContent_MakeAvailable(flecs)
-
 # Export all symbols to help SDL3_image find them
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
@@ -201,7 +192,6 @@ target_link_libraries(mvn
     $<BUILD_INTERFACE:SDL3::SDL3>
     $<BUILD_INTERFACE:SDL3_image::SDL3_image>
     $<BUILD_INTERFACE:SDL3_ttf::SDL3_ttf>
-    $<BUILD_INTERFACE:flecs::flecs>
     # For install-time usage - handled via find_dependency in config file
     $<INSTALL_INTERFACE:>
 )

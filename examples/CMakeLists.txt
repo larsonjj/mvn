@@ -10,7 +10,7 @@ add_custom_target(copy_example_assets ALL
 function(mvn_add_example target source_file)
     add_executable(${target} ${source_file})
     add_dependencies(${target} copy_example_assets)
-    target_link_libraries(${target} PRIVATE mvn SDL3::SDL3 SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf flecs)
+    target_link_libraries(${target} PRIVATE mvn SDL3::SDL3 SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf)
     target_compile_definitions(${target} PRIVATE ASSET_DIR="${CMAKE_BINARY_DIR}/examples/assets")
     set_target_properties(${target} PROPERTIES
         C_STANDARD 99
