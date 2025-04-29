@@ -32,8 +32,6 @@ jobs:
           lcov --capture --directory ${{github.workspace}}/build --output-file coverage.info
           lcov --remove coverage.info '/usr/*' --output-file coverage.info
           lcov --remove coverage.info '*/_deps/*' --output-file coverage.info
-          lcov --remove coverage.info '*/cmake/*' --output-file coverage.info
-          lcov --remove coverage.info '*/CMakeFiles/*' --output-file coverage.info
           lcov --list coverage.info
 
       - name: Upload coverage to Codecov
