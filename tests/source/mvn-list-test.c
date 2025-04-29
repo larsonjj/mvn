@@ -25,13 +25,13 @@
 static int
 test_list_init(void) {
     // Test with default capacity (0)
-    mvn_list_t* list1 = mvn_list_init(sizeof(int), 0);
+    mvn_list_t* list1 = MVN_LIST_INIT(int, 0);
     TEST_ASSERT(list1 != NULL, "Failed to initialize list with default capacity");
     TEST_ASSERT(mvn_list_length(list1) == 0, "New list should have length 0");
     mvn_list_free(list1);
 
     // Test with specific capacity
-    mvn_list_t* list2 = mvn_list_init(sizeof(int), 16);
+    mvn_list_t* list2 = MVN_LIST_INIT(int, 16);
     TEST_ASSERT(list2 != NULL, "Failed to initialize list with specific capacity");
     TEST_ASSERT(mvn_list_length(list2) == 0, "New list should have length 0");
     mvn_list_free(list2);
@@ -60,7 +60,7 @@ test_list_push_pop(void) {
     // Test pushing items
     int values[] = {10, 20, 30, 40, 50};
     for (int idx = 0; idx < 5; idx++) {
-        TEST_ASSERT(mvn_list_push(list, &values[idx]), "Failed to push value to list");
+        MVN_LIST_PUSH(list, int, values[idx]);
         TEST_ASSERT(mvn_list_length(list) == (size_t)(idx + 1), "List length incorrect after push");
     }
 
@@ -105,16 +105,14 @@ test_list_unshift_shift(void) {
     // Test unshifting items
     int values[] = {10, 20, 30, 40, 50};
     for (int idx = 0; idx < 5; idx++) {
-        int temp_value = values[idx];
-        // Corrected usage: Pass type 'int' and value 'temp_value'
-        TEST_ASSERT(mvn_list_unshift(list, &temp_value), "Failed to unshift value to list");
+        MVN_LIST_UNSHIFT(list, int, values[idx]);
         TEST_ASSERT(mvn_list_length(list) == (size_t)(idx + 1),
                     "List length incorrect after unshift");
 
         // Verify the item was added to the beginning
         int* first = MVN_LIST_GET(int, list, 0);
         TEST_ASSERT(first != NULL, "Failed to get first value from list");
-        TEST_ASSERT(*first == temp_value, "Unshifted value is incorrect");
+        TEST_ASSERT(*first == values[idx], "Unshifted value is incorrect");
     }
 
     // List should now contain: 50, 40, 30, 20, 10
@@ -154,29 +152,28 @@ test_list_get_set(void) {
     // Add some items
     int values[] = {10, 20, 30, 40};
     for (int idx = 0; idx < 4; idx++) {
-        TEST_ASSERT(mvn_list_push(list, &values[idx]), "Failed to push value to list");
+        MVN_LIST_PUSH(list, int, values[idx]);
     }
 
     // Test get with valid index
     for (int idx = 0; idx < 4; idx++) {
-        int* value = mvn_list_get(list, idx);
+        int* value = MVN_LIST_GET(int, list, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from list");
         TEST_ASSERT(*value == values[idx], "Retrieved value is incorrect");
     }
 
     // Test get with invalid index
-    TEST_ASSERT(mvn_list_get(list, 4) == NULL, "Get with invalid index should return NULL");
-    TEST_ASSERT(mvn_list_get(list, 100) == NULL, "Get with invalid index should return NULL");
+    TEST_ASSERT(MVN_LIST_GET(int, list, 4) == NULL, "Get with invalid index should return NULL");
+    TEST_ASSERT(MVN_LIST_GET(int, list, 100) == NULL, "Get with invalid index should return NULL");
 
     // Test get from NULL list
-    TEST_ASSERT(mvn_list_get(NULL, 0) == NULL, "Get from NULL list should return NULL");
+    TEST_ASSERT(MVN_LIST_GET(int, NULL, 0) == NULL, "Get from NULL list should return NULL");
 
     // Test set with valid index
     int new_value = 99;
     for (int idx = 0; idx < 4; idx++) {
         int temp_set_value = new_value + idx;
-        // Call mvn_list_set directly for portability
-        TEST_ASSERT(mvn_list_set(list, idx, &temp_set_value), "Failed to set value in list");
+        MVN_LIST_SET(list, idx, int, temp_set_value);
         int* value = MVN_LIST_GET(int, list, idx);
         TEST_ASSERT(value != NULL, "Failed to get value after set");
         TEST_ASSERT(*value == temp_set_value, "Set value is incorrect");
@@ -208,7 +205,7 @@ test_list_slice(void) {
     // Add some items
     int values[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
     for (int idx = 0; idx < 10; idx++) {
-        TEST_ASSERT(mvn_list_push(list, &values[idx]), "Failed to push value to list");
+        MVN_LIST_PUSH(list, int, values[idx]);
     }
 
     // Test slice with valid indices
@@ -272,13 +269,13 @@ test_list_concat(void) {
     // Add items to first list
     int values1[] = {10, 20, 30};
     for (int idx = 0; idx < 3; idx++) {
-        TEST_ASSERT(mvn_list_push(list1, &values1[idx]), "Failed to push value to list1");
+        MVN_LIST_PUSH(list1, int, values1[idx]);
     }
 
     // Add items to second list
     int values2[] = {40, 50, 60};
     for (int idx = 0; idx < 3; idx++) {
-        TEST_ASSERT(mvn_list_push(list2, &values2[idx]), "Failed to push value to list2");
+        MVN_LIST_PUSH(list2, int, values2[idx]);
     }
 
     // Concatenate lists
@@ -344,7 +341,7 @@ test_list_clone(void) {
     // Add some items
     int values[] = {10, 20, 30, 40, 50};
     for (int idx = 0; idx < 5; idx++) {
-        TEST_ASSERT(mvn_list_push(list, &values[idx]), "Failed to push value to list");
+        MVN_LIST_PUSH(list, int, values[idx]);
     }
 
     // Clone the list
@@ -396,7 +393,7 @@ test_list_resize(void) {
     // Add some items to fill the initial capacity
     int values[] = {10, 20, 30};
     for (int idx = 0; idx < 3; idx++) {
-        TEST_ASSERT(mvn_list_push(list, &values[idx]), "Failed to push value to list");
+        MVN_LIST_PUSH(list, int, values[idx]);
     }
 
     // Resize to larger capacity
@@ -405,7 +402,7 @@ test_list_resize(void) {
     // Add more items to the resized list
     int more_values[] = {40, 50, 60, 70};
     for (int idx = 0; idx < 4; idx++) {
-        TEST_ASSERT(mvn_list_push(list, &more_values[idx]), "Failed to push value to resized list");
+        MVN_LIST_PUSH(list, int, more_values[idx]);
     }
 
     // Verify all items are still there
@@ -448,7 +445,7 @@ test_list_reverse(void) {
     // Add some items
     int values[] = {10, 20, 30, 40, 50};
     for (int idx = 0; idx < 5; idx++) {
-        TEST_ASSERT(mvn_list_push(list, &values[idx]), "Failed to push value to list");
+        MVN_LIST_PUSH(list, int, values[idx]);
     }
 
     // Reverse the list
@@ -464,7 +461,7 @@ test_list_reverse(void) {
     // Test reverse with single item
     mvn_list_t* single = MVN_LIST_INIT(int, 1);
     int single_value = 42;
-    mvn_list_push(single, &single_value);
+    MVN_LIST_PUSH(single, int, single_value);
 
     TEST_ASSERT(mvn_list_reverse(single), "Failed to reverse single-item list");
     int* result = MVN_LIST_GET(int, single, 0);
@@ -519,7 +516,7 @@ test_list_sort(void) {
     // Add items in unsorted order
     int values[] = {30, 10, 50, 40, 20, 70, 60};
     for (int idx = 0; idx < 7; idx++) {
-        TEST_ASSERT(mvn_list_push(list, &values[idx]), "Failed to push value to list");
+        MVN_LIST_PUSH(list, int, values[idx]);
     }
 
     // Sort the list
@@ -546,7 +543,7 @@ test_list_sort(void) {
     // Test sort with single item
     mvn_list_t* single = MVN_LIST_INIT(int, 1);
     int single_value = 42;
-    mvn_list_push(single, &single_value);
+    MVN_LIST_PUSH(single, int, single_value);
 
     TEST_ASSERT(mvn_list_sort(single, compare_ints), "Failed to sort single-item list");
     int* result = MVN_LIST_GET(int, single, 0);
@@ -603,7 +600,7 @@ test_list_filter(void) {
     // Add some items
     int values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     for (int idx = 0; idx < 10; idx++) {
-        TEST_ASSERT(mvn_list_push(list, &values[idx]), "Failed to push value to list");
+        MVN_LIST_PUSH(list, int, values[idx]);
     }
 
     // Filter for even numbers

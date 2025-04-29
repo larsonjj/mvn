@@ -94,9 +94,8 @@ mvn_is_file_extension(const char* fileName, const char* ext) {
 
     bool result = false;
     if (fileExt->length == 0) {
-        result = (ext[0] == '\0'); // No extension matches empty extension
+        result = false;
     } else {
-        // Case-insensitive comparison
         result = (SDL_strcasecmp(mvn_string_to_cstr(fileExt), ext) == 0);
     }
 

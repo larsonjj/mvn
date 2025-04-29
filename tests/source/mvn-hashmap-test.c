@@ -19,19 +19,19 @@
 #include "mvn/mvn-types.h"
 
 /**
- * \brief           Test basic hashmap initialization and freeing
- * \return          1 on success, 0 on failure
- */
+  * \brief           Test basic hashmap initialization and freeing
+  * \return          1 on success, 0 on failure
+  */
 static int
 test_hashmap_init(void) {
     // Test with default capacity (0)
-    mvn_hmap_t* hmap1 = mvn_hmap_init(sizeof(int), 0);
+    mvn_hmap_t* hmap1 = MVN_HMAP_INIT(int, 0);
     TEST_ASSERT(hmap1 != NULL, "Failed to initialize hashmap with default capacity");
     TEST_ASSERT(mvn_hmap_length(hmap1) == 0, "New hashmap should have length 0");
     mvn_hmap_free(hmap1);
 
     // Test with specific capacity
-    mvn_hmap_t* hmap2 = mvn_hmap_init(sizeof(int), 16);
+    mvn_hmap_t* hmap2 = MVN_HMAP_INIT(int, 16);
     TEST_ASSERT(hmap2 != NULL, "Failed to initialize hashmap with specific capacity");
     TEST_ASSERT(mvn_hmap_length(hmap2) == 0, "New hashmap should have length 0");
     mvn_hmap_free(hmap2);
@@ -49,9 +49,9 @@ test_hashmap_init(void) {
 }
 
 /**
- * \brief           Test setting and getting values in the hashmap
- * \return          1 on success, 0 on failure
- */
+  * \brief           Test setting and getting values in the hashmap
+  * \return          1 on success, 0 on failure
+  */
 static int
 test_hashmap_set_get(void) {
     // Initialize hashmap for integers
@@ -63,9 +63,9 @@ test_hashmap_set_get(void) {
     int value2 = 100;
     int value3 = -10;
 
-    TEST_ASSERT(mvn_hmap_set(hmap, "key1", &value1), "Failed to set key1");
-    TEST_ASSERT(mvn_hmap_set(hmap, "key2", &value2), "Failed to set key2");
-    TEST_ASSERT(mvn_hmap_set(hmap, "key3", &value3), "Failed to set key3");
+    MVN_HMAP_SET(hmap, "key1", int, value1);
+    MVN_HMAP_SET(hmap, "key2", int, value2);
+    MVN_HMAP_SET(hmap, "key3", int, value3);
 
     TEST_ASSERT(mvn_hmap_length(hmap) == 3, "Hashmap should have 3 items");
 
@@ -85,7 +85,7 @@ test_hashmap_set_get(void) {
 
     // Test updating an existing key
     int updated_value = 999;
-    TEST_ASSERT(mvn_hmap_set(hmap, "key1", &updated_value), "Failed to update key1");
+    MVN_HMAP_SET(hmap, "key1", int, updated_value);
     retrieved1 = MVN_HMAP_GET(int, hmap, "key1");
     TEST_ASSERT(retrieved1 != NULL, "Failed to get updated key1");
     TEST_ASSERT(*retrieved1 == 999, "Retrieved value for updated key1 is incorrect");
@@ -97,9 +97,9 @@ test_hashmap_set_get(void) {
 }
 
 /**
- * \brief           Test deleting items from the hashmap
- * \return          1 on success, 0 on failure
- */
+  * \brief           Test deleting items from the hashmap
+  * \return          1 on success, 0 on failure
+  */
 static int
 test_hashmap_delete(void) {
     mvn_hmap_t* hmap = MVN_HMAP_INIT(int, 8);
@@ -110,9 +110,9 @@ test_hashmap_delete(void) {
     int value2 = 100;
     int value3 = -10;
 
-    TEST_ASSERT(mvn_hmap_set(hmap, "key1", &value1), "Failed to set key1");
-    TEST_ASSERT(mvn_hmap_set(hmap, "key2", &value2), "Failed to set key2");
-    TEST_ASSERT(mvn_hmap_set(hmap, "key3", &value3), "Failed to set key3");
+    MVN_HMAP_SET(hmap, "key1", int, value1);
+    MVN_HMAP_SET(hmap, "key2", int, value2);
+    MVN_HMAP_SET(hmap, "key3", int, value3);
     TEST_ASSERT(mvn_hmap_length(hmap) == 3, "Hashmap should have 3 items");
 
     // Test deleting a key
@@ -143,9 +143,9 @@ test_hashmap_delete(void) {
 }
 
 /**
- * \brief           Test keys and values collections
- * \return          1 on success, 0 on failure
- */
+  * \brief           Test keys and values collections
+  * \return          1 on success, 0 on failure
+  */
 static int
 test_hashmap_keys_values(void) {
     mvn_hmap_t* hmap = MVN_HMAP_INIT(int, 8);
@@ -156,7 +156,7 @@ test_hashmap_keys_values(void) {
     const char* keys[5] = {"key1", "key2", "key3", "key4", "key5"};
 
     for (int i = 0; i < 5; i++) {
-        TEST_ASSERT(mvn_hmap_set(hmap, keys[i], &values[i]), "Failed to set key");
+        MVN_HMAP_SET(hmap, keys[i], int, values[i]);
     }
 
     // Test keys collection
@@ -216,9 +216,9 @@ test_hashmap_keys_values(void) {
 }
 
 /**
- * \brief           Test complex data structures in hashmap
- * \return          1 on success, 0 on failure
- */
+  * \brief           Test complex data structures in hashmap
+  * \return          1 on success, 0 on failure
+  */
 static int
 test_hashmap_complex_types(void) {
     // Test with Points
@@ -228,8 +228,8 @@ test_hashmap_complex_types(void) {
     mvn_point_t pt1 = {10, 20};
     mvn_point_t pt2 = {-5, 30};
 
-    TEST_ASSERT(mvn_hmap_set(point_map, "point1", &pt1), "Failed to set point1");
-    TEST_ASSERT(mvn_hmap_set(point_map, "point2", &pt2), "Failed to set point2");
+    MVN_HMAP_SET(point_map, "point1", mvn_point_t, pt1);
+    MVN_HMAP_SET(point_map, "point2", mvn_point_t, pt2);
 
     mvn_point_t* retrieved_p1 = MVN_HMAP_GET(mvn_point_t, point_map, "point1");
     mvn_point_t* retrieved_p2 = MVN_HMAP_GET(mvn_point_t, point_map, "point2");
@@ -251,10 +251,9 @@ test_hashmap_complex_types(void) {
     mvn_color_t blue = {0, 0, 1, 1};
     mvn_color_t transparent_green = {0, 1, 0, 125};
 
-    TEST_ASSERT(mvn_hmap_set(color_map, "red", &red), "Failed to set red");
-    TEST_ASSERT(mvn_hmap_set(color_map, "blue", &blue), "Failed to set blue");
-    TEST_ASSERT(mvn_hmap_set(color_map, "transparent_green", &transparent_green),
-                "Failed to set transparent_green");
+    MVN_HMAP_SET(color_map, "red", mvn_color_t, red);
+    MVN_HMAP_SET(color_map, "blue", mvn_color_t, blue);
+    MVN_HMAP_SET(color_map, "transparent_green", mvn_color_t, transparent_green);
 
     mvn_color_t* retrieved_red = MVN_HMAP_GET(mvn_color_t, color_map, "red");
     mvn_color_t* retrieved_blue = MVN_HMAP_GET(mvn_color_t, color_map, "blue");
@@ -282,9 +281,9 @@ test_hashmap_complex_types(void) {
 }
 
 /**
- * \brief           Test edge cases
- * \return          1 on success, 0 on failure
- */
+  * \brief           Test edge cases
+  * \return          1 on success, 0 on failure
+  */
 static int
 test_hashmap_edge_cases(void) {
     mvn_hmap_t* hmap = MVN_HMAP_INIT(int, 2); // Small initial capacity to test resizing
@@ -323,8 +322,7 @@ test_hashmap_edge_cases(void) {
     for (int i = 0; i < NUM_ITEMS; i++) {
         snprintf(keys[i], sizeof(keys[i]), "key%d", i);
         values[i] = i * 10;
-        TEST_ASSERT(mvn_hmap_set(hmap, keys[i], &values[i]),
-                    "Failed to set key during resize test");
+        MVN_HMAP_SET(hmap, keys[i], int, values[i]);
     }
 
     TEST_ASSERT(mvn_hmap_length(hmap) == NUM_ITEMS,
@@ -365,12 +363,12 @@ test_hashmap_edge_cases(void) {
 }
 
 /**
- * \brief           Run all hashmap tests
- * \param[out] passed_tests Pointer to the number of passed tests
- * \param[out] failed_tests Pointer to the number of failed tests
- * \param[out] total_tests Pointer to the total number of tests
- * \return          Number of passed tests
- */
+  * \brief           Run all hashmap tests
+  * \param[out] passed_tests Pointer to the number of passed tests
+  * \param[out] failed_tests Pointer to the number of failed tests
+  * \param[out] total_tests Pointer to the total number of tests
+  * \return          Number of passed tests
+  */
 int
 run_hashmap_tests(int* passed_tests, int* failed_tests, int* total_tests) {
     printf("\n===== HASHMAP TESTS =====\n\n");
