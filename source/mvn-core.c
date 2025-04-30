@@ -41,21 +41,21 @@
 #include "mvn/mvn-utils.h"
 
 /* Static variables to hold the window and renderer */
-static mvn_window_t* window = NULL;
-static mvn_renderer_t* renderer = NULL;
-static mvn_text_engine_t* text_engine = NULL;
+static mvn_window_t* g_window = NULL;
+static mvn_renderer_t* g_renderer = NULL;
+static mvn_text_engine_t* g_text_engine = NULL;
 
 /* Static variables for timing */
-static uint64_t performance_frequency = 0; // Frequency of the performance counter
-static uint64_t start_time = 0;            // Time point when mvn_init was called
-static uint64_t last_frame_time = 0;       // Time point at the beginning of the last frame
-static uint64_t current_frame_time = 0;    // Time point at the end of the current frame
-static double delta_time = 0.0;            // Time elapsed for the last frame in seconds
-static int target_fps = 300;               // Target FPS (default 300)
-static double target_frame_time = 0.0;     // Minimum time per frame in seconds
-static int frame_counter = 0;              // Frames counted in the current second
-static uint64_t fps_timer = 0;             // Timer to track 1 second for FPS calculation
-static int current_fps = 0;                // Calculated FPS for the last second
+static uint64_t g_performance_frequency = 0; // Frequency of the performance counter
+static uint64_t g_start_time = 0;            // Time point when mvn_init was called
+static uint64_t g_last_frame_time = 0;       // Time point at the beginning of the last frame
+static uint64_t g_current_frame_time = 0;    // Time point at the end of the current frame
+static double g_delta_time = 0.0;            // Time elapsed for the last frame in seconds
+static int g_target_fps = 300;               // Target FPS (default 300)
+static double g_target_frame_time = 0.0;     // Minimum time per frame in seconds
+static int g_frame_counter = 0;              // Frames counted in the current second
+static uint64_t g_fps_timer = 0;             // Timer to track 1 second for FPS calculation
+static int g_current_fps = 0;                // Calculated FPS for the last second
 
 /**
  * \brief           Get the current version of the MVN engine
@@ -91,18 +91,18 @@ mvn_init(int width, int height, const char* title, mvn_window_flags_t flags) {
     }
 
     // Create the window with specified flags
-    window = SDL_CreateWindow(title, width, height, flags);
-    if (!window) {
+    g_window = SDL_CreateWindow(title, width, height, flags);
+    if (!g_window) {
         mvn_log_error("Window creation failed: %s", SDL_GetError());
         SDL_Quit();
         return false;
     }
 
     // Create renderer for window
-    renderer = SDL_CreateRenderer(window, NULL);
-    if (!renderer) {
+    g_renderer = SDL_CreateRenderer(g_window, NULL);
+    if (!g_renderer) {
         mvn_log_error("Renderer creation failed: %s", SDL_GetError());
-        SDL_DestroyWindow(window);
+        SDL_DestroyWindow(g_window);
         SDL_Quit();
         return false;
     }
@@ -111,30 +111,30 @@ mvn_init(int width, int height, const char* title, mvn_window_flags_t flags) {
     if (!TTF_WasInit() && !TTF_Init()) {
         mvn_log_error("Failed to initialize SDL_ttf: %s", SDL_GetError());
         // Clean up SDL resources before returning
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
+        SDL_DestroyRenderer(g_renderer);
+        SDL_DestroyWindow(g_window);
         SDL_Quit();
         return false;
     }
 
     // Create the renderer text engine
-    text_engine = TTF_CreateRendererTextEngine(mvn_get_renderer());
-    if (!text_engine) {
+    g_text_engine = TTF_CreateRendererTextEngine(mvn_get_renderer());
+    if (!g_text_engine) {
         mvn_log_error("Failed to create renderer text engine: %s", SDL_GetError());
         // Clean up SDL resources before returning
         TTF_Quit();
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
+        SDL_DestroyRenderer(g_renderer);
+        SDL_DestroyWindow(g_window);
         SDL_Quit();
         return false;
     }
 
     // Initialize timing variables
-    performance_frequency = SDL_GetPerformanceFrequency();
-    start_time = SDL_GetPerformanceCounter();
-    last_frame_time = start_time;
-    current_frame_time = start_time;
-    fps_timer = start_time;
+    g_performance_frequency = SDL_GetPerformanceFrequency();
+    g_start_time = SDL_GetPerformanceCounter();
+    g_last_frame_time = g_start_time;
+    g_current_frame_time = g_start_time;
+    g_fps_timer = g_start_time;
     mvn_set_target_fps(300); // Set default target FPS
 
     return true;
@@ -146,21 +146,21 @@ mvn_init(int width, int height, const char* title, mvn_window_flags_t flags) {
 void
 mvn_quit(void) {
     // Clean up in reverse order of creation
-    if (renderer != NULL) {
-        SDL_DestroyRenderer(renderer);
-        renderer = NULL;
+    if (g_renderer != NULL) {
+        SDL_DestroyRenderer(g_renderer);
+        g_renderer = NULL;
     }
 
     // Clean up the window
-    if (window != NULL) {
-        SDL_DestroyWindow(window);
-        window = NULL;
+    if (g_window != NULL) {
+        SDL_DestroyWindow(g_window);
+        g_window = NULL;
     }
 
     // Clean up text engine
-    if (text_engine != NULL) {
-        TTF_DestroyRendererTextEngine(text_engine);
-        text_engine = NULL;
+    if (g_text_engine != NULL) {
+        TTF_DestroyRendererTextEngine(g_text_engine);
+        g_text_engine = NULL;
     }
 
     // Quit SDL_ttf
@@ -176,7 +176,7 @@ mvn_quit(void) {
  */
 mvn_window_t*
 mvn_get_window(void) {
-    return window;
+    return g_window;
 }
 
 /**
@@ -185,7 +185,7 @@ mvn_get_window(void) {
  */
 mvn_renderer_t*
 mvn_get_renderer(void) {
-    return renderer;
+    return g_renderer;
 }
 
 /**
@@ -194,7 +194,7 @@ mvn_get_renderer(void) {
  */
 mvn_text_engine_t*
 mvn_get_text_engine(void) {
-    return text_engine;
+    return g_text_engine;
 }
 
 /**
@@ -230,15 +230,15 @@ mvn_window_should_close(void) {
  */
 bool
 mvn_begin_drawing(void) {
-    if (renderer == NULL) {
-        mvn_log_error("Cannot begin drawing: renderer is NULL");
+    if (g_renderer == NULL) {
+        mvn_log_error("Cannot begin drawing: g_renderer is NULL");
         return false;
     }
 
     // Calculate delta time from the previous frame
     uint64_t frame_start_time = SDL_GetPerformanceCounter();
-    delta_time = (double)(frame_start_time - last_frame_time) / (double)performance_frequency;
-    last_frame_time = frame_start_time; // Update last frame time for the next frame
+    g_delta_time = (double)(frame_start_time - g_last_frame_time) / (double)g_performance_frequency;
+    g_last_frame_time = frame_start_time; // Update last frame time for the next frame
 
     // No longer clearing automatically - user should call mvn_clear_background
     return true;
@@ -251,20 +251,20 @@ mvn_begin_drawing(void) {
  */
 bool
 mvn_clear_background(mvn_color_t color) {
-    if (renderer == NULL) {
-        mvn_log_error("Cannot clear background: renderer is NULL");
+    if (g_renderer == NULL) {
+        mvn_log_error("Cannot clear background: g_renderer is NULL");
         return false;
     }
 
-    // Set the renderer draw color
-    if (!SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a)) {
+    // Set the g_renderer draw color
+    if (!SDL_SetRenderDrawColor(g_renderer, color.r, color.g, color.b, color.a)) {
         mvn_log_error("Failed to set render color: %s", SDL_GetError());
         return false;
     }
 
-    // Clear the entire renderer with the set color
-    if (!SDL_RenderClear(renderer)) {
-        mvn_log_error("Failed to clear renderer: %s", SDL_GetError());
+    // Clear the entire g_renderer with the set color
+    if (!SDL_RenderClear(g_renderer)) {
+        mvn_log_error("Failed to clear g_renderer: %s", SDL_GetError());
         return false;
     }
 
@@ -277,21 +277,21 @@ mvn_clear_background(mvn_color_t color) {
  */
 bool
 mvn_end_drawing(void) {
-    if (renderer == NULL) {
-        mvn_log_error("Cannot end drawing: renderer is NULL");
+    if (g_renderer == NULL) {
+        mvn_log_error("Cannot end drawing: g_renderer is NULL");
         return false;
     }
 
-    // Present the renderer contents to the screen
-    SDL_RenderPresent(renderer);
+    // Present the g_renderer contents to the screen
+    SDL_RenderPresent(g_renderer);
 
     // --- Accurate Frame Limiting ---
     uint64_t frame_end_time = SDL_GetPerformanceCounter();
-    double elapsed_frame_time_seconds = (double)(frame_end_time - last_frame_time)
-                                        / (double)performance_frequency;
+    double elapsed_frame_time_seconds = (double)(frame_end_time - g_last_frame_time)
+                                        / (double)g_performance_frequency;
 
-    if (target_fps > 0 && elapsed_frame_time_seconds < target_frame_time) {
-        double time_to_wait_seconds = target_frame_time - elapsed_frame_time_seconds;
+    if (g_target_fps > 0 && elapsed_frame_time_seconds < g_target_frame_time) {
+        double time_to_wait_seconds = g_target_frame_time - elapsed_frame_time_seconds;
 
         // Use SDL_Delay for most of the wait time, leave ~1.5ms for busy-wait
         const double busy_wait_threshold_seconds = 0.0015;
@@ -304,27 +304,27 @@ mvn_end_drawing(void) {
         }
 
         // Busy-wait for the remaining time for precision
-        uint64_t target_ticks = last_frame_time
-                                + (uint64_t)(target_frame_time * (double)performance_frequency);
+        uint64_t target_ticks = g_last_frame_time
+                                + (uint64_t)(g_target_frame_time * (double)g_performance_frequency);
         while (SDL_GetPerformanceCounter() < target_ticks) {
             // Spin-lock briefly to free up CPU resources
         }
-        current_frame_time = SDL_GetPerformanceCounter(); // Update after waiting
+        g_current_frame_time = SDL_GetPerformanceCounter(); // Update after waiting
     } else {
         // Frame took too long, no wait needed
-        current_frame_time = frame_end_time;
+        g_current_frame_time = frame_end_time;
     }
     // --- End Accurate Frame Limiting ---
 
     // FPS calculation (uses the final current_frame_time)
-    frame_counter++;
-    double time_since_fps_reset = (double)(current_frame_time - fps_timer)
-                                  / (double)performance_frequency;
+    g_frame_counter++;
+    double time_since_fps_reset = (double)(g_current_frame_time - g_fps_timer)
+                                  / (double)g_performance_frequency;
 
     if (time_since_fps_reset >= 1.0) {
-        current_fps = frame_counter;
-        frame_counter = 0;
-        fps_timer = current_frame_time; // Reset timer for the next second
+        g_current_fps = g_frame_counter;
+        g_frame_counter = 0;
+        g_fps_timer = g_current_frame_time; // Reset timer for the next second
     }
 
     return true;
@@ -368,7 +368,7 @@ mvn_toggle_borderless_windowed(void) {
         return false;
     }
 
-    uint32_t flags = SDL_GetWindowFlags(window);
+    SDL_WindowFlags flags = SDL_GetWindowFlags(window);
     bool is_borderless = flags & SDL_WINDOW_BORDERLESS;
     bool is_fullscreen = flags & SDL_WINDOW_FULLSCREEN;
 
@@ -1047,11 +1047,11 @@ mvn_is_cursor_on_screen(void) {
  */
 void
 mvn_set_target_fps(int fps) {
-    target_fps = fps;
-    if (target_fps <= 0) {
-        target_frame_time = 0.0; // Uncapped
+    g_target_fps = fps;
+    if (g_target_fps <= 0) {
+        g_target_frame_time = 0.0; // Uncapped
     } else {
-        target_frame_time = 1.0 / (double)target_fps;
+        g_target_frame_time = 1.0 / (double)g_target_fps;
     }
 }
 
@@ -1061,7 +1061,7 @@ mvn_set_target_fps(int fps) {
  */
 float
 mvn_get_frame_time(void) {
-    return (float)delta_time;
+    return (float)g_delta_time;
 }
 
 /**
@@ -1070,11 +1070,11 @@ mvn_get_frame_time(void) {
  */
 double
 mvn_get_time(void) {
-    if (performance_frequency == 0) {
+    if (g_performance_frequency == 0) {
         return 0.0; // Avoid division by zero if not initialized
     }
     uint64_t current_time = SDL_GetPerformanceCounter();
-    return (double)(current_time - start_time) / (double)performance_frequency;
+    return (double)(current_time - g_start_time) / (double)g_performance_frequency;
 }
 
 /**
@@ -1083,5 +1083,5 @@ mvn_get_time(void) {
  */
 int
 mvn_get_fps(void) {
-    return current_fps;
+    return g_current_fps;
 }

@@ -32,7 +32,7 @@
  */
 
 #include <SDL3/SDL.h>
-#include <strings.h>
+// #include <strings.h>
 #include "mvn/mvn-file.h"
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-string.h"

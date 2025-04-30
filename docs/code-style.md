@@ -16,6 +16,7 @@ Modifications:
 - Prefer mvn_hashmap_t for data structures where they provide improved flexibility and performance
 - Include instructions to docuent macros in header file
 - Ensure that all variables are at least 3 characters long
+- Ensure that code is compatible with MSVC, GCC, and Clang
 
 ## Table of Contents
 
