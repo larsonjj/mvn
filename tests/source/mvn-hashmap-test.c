@@ -312,14 +312,14 @@ test_hashmap_edge_cases(void) {
     TEST_ASSERT(mvn_hmap_keys(NULL) == NULL, "mvn_hmap_keys with NULL hmap should return NULL");
     TEST_ASSERT(mvn_hmap_values(NULL) == NULL, "mvn_hmap_values with NULL hmap should return NULL");
 
-    TEST_ASSERT(mvn_hmap_length(NULL) == 0, "mvn_hmap_length with NULL hmap should return 0");
-
-    // Test inserting many items to trigger resizing
-    const int NUM_ITEMS = 50; // Should trigger at least one resize with initial capacity 2
-    char keys[NUM_ITEMS][20];
-    int values[NUM_ITEMS];
-
-    for (int i = 0; i < NUM_ITEMS; i++) {
+        TEST_ASSERT(mvn_hmap_length(NULL) == 0, "mvn_hmap_length with NULL hmap should return 0");
+    
+        // Test inserting many items to trigger resizing
+    #define NUM_ITEMS 50 // Should trigger at least one resize with initial capacity 2
+        char keys[NUM_ITEMS][20];
+        int values[NUM_ITEMS];
+    
+        for (int i = 0; i < NUM_ITEMS; i++) {
         snprintf(keys[i], sizeof(keys[i]), "key%d", i);
         values[i] = i * 10;
         MVN_HMAP_SET(hmap, keys[i], int, values[i]);
