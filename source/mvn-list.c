@@ -35,6 +35,12 @@ mvn_list_init(size_t item_size, size_t initial_capacity) {
         initial_capacity = MVN_LIST_DEFAULT_CAPACITY;
     }
 
+    /* Check for potential integer overflow before allocation */
+    if (initial_capacity > SIZE_MAX / item_size) {
+        mvn_log_error("Integer overflow detected when calculating initial list capacity");
+        return NULL;
+    }
+
     /* Allocate list structure */
     mvn_list_t* list = MVN_MALLOC(sizeof(mvn_list_t));
     if (!list) {
@@ -124,8 +130,17 @@ mvn_list_resize(mvn_list_t* list, size_t new_capacity) {
 
     // Check for zero capacity
     if (new_capacity == 0) {
-        mvn_log_error("Attempted to allocate zero capacity");
-        return false;
+        /* Allow resizing to 0 capacity if length is also 0, effectively freeing data */
+        if (list->length == 0) {
+            MVN_FREE(list->data);
+            list->data = NULL;
+            list->capacity = 0;
+            mvn_log_debug("List resized to 0 capacity");
+            return true;
+        } else {
+            mvn_log_error("Attempted to resize non-empty list to zero capacity");
+            return false;
+        }
     }
 
     /* Don't allow resizing smaller than current length */
@@ -137,13 +152,26 @@ mvn_list_resize(mvn_list_t* list, size_t new_capacity) {
         return true; /* No change needed */
     }
 
-    /* For very small new capacities, use a minimum threshold to reduce future resizes */
+    /* For very small non-zero capacities, use a minimum threshold */
     if (new_capacity > 0 && new_capacity < MVN_LIST_DEFAULT_CAPACITY) {
         new_capacity = MVN_LIST_DEFAULT_CAPACITY;
     }
 
+    /* Check for potential integer overflow before reallocation */
+    if (new_capacity > SIZE_MAX / list->item_size) {
+        mvn_log_error("Integer overflow detected when calculating resize capacity");
+        return false;
+    }
+
     void* new_data = MVN_REALLOC(list->data, new_capacity * list->item_size);
     if (!new_data) {
+        /* If realloc fails for 0 capacity, it's not necessarily an error if length is 0 */
+        if (new_capacity == 0 && list->length == 0) {
+             list->data = NULL; /* Data is freed by REALLOC(ptr, 0) */
+             list->capacity = 0;
+             mvn_log_debug("List resized to 0 capacity (realloc returned NULL)");
+             return true;
+        }
         mvn_log_error("Failed to resize list to capacity %zu", new_capacity);
         return false;
     }
