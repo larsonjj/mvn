@@ -112,6 +112,12 @@ resize_hashmap(mvn_hmap_t* hmap, size_t new_capacity) {
         return false;
     }
 
+    /* Check for potential integer overflow before allocation */
+    if (new_capacity > SIZE_MAX / sizeof(mvn_hmap_entry_t*)) {
+        mvn_log_error("Integer overflow detected when calculating hashmap resize capacity");
+        return false;
+    }
+
     /* Allocate new buckets array */
     mvn_hmap_entry_t** new_buckets = (mvn_hmap_entry_t**)MVN_CALLOC(new_capacity,
                                                                     sizeof(mvn_hmap_entry_t*));
@@ -163,6 +169,12 @@ mvn_hmap_init(size_t item_size, size_t initial_capacity) {
     /* Use default capacity if not specified */
     if (initial_capacity == 0) {
         initial_capacity = MVN_HMAP_DEFAULT_CAPACITY;
+    }
+
+    /* Check for potential integer overflow before allocating buckets */
+    if (initial_capacity > SIZE_MAX / sizeof(mvn_hmap_entry_t*)) {
+        mvn_log_error("Integer overflow detected when calculating initial hashmap capacity");
+        return NULL;
     }
 
     /* Allocate hashmap structure */
