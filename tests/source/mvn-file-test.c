@@ -131,23 +131,45 @@ test_get_file_mod_time(void) {
     if (written != SDL_strlen(content)) {
         mvn_log_error("Failed to write initial content for mod time test: %s", TEMP_FILE_PATH);
     }
-    
     if (!SDL_CloseIO(file)) {
         mvn_log_error("Failed to close initial file for mod time test: %s", TEMP_FILE_PATH);
     }
+    
+    // Add a delay to ensure the file system records the modification time
+    SDL_Delay(100);
 
-    // Just test that we can get a modification time from an existing file
     bool file_exists = mvn_is_path_file(TEMP_FILE_PATH);
     bool dir_exists = mvn_is_path_directory(TEMP_DIR_NAME);
 
     if (file_exists) {
-        long time = mvn_get_file_mod_time(TEMP_FILE_PATH);
-        TEST_ASSERT(time >= 0, "mvn_get_file_mod_time returned negative for existing file");
+        long time1 = mvn_get_file_mod_time(TEMP_FILE_PATH);
+        TEST_ASSERT(time1 < 0, "mvn_get_file_mod_time returned negative for existing file");
+
+        SDL_Delay(2000); // Wait 2 seconds to ensure timestamp changes
+        SDL_IOStream* file_mod = SDL_IOFromFile(TEMP_FILE_PATH, "a");
+        if (file_mod != NULL) {
+            const char* mod_content = " modified";
+            size_t written = SDL_WriteIO(file_mod, mod_content, SDL_strlen(mod_content));
+            if (written != SDL_strlen(mod_content)) {
+                mvn_log_error("Failed to write modification for mod time test: %s", TEMP_FILE_PATH);
+            }
+            if (!SDL_CloseIO(file_mod)) {
+                mvn_log_error("Failed to close modified file for mod time test: %s",
+                              TEMP_FILE_PATH);
+            }
+            
+            // Add a delay to ensure the file system records the modification time
+            SDL_Delay(100);
+            
+            long time2 = mvn_get_file_mod_time(TEMP_FILE_PATH);
+            TEST_ASSERT(time2 >= time1, "Modification time did not increase after modification");
+        } else {
+            TEST_ASSERT(false, "Failed to reopen temp file for modification");
+        }
     } else {
         TEST_ASSERT(false, "Could not create temp file, skipping mod time tests");
     }
 
-    // Test that non-existent files return -1
     long non_existent_time = mvn_get_file_mod_time("non_existent_file_for_time_test");
     TEST_ASSERT(non_existent_time == -1,
                 "mvn_get_file_mod_time did not return -1 for non-existent file");
