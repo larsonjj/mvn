@@ -144,7 +144,7 @@ static int test_get_file_mod_time(void)
 
     if (file_exists) {
         long time1 = mvn_get_file_mod_time(TEMP_FILE_PATH);
-        TEST_ASSERT(time1 < 0, "mvn_get_file_mod_time returned negative for existing file");
+        TEST_ASSERT(time1 >= 0, "mvn_get_file_mod_time returned negative for existing file");
 
         SDL_Delay(2000); // Wait 2 seconds to ensure timestamp changes
         SDL_IOStream *file_mod = SDL_IOFromFile(TEMP_FILE_PATH, "a");
