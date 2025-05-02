@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 /**
  * \brief           Run all image tests
  * \param[out] passed Pointer to the number of passed tests

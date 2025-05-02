@@ -40,7 +40,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-
 /* Private variables */
 static int32_t mvn_line_spacing = 0;
 

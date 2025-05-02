@@ -10,7 +10,6 @@
 
 #include <SDL3/SDL.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

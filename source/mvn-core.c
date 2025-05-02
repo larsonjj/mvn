@@ -42,7 +42,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 
-
 /* Static variables to hold the window and renderer */
 static mvn_window_t *     g_window      = NULL;
 static mvn_renderer_t *   g_renderer    = NULL;

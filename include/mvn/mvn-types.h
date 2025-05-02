@@ -39,7 +39,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -111,9 +110,10 @@ typedef SDL_DisplayID mvn_display_id_t;
 #define MVN_BLACK MVN_STRUCT(mvn_color_t, {.r = 0, .g = 0, .b = 0, .a = 255})
 #define MVN_LIGHTGRAY                                                                              \
     MVN_STRUCT(mvn_color_t, {.r = 200, .g = 200, .b = 200, .a = 255}) /* Light Gray */
-#define MVN_GRAY     MVN_STRUCT(mvn_color_t, {.r = 130, .g = 130, .b = 130, .a = 255}) /* Gray */
-#define MVN_DARKGRAY MVN_STRUCT(mvn_color_t, {.r = 80, .g = 80, .b = 80, .a = 255}) /* Dark Gray   \
-                                                                                     */
+#define MVN_GRAY MVN_STRUCT(mvn_color_t, {.r = 130, .g = 130, .b = 130, .a = 255}) /* Gray */
+#define MVN_DARKGRAY                                                                               \
+    MVN_STRUCT(mvn_color_t, {.r = 80, .g = 80, .b = 80, .a = 255}) /* Dark Gray                    \
+                                                                    */
 #define MVN_YELLOW MVN_STRUCT(mvn_color_t, {.r = 253, .g = 249, .b = 0, .a = 255}) /* Yellow */
 #define MVN_GOLD   MVN_STRUCT(mvn_color_t, {.r = 255, .g = 203, .b = 0, .a = 255}) /* Gold */
 #define MVN_ORANGE MVN_STRUCT(mvn_color_t, {.r = 255, .g = 161, .b = 0, .a = 255}) /* Orange */
@@ -124,11 +124,13 @@ typedef SDL_DisplayID mvn_display_id_t;
 #define MVN_LIME   MVN_STRUCT(mvn_color_t, {.r = 0, .g = 158, .b = 47, .a = 255}) /* Lime */
 #define MVN_DARKGREEN                                                                              \
     MVN_STRUCT(mvn_color_t, {.r = 0, .g = 117, .b = 44, .a = 255}) /* Dark Green */
-#define MVN_SKYBLUE MVN_STRUCT(mvn_color_t, {.r = 102, .g = 191, .b = 255, .a = 255}) /* Sky Blue  \
-                                                                                       */
-#define MVN_BLUE     MVN_STRUCT(mvn_color_t, {.r = 0, .g = 121, .b = 241, .a = 255}) /* Blue */
-#define MVN_DARKBLUE MVN_STRUCT(mvn_color_t, {.r = 0, .g = 82, .b = 172, .a = 255}) /* Dark Blue   \
-                                                                                     */
+#define MVN_SKYBLUE                                                                                \
+    MVN_STRUCT(mvn_color_t, {.r = 102, .g = 191, .b = 255, .a = 255}) /* Sky Blue                  \
+                                                                       */
+#define MVN_BLUE MVN_STRUCT(mvn_color_t, {.r = 0, .g = 121, .b = 241, .a = 255}) /* Blue */
+#define MVN_DARKBLUE                                                                               \
+    MVN_STRUCT(mvn_color_t, {.r = 0, .g = 82, .b = 172, .a = 255}) /* Dark Blue                    \
+                                                                    */
 #define MVN_PURPLE MVN_STRUCT(mvn_color_t, {.r = 200, .g = 122, .b = 255, .a = 255}) /* Purple */
 #define MVN_VIOLET MVN_STRUCT(mvn_color_t, {.r = 135, .g = 60, .b = 190, .a = 255}) /* Violet */
 #define MVN_DARKPURPLE                                                                             \

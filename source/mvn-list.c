@@ -10,7 +10,6 @@
 
 #include <SDL3/SDL.h>
 
-
 /* Default initial capacity if none is specified */
 #define MVN_LIST_DEFAULT_CAPACITY 8
 

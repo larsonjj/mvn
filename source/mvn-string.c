@@ -11,7 +11,6 @@
 
 #include <SDL3/SDL.h>
 
-
 /* Default initial capacity if none is specified */
 #define MVN_STRING_DEFAULT_CAPACITY 16
 

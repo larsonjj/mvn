@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 /**
  * \brief           Main entry point for tests
  * \return          EXIT_SUCCESS on success, EXIT_FAILURE on failure

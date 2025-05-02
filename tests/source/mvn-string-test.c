@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 /**
  * \brief           Test string initialization and freeing
  * \return          1 on success, 0 on failure

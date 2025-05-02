@@ -35,7 +35,6 @@
 
 #include <SDL3/SDL.h>
 
-
 /**
  * \brief           Set the seed for the random number generator
  * \param[in]       seed: Seed value to set

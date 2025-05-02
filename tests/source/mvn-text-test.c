@@ -19,7 +19,6 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <stdio.h>
 
-
 #define TEST_FONT_PATH "./assets/test-font.ttf" // Path to the test font file
 #define TEST_FONT_SIZE 16.0f
 

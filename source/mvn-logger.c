@@ -35,7 +35,6 @@
 
 #include <SDL3/SDL.h>
 
-
 /**
  * \brief           Initialize the MVN logger
  * \return          true on success, false on failure

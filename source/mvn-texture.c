@@ -38,7 +38,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 
-
 /**
  * \brief           Load an image from the assets directory
  * \param[in]       filename: Name of the image file in assets/images/ directory

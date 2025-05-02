@@ -17,7 +17,6 @@
 
 #include <SDL3/SDL.h>
 
-
 /**
  * \brief           Test the engine version function
  * \return          1 on success, 0 on failure

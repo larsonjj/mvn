@@ -37,7 +37,6 @@
 #include <SDL3/SDL.h>
 #include <stdio.h>
 
-
 /**
  * \brief           Custom log output function to redirect logs to a buffer for testing
  * \param[in]       userdata: User data pointer (our log buffer)
