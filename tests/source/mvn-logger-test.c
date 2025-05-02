@@ -31,10 +31,12 @@
  * Author:          Jake Larson
  */
 
-#include <SDL3/SDL.h>
-#include <stdio.h>
 #include "mvn-test-utils.h"
 #include "mvn/mvn-logger.h"
+
+#include <SDL3/SDL.h>
+#include <stdio.h>
+
 
 /**
  * \brief           Custom log output function to redirect logs to a buffer for testing
@@ -44,22 +46,23 @@
  * \param[in]       message: Log message
  */
 static void
-test_log_output(void* userdata, int category, SDL_LogPriority priority, const char* message) {
+test_log_output(void *userdata, int category, SDL_LogPriority priority, const char *message)
+{
     (void)category; /* Unused */
     (void)priority; /* Unused */
 
-    char** buffer = (char**)userdata;
+    char **buffer = (char **)userdata;
     if (buffer != NULL && *buffer != NULL) {
         /* Append to our test buffer */
         size_t current_len = SDL_strlen(*buffer);
         size_t message_len = SDL_strlen(message);
 
-        char* new_buffer = SDL_realloc(*buffer,
-                                       current_len + message_len + 2); /* +2 for \n and \0 */
+        char *new_buffer =
+            SDL_realloc(*buffer, current_len + message_len + 2); /* +2 for \n and \0 */
         if (new_buffer) {
             *buffer = new_buffer;
             SDL_strlcpy(*buffer + current_len, message, message_len + 1);
-            (*buffer)[current_len + message_len] = '\n';
+            (*buffer)[current_len + message_len]     = '\n';
             (*buffer)[current_len + message_len + 1] = '\0';
         }
     }
@@ -69,8 +72,8 @@ test_log_output(void* userdata, int category, SDL_LogPriority priority, const ch
  * \brief           Test logger initialization
  * \return          true if test passes, false otherwise
  */
-static bool
-test_logger_init(void) {
+static bool test_logger_init(void)
+{
     printf("Testing logger initialization...\n");
 
     bool result = mvn_logger_init();
@@ -87,13 +90,13 @@ test_logger_init(void) {
  * \brief           Test setting log levels
  * \return          true if test passes, false otherwise
  */
-static bool
-test_logger_set_levels(void) {
+static bool test_logger_set_levels(void)
+{
     printf("Testing logger level settings...\n");
 
     /* Save the original output function to restore later */
     SDL_LogOutputFunction original_fn;
-    void* original_userdata;
+    void *                original_userdata;
     SDL_GetLogOutputFunction(&original_fn, &original_userdata);
 
     /* Test setting individual category levels */
@@ -114,12 +117,12 @@ test_logger_set_levels(void) {
  * \brief           Test basic logging functionality
  * \return          true if test passes, false otherwise
  */
-static bool
-test_basic_logging(void) {
+static bool test_basic_logging(void)
+{
     printf("Testing basic logging functionality...\n");
 
     /* Set up our test log output */
-    char* log_buffer = SDL_calloc(1, 1); /* Start with empty string */
+    char *log_buffer = SDL_calloc(1, 1); /* Start with empty string */
     if (!log_buffer) {
         printf("FAIL: Could not allocate log buffer\n");
         return false;
@@ -127,11 +130,11 @@ test_basic_logging(void) {
 
     /* Save the original output function to restore later */
     SDL_LogOutputFunction original_fn;
-    void* original_userdata;
+    void *                original_userdata;
     SDL_GetLogOutputFunction(&original_fn, &original_userdata);
 
     /* Set our test log function */
-    SDL_SetLogOutputFunction(test_log_output, (void*)&log_buffer);
+    SDL_SetLogOutputFunction(test_log_output, (void *)&log_buffer);
 
     /* Set all levels to debug to ensure we capture everything */
     mvn_logger_set_all_levels(MVN_LOG_DEBUG);
@@ -183,12 +186,12 @@ test_basic_logging(void) {
  * \brief           Test log filtering based on level
  * \return          true if test passes, false otherwise
  */
-static bool
-test_log_filtering(void) {
+static bool test_log_filtering(void)
+{
     printf("Testing log level filtering...\n");
 
     /* Set up our test log output */
-    char* log_buffer = SDL_calloc(1, 1); /* Start with empty string */
+    char *log_buffer = SDL_calloc(1, 1); /* Start with empty string */
     if (!log_buffer) {
         printf("FAIL: Could not allocate log buffer\n");
         return false;
@@ -196,11 +199,11 @@ test_log_filtering(void) {
 
     /* Save the original output function to restore later */
     SDL_LogOutputFunction original_fn;
-    void* original_userdata;
+    void *                original_userdata;
     SDL_GetLogOutputFunction(&original_fn, &original_userdata);
 
     /* Set our test log function */
-    SDL_SetLogOutputFunction(test_log_output, (void*)&log_buffer);
+    SDL_SetLogOutputFunction(test_log_output, (void *)&log_buffer);
 
     /* Set log level to WARN - this should filter out DEBUG and INFO messages */
     mvn_logger_set_all_levels(MVN_LOG_WARN);
@@ -248,12 +251,12 @@ test_log_filtering(void) {
  * \brief           Test category-specific logging
  * \return          true if test passes, false otherwise
  */
-static bool
-test_category_logging(void) {
+static bool test_category_logging(void)
+{
     printf("Testing category-specific logging...\n");
 
     /* Set up our test log output */
-    char* log_buffer = SDL_calloc(1, 1); /* Start with empty string */
+    char *log_buffer = SDL_calloc(1, 1); /* Start with empty string */
     if (!log_buffer) {
         printf("FAIL: Could not allocate log buffer\n");
         return false;
@@ -261,11 +264,11 @@ test_category_logging(void) {
 
     /* Save the original output function to restore later */
     SDL_LogOutputFunction original_fn;
-    void* original_userdata;
+    void *                original_userdata;
     SDL_GetLogOutputFunction(&original_fn, &original_userdata);
 
     /* Set our test log function */
-    SDL_SetLogOutputFunction(test_log_output, (void*)&log_buffer);
+    SDL_SetLogOutputFunction(test_log_output, (void *)&log_buffer);
 
     /* Set different levels for different categories */
     mvn_logger_set_level(MVN_LOG_CATEGORY_DEFAULT, MVN_LOG_ERROR); /* Only ERROR and above */
@@ -308,12 +311,12 @@ test_category_logging(void) {
  * \brief           Test debug vs. release logging configuration example
  * \return          true if test passes, false otherwise
  */
-static bool
-test_debug_vs_release_config(void) {
+static bool test_debug_vs_release_config(void)
+{
     printf("Testing debug vs. release logging configuration...\n");
 
     /* Set up our test log output */
-    char* log_buffer = SDL_calloc(1, 1); /* Start with empty string */
+    char *log_buffer = SDL_calloc(1, 1); /* Start with empty string */
     if (!log_buffer) {
         printf("FAIL: Could not allocate log buffer\n");
         return false;
@@ -321,11 +324,11 @@ test_debug_vs_release_config(void) {
 
     /* Save the original output function to restore later */
     SDL_LogOutputFunction original_fn;
-    void* original_userdata;
+    void *                original_userdata;
     SDL_GetLogOutputFunction(&original_fn, &original_userdata);
 
     /* Set our test log function */
-    SDL_SetLogOutputFunction(test_log_output, (void*)&log_buffer);
+    SDL_SetLogOutputFunction(test_log_output, (void *)&log_buffer);
 
     /* Clear the buffer */
     SDL_free(log_buffer);
@@ -395,8 +398,8 @@ test_debug_vs_release_config(void) {
  * \param[out] total_tests Pointer to the total number of tests
  * \return          Number of passed tests
  */
-int
-run_logger_tests(int* passed_tests, int* failed_tests, int* total_tests) {
+int run_logger_tests(int *passed_tests, int *failed_tests, int *total_tests)
+{
     printf("\n===== LIST TESTS =====\n\n");
     int passed_before = *passed_tests;
     int failed_before = *failed_tests;
@@ -418,11 +421,11 @@ run_logger_tests(int* passed_tests, int* failed_tests, int* total_tests) {
 }
 
 #if defined(MVN_LOGGER_TEST_MAIN)
-int
-main(void) {
+int main(void)
+{
     int passed = 0;
     int failed = 0;
-    int total = 0;
+    int total  = 0;
 
     run_logger_tests(&passed, &failed, &total);
 

@@ -44,38 +44,38 @@ extern "C" {
  * \brief           Dynamic string structure
  */
 typedef struct mvn_string_t {
-    char* data;      /*!< String data */
+    char * data;     /*!< String data */
     size_t length;   /*!< String length (excluding null terminator) */
     size_t capacity; /*!< Allocated capacity (including null terminator) */
 } mvn_string_t;
 
-mvn_string_t* mvn_string_init(size_t initial_capacity);
-mvn_string_t* mvn_string_from_cstr(const char* cstr);
-void mvn_string_free(mvn_string_t* str);
-size_t mvn_string_length(const mvn_string_t* str);
-const char* mvn_string_to_cstr(const mvn_string_t* str);
-mvn_string_t* mvn_string_concat(const mvn_string_t* str1, const mvn_string_t* str2);
-bool mvn_string_append(mvn_string_t* str, const char* cstr);
-bool mvn_string_ends_with(const mvn_string_t* str, const char* suffix);
-bool mvn_string_starts_with(const mvn_string_t* str, const char* prefix);
-bool mvn_string_includes(const mvn_string_t* str, const char* substr);
-mvn_string_t* mvn_string_pad_end(const mvn_string_t* str, size_t target_length, char pad_char);
-mvn_string_t* mvn_string_pad_start(const mvn_string_t* str, size_t target_length, char pad_char);
-mvn_string_t* mvn_string_repeat(const mvn_string_t* str, size_t count);
-mvn_string_t* mvn_string_replace(const mvn_string_t* str, const char* search,
-                                 const char* replacement);
-mvn_string_t* mvn_string_replace_all(const mvn_string_t* str, const char* search,
-                                     const char* replacement);
-struct mvn_list_t* mvn_string_split(const mvn_string_t* str, const char* delimiter);
-mvn_string_t* mvn_string_to_lowercase(const mvn_string_t* str);
-mvn_string_t* mvn_string_to_uppercase(const mvn_string_t* str);
-mvn_string_t* mvn_string_trim(const mvn_string_t* str);
-mvn_string_t* mvn_string_trim_end(const mvn_string_t* str);
-mvn_string_t* mvn_string_trim_start(const mvn_string_t* str);
-mvn_string_t* mvn_string_substring(const mvn_string_t* str, size_t start, size_t length);
-bool mvn_string_compare(const mvn_string_t* str1, const mvn_string_t* str2);
-size_t mvn_string_capacity(const mvn_string_t* str);
-void mvn_string_clear(mvn_string_t* str);
+mvn_string_t *mvn_string_init(size_t initial_capacity);
+mvn_string_t *mvn_string_from_cstr(const char *cstr);
+void          mvn_string_free(mvn_string_t *str);
+size_t        mvn_string_length(const mvn_string_t *str);
+const char *  mvn_string_to_cstr(const mvn_string_t *str);
+mvn_string_t *mvn_string_concat(const mvn_string_t *str1, const mvn_string_t *str2);
+bool          mvn_string_append(mvn_string_t *str, const char *cstr);
+bool          mvn_string_ends_with(const mvn_string_t *str, const char *suffix);
+bool          mvn_string_starts_with(const mvn_string_t *str, const char *prefix);
+bool          mvn_string_includes(const mvn_string_t *str, const char *substr);
+mvn_string_t *mvn_string_pad_end(const mvn_string_t *str, size_t target_length, char pad_char);
+mvn_string_t *mvn_string_pad_start(const mvn_string_t *str, size_t target_length, char pad_char);
+mvn_string_t *mvn_string_repeat(const mvn_string_t *str, size_t count);
+mvn_string_t *
+mvn_string_replace(const mvn_string_t *str, const char *search, const char *replacement);
+mvn_string_t *
+mvn_string_replace_all(const mvn_string_t *str, const char *search, const char *replacement);
+struct mvn_list_t *mvn_string_split(const mvn_string_t *str, const char *delimiter);
+mvn_string_t *     mvn_string_to_lowercase(const mvn_string_t *str);
+mvn_string_t *     mvn_string_to_uppercase(const mvn_string_t *str);
+mvn_string_t *     mvn_string_trim(const mvn_string_t *str);
+mvn_string_t *     mvn_string_trim_end(const mvn_string_t *str);
+mvn_string_t *     mvn_string_trim_start(const mvn_string_t *str);
+mvn_string_t *     mvn_string_substring(const mvn_string_t *str, size_t start, size_t length);
+bool               mvn_string_compare(const mvn_string_t *str1, const mvn_string_t *str2);
+size_t             mvn_string_capacity(const mvn_string_t *str);
+void               mvn_string_clear(mvn_string_t *str);
 
 #ifdef __cplusplus
 }

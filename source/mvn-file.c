@@ -43,8 +43,8 @@
  * \param[in]       fileName: Path to the file
  * \return          true if file exists, false otherwise
  */
-bool
-mvn_file_exists(const char* fileName) {
+bool mvn_file_exists(const char *fileName)
+{
     if (fileName == NULL || fileName[0] == '\0') {
         return false;
     }
@@ -62,8 +62,8 @@ mvn_file_exists(const char* fileName) {
  * \param[in]       dirPath: Path to the directory
  * \return          true if directory exists, false otherwise
  */
-bool
-mvn_directory_exists(const char* dirPath) {
+bool mvn_directory_exists(const char *dirPath)
+{
     if (dirPath == NULL || dirPath[0] == '\0') {
         return false;
     }
@@ -82,13 +82,13 @@ mvn_directory_exists(const char* dirPath) {
  * \param[in]       ext: Extension to check for (including dot, e.g. ".png")
  * \return          true if file has the extension, false otherwise
  */
-bool
-mvn_is_file_extension(const char* fileName, const char* ext) {
+bool mvn_is_file_extension(const char *fileName, const char *ext)
+{
     if (fileName == NULL || ext == NULL) {
         return false;
     }
 
-    mvn_string_t* fileExt = mvn_get_file_extension(fileName);
+    mvn_string_t *fileExt = mvn_get_file_extension(fileName);
     if (!fileExt) {
         return false;
     }
@@ -109,8 +109,8 @@ mvn_is_file_extension(const char* fileName, const char* ext) {
  * \param[in]       fileName: Path to the file
  * \return          File size in bytes, -1 on failure
  */
-int32_t
-mvn_get_file_length(const char* fileName) {
+int32_t mvn_get_file_length(const char *fileName)
+{
     if (fileName == NULL) {
         return -1;
     }
@@ -130,21 +130,22 @@ mvn_get_file_length(const char* fileName) {
 /**
  * \brief           Get file extension
  * \param[in]       fileName: Path to the file
- * \return          File extension as mvn_string_t including dot (e.g. ".png"), empty string if no extension
+ * \return          File extension as mvn_string_t including dot (e.g. ".png"), empty string if no
+ * extension
  */
-mvn_string_t*
-mvn_get_file_extension(const char* fileName) {
+mvn_string_t *mvn_get_file_extension(const char *fileName)
+{
     if (fileName == NULL) {
         return mvn_string_from_cstr("");
     }
 
-    const char* dot = SDL_strrchr(fileName, '.');
+    const char *dot = SDL_strrchr(fileName, '.');
     if (dot == NULL || dot == fileName) {
         return mvn_string_from_cstr(""); // No extension or filename starts with dot
     }
 
     // Make sure there's no directory separator after the last dot
-    const char* slash = SDL_max(SDL_strrchr(fileName, '/'), SDL_strrchr(fileName, '\\'));
+    const char *slash = SDL_max(SDL_strrchr(fileName, '/'), SDL_strrchr(fileName, '\\'));
     if (slash != NULL && slash > dot) {
         return mvn_string_from_cstr(""); // Last dot is in a directory component
     }
@@ -157,15 +158,15 @@ mvn_get_file_extension(const char* fileName) {
  * \param[in]       filePath: Path to the file
  * \return          Filename part of the path as mvn_string_t
  */
-mvn_string_t*
-mvn_get_file_name(const char* filePath) {
+mvn_string_t *mvn_get_file_name(const char *filePath)
+{
     if (filePath == NULL) {
         return mvn_string_from_cstr("");
     }
 
-    const char* slash1 = SDL_strrchr(filePath, '/');
-    const char* slash2 = SDL_strrchr(filePath, '\\');
-    const char* lastSlash = SDL_max(slash1, slash2);
+    const char *slash1    = SDL_strrchr(filePath, '/');
+    const char *slash2    = SDL_strrchr(filePath, '\\');
+    const char *lastSlash = SDL_max(slash1, slash2);
 
     if (lastSlash != NULL) {
         return mvn_string_from_cstr(lastSlash + 1); // Skip the slash character
@@ -179,31 +180,31 @@ mvn_get_file_name(const char* filePath) {
  * \param[in]       filePath: Path to the file
  * \return          Filename without extension as a mvn_string_t
  */
-mvn_string_t*
-mvn_get_file_name_without_ext(const char* filePath) {
+mvn_string_t *mvn_get_file_name_without_ext(const char *filePath)
+{
     if (filePath == NULL) {
         return mvn_string_from_cstr("");
     }
 
-    mvn_string_t* fileName = mvn_get_file_name(filePath);
+    mvn_string_t *fileName = mvn_get_file_name(filePath);
     if (!fileName) {
         return mvn_string_from_cstr("");
     }
 
-    mvn_string_t* extStr = mvn_get_file_extension(mvn_string_to_cstr(fileName));
+    mvn_string_t *extStr = mvn_get_file_extension(mvn_string_to_cstr(fileName));
     if (!extStr) {
         mvn_string_free(fileName);
         return mvn_string_from_cstr("");
     }
 
-    const char* name = mvn_string_to_cstr(fileName);
-    const char* ext = mvn_string_to_cstr(extStr);
+    const char *name = mvn_string_to_cstr(fileName);
+    const char *ext  = mvn_string_to_cstr(extStr);
 
     // Calculate the length of the filename without extension
     size_t length = (ext[0] != '\0') ? (size_t)(ext - name) : fileName->length;
 
     // Create a new string with the calculated length
-    mvn_string_t* result = mvn_string_init(length + 1);
+    mvn_string_t *result = mvn_string_init(length + 1);
     if (result == NULL) {
         mvn_log_error("Failed to create string for filename without extension");
         mvn_string_free(fileName);
@@ -214,7 +215,7 @@ mvn_get_file_name_without_ext(const char* filePath) {
     // Copy the filename without the extension
     SDL_memcpy(result->data, name, length);
     result->data[length] = '\0';
-    result->length = length;
+    result->length       = length;
 
     mvn_string_free(fileName);
     mvn_string_free(extStr);
@@ -226,18 +227,18 @@ mvn_get_file_name_without_ext(const char* filePath) {
  * \param[in]       filePath: Path to the file
  * \return          Directory path as a mvn_string_t
  */
-mvn_string_t*
-mvn_get_directory_path(const char* filePath) {
+mvn_string_t *mvn_get_directory_path(const char *filePath)
+{
     if (filePath == NULL) {
         return mvn_string_from_cstr("");
     }
 
     // Find the last slash
-    const char* lastSlash1 = SDL_strrchr(filePath, '/');
-    const char* lastSlash2 = SDL_strrchr(filePath, '\\');
-    const char* lastSlash = SDL_max(lastSlash1, lastSlash2);
+    const char *lastSlash1 = SDL_strrchr(filePath, '/');
+    const char *lastSlash2 = SDL_strrchr(filePath, '\\');
+    const char *lastSlash  = SDL_max(lastSlash1, lastSlash2);
 
-    mvn_string_t* result;
+    mvn_string_t *result;
 
     if (lastSlash == NULL) {
         // No directory component, return "."
@@ -256,7 +257,7 @@ mvn_get_directory_path(const char* filePath) {
         // Copy the directory path
         SDL_memcpy(result->data, filePath, length);
         result->data[length] = '\0';
-        result->length = length;
+        result->length       = length;
     }
 
     return result;
@@ -267,22 +268,22 @@ mvn_get_directory_path(const char* filePath) {
  * \param[in]       dirPath: Current directory path
  * \return          Parent directory path as a mvn_string_t
  */
-mvn_string_t*
-mvn_get_parent_directory_path(const char* dirPath) {
+mvn_string_t *mvn_get_parent_directory_path(const char *dirPath)
+{
     if (dirPath == NULL || dirPath[0] == '\0') {
         return mvn_string_from_cstr("");
     }
 
     // Make a copy of the path that we can modify
-    mvn_string_t* path = mvn_string_from_cstr(dirPath);
+    mvn_string_t *path = mvn_string_from_cstr(dirPath);
     if (path == NULL) {
         mvn_log_error("Failed to create string for parent directory path");
         return mvn_string_from_cstr("");
     }
 
     // Remove trailing slashes
-    while (path->length > 0
-           && (path->data[path->length - 1] == '/' || path->data[path->length - 1] == '\\')) {
+    while (path->length > 0 &&
+           (path->data[path->length - 1] == '/' || path->data[path->length - 1] == '\\')) {
         path->data[path->length - 1] = '\0';
         path->length--;
     }
@@ -293,9 +294,9 @@ mvn_get_parent_directory_path(const char* dirPath) {
     }
 
     // Find the last slash
-    char* lastSlash1 = SDL_strrchr(path->data, '/');
-    char* lastSlash2 = SDL_strrchr(path->data, '\\');
-    char* lastSlash = SDL_max(lastSlash1, lastSlash2);
+    char *lastSlash1 = SDL_strrchr(path->data, '/');
+    char *lastSlash2 = SDL_strrchr(path->data, '\\');
+    char *lastSlash  = SDL_max(lastSlash1, lastSlash2);
 
     if (lastSlash == NULL) {
         mvn_string_free(path);
@@ -303,7 +304,7 @@ mvn_get_parent_directory_path(const char* dirPath) {
     }
 
     // Terminate the string at the last slash
-    *lastSlash = '\0';
+    *lastSlash   = '\0';
     path->length = (size_t)(lastSlash - path->data);
 
     if (path->length == 0) {
@@ -318,16 +319,16 @@ mvn_get_parent_directory_path(const char* dirPath) {
  * \brief           Get the directory of the running application
  * \return          Application directory as a mvn_string_t
  */
-mvn_string_t*
-mvn_get_application_directory(void) {
-    const char* basePath = SDL_GetBasePath();
+mvn_string_t *mvn_get_application_directory(void)
+{
+    const char *basePath = SDL_GetBasePath();
     if (basePath == NULL) {
         mvn_log_error("Failed to get application directory: %s", SDL_GetError());
         return mvn_string_from_cstr("");
     }
 
-    mvn_string_t* result = mvn_string_from_cstr(basePath);
-    MVN_FREE((void*)basePath);
+    mvn_string_t *result = mvn_string_from_cstr(basePath);
+    MVN_FREE((void *)basePath);
 
     if (result == NULL) {
         mvn_log_error("Failed to create string for application directory");
@@ -342,8 +343,8 @@ mvn_get_application_directory(void) {
  * \param[in]       path: Path to check
  * \return          true if path is a file, false otherwise
  */
-bool
-mvn_is_path_file(const char* path) {
+bool mvn_is_path_file(const char *path)
+{
     if (path == NULL || path[0] == '\0') {
         return false;
     }
@@ -361,8 +362,8 @@ mvn_is_path_file(const char* path) {
  * \param[in]       path: Path to check
  * \return          true if path is a directory, false otherwise
  */
-bool
-mvn_is_path_directory(const char* path) {
+bool mvn_is_path_directory(const char *path)
+{
     if (path == NULL || path[0] == '\0') {
         return false;
     }
@@ -380,8 +381,8 @@ mvn_is_path_directory(const char* path) {
  * \param[in]       fileName: Path to the file
  * \return          Modification time as a Unix timestamp, -1 on failure
  */
-long
-mvn_get_file_mod_time(const char* fileName) {
+long mvn_get_file_mod_time(const char *fileName)
+{
     if (fileName == NULL || fileName[0] == '\0') {
         return -1;
     }

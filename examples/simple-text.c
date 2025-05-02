@@ -33,17 +33,17 @@
 
 #include "mvn/mvn.h" // IWYU pragma: keep
 
-int
-main(void) {
+int main(void)
+{
     /* Initialize MVN */
     if (!mvn_init(800, 600, "MVN Simple Text Example", 0)) {
         return 1;
     }
 
     /* Load fonts at different sizes */
-    TTF_Font* fontSmall = mvn_load_font("assets/press_start_2p.ttf", 16);
-    TTF_Font* fontMedium = mvn_load_font("assets/press_start_2p.ttf", 20);
-    TTF_Font* fontLarge = mvn_load_font("assets/press_start_2p.ttf", 24);
+    TTF_Font *fontSmall  = mvn_load_font("assets/press_start_2p.ttf", 16);
+    TTF_Font *fontMedium = mvn_load_font("assets/press_start_2p.ttf", 20);
+    TTF_Font *fontLarge  = mvn_load_font("assets/press_start_2p.ttf", 24);
 
     if (fontSmall == NULL || fontMedium == NULL || fontLarge == NULL) {
         mvn_log_error("Failed to load fonts");
@@ -67,23 +67,27 @@ main(void) {
         mvn_clear_background(MVN_BLACK);
 
         /* Draw section titles */
-        mvn_draw_text(fontMedium, "MVN Text Rendering Showcase", MVN_STRUCT(mvn_fpoint_t, {20, 20}),
+        mvn_draw_text(fontMedium,
+                      "MVN Text Rendering Showcase",
+                      MVN_STRUCT(mvn_fpoint_t, {20, 20}),
                       MVN_YELLOW);
 
-        mvn_draw_text(fontSmall, "1. Basic Text Drawing", MVN_STRUCT(mvn_fpoint_t, {20, 60}),
-                      MVN_WHITE);
+        mvn_draw_text(
+            fontSmall, "1. Basic Text Drawing", MVN_STRUCT(mvn_fpoint_t, {20, 60}), MVN_WHITE);
 
         /* 1. Basic text drawing */
-        mvn_draw_text(fontSmall, "Small Font (12pt)", MVN_STRUCT(mvn_fpoint_t, {40, 120}),
-                      MVN_WHITE);
-        mvn_draw_text(fontMedium, "Medium Font (16pt)", MVN_STRUCT(mvn_fpoint_t, {40, 150}),
-                      MVN_WHITE);
-        mvn_draw_text(fontLarge, "Large Font (24pt)", MVN_STRUCT(mvn_fpoint_t, {40, 180}),
-                      MVN_WHITE);
+        mvn_draw_text(
+            fontSmall, "Small Font (12pt)", MVN_STRUCT(mvn_fpoint_t, {40, 120}), MVN_WHITE);
+        mvn_draw_text(
+            fontMedium, "Medium Font (16pt)", MVN_STRUCT(mvn_fpoint_t, {40, 150}), MVN_WHITE);
+        mvn_draw_text(
+            fontLarge, "Large Font (24pt)", MVN_STRUCT(mvn_fpoint_t, {40, 180}), MVN_WHITE);
 
         /* 2. Text with colored tints */
-        mvn_draw_text(fontSmall, "2. Text with Different Colors",
-                      MVN_STRUCT(mvn_fpoint_t, {20, 220}), MVN_WHITE);
+        mvn_draw_text(fontSmall,
+                      "2. Text with Different Colors",
+                      MVN_STRUCT(mvn_fpoint_t, {20, 220}),
+                      MVN_WHITE);
         mvn_draw_text(fontMedium, "Red Text", MVN_STRUCT(mvn_fpoint_t, {40, 250}), MVN_RED);
         mvn_draw_text(fontMedium, "Green Text", MVN_STRUCT(mvn_fpoint_t, {40, 280}), MVN_GREEN);
         mvn_draw_text(fontMedium, "Blue Text", MVN_STRUCT(mvn_fpoint_t, {40, 310}), MVN_BLUE);
@@ -92,28 +96,39 @@ main(void) {
         mvn_draw_text(fontSmall, "4. Rotated Text", MVN_STRUCT(mvn_fpoint_t, {400, 60}), MVN_WHITE);
 
         /* Static rotated examples */
-        mvn_draw_text_pro(fontMedium, "Rotated 15°", MVN_STRUCT(mvn_fpoint_t, {450, 100}),
-                          MVN_STRUCT(mvn_fpoint_t, {0, 0}), 15.0f, MVN_WHITE);
+        mvn_draw_text_pro(fontMedium,
+                          "Rotated 15°",
+                          MVN_STRUCT(mvn_fpoint_t, {450, 100}),
+                          MVN_STRUCT(mvn_fpoint_t, {0, 0}),
+                          15.0f,
+                          MVN_WHITE);
 
-        mvn_draw_text_pro(fontMedium, "Rotated 45°", MVN_STRUCT(mvn_fpoint_t, {500, 150}),
-                          MVN_STRUCT(mvn_fpoint_t, {0, 0}), 45.0f, MVN_WHITE);
+        mvn_draw_text_pro(fontMedium,
+                          "Rotated 45°",
+                          MVN_STRUCT(mvn_fpoint_t, {500, 150}),
+                          MVN_STRUCT(mvn_fpoint_t, {0, 0}),
+                          45.0f,
+                          MVN_WHITE);
 
         /* Animated rotation with custom origin */
         int width = mvn_measure_text(fontLarge, "Rotating Text", 0);
-        mvn_draw_text_pro(fontLarge, "Rotating Text", MVN_STRUCT(mvn_fpoint_t, {550.0f, 250.0f}),
-                          MVN_STRUCT(mvn_fpoint_t, {(float)width / 2.0f, 12.0f}), rotation,
+        mvn_draw_text_pro(fontLarge,
+                          "Rotating Text",
+                          MVN_STRUCT(mvn_fpoint_t, {550.0f, 250.0f}),
+                          MVN_STRUCT(mvn_fpoint_t, {(float)width / 2.0f, 12.0f}),
+                          rotation,
                           MVN_YELLOW);
 
         /* 5. Text measurements */
-        mvn_draw_text(fontSmall, "5. Text Measurements", MVN_STRUCT(mvn_fpoint_t, {400, 350}),
-                      MVN_WHITE);
+        mvn_draw_text(
+            fontSmall, "5. Text Measurements", MVN_STRUCT(mvn_fpoint_t, {400, 350}), MVN_WHITE);
 
-        const char* measureText = "Measured text width";
-        int textWidth = mvn_measure_text(fontMedium, measureText, 0);
+        const char *measureText = "Measured text width";
+        int         textWidth   = mvn_measure_text(fontMedium, measureText, 0);
         mvn_draw_text(fontMedium, measureText, MVN_STRUCT(mvn_fpoint_t, {420, 380}), MVN_WHITE);
 
         /* Draw a line showing the text width */
-        mvn_renderer_t* renderer = mvn_get_renderer();
+        mvn_renderer_t *renderer = mvn_get_renderer();
         SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
         SDL_RenderLine(renderer, 420.0f, 400.0f, 420.0f + (float)textWidth, 400.0f);
 
@@ -123,14 +138,14 @@ main(void) {
         mvn_draw_text(fontSmall, widthStr, MVN_STRUCT(mvn_fpoint_t, {420, 410}), MVN_YELLOW);
 
         /* Draw FPS counter */
-        int currentFps = mvn_get_fps();
+        int  currentFps = mvn_get_fps();
         char fpsText[16];
         SDL_snprintf(fpsText, sizeof(fpsText), "FPS: %d", currentFps);
 
-        int screenWidth = mvn_get_render_width();
-        int screenHeight = mvn_get_render_height();
-        int fpsTextWidth = mvn_measure_text(fontSmall, fpsText, 0);
-        float margin = 32.0f;
+        int   screenWidth  = mvn_get_render_width();
+        int   screenHeight = mvn_get_render_height();
+        int   fpsTextWidth = mvn_measure_text(fontSmall, fpsText, 0);
+        float margin       = 32.0f;
 
         mvn_fpoint_t fpsPos = MVN_STRUCT(mvn_fpoint_t,
                                          {

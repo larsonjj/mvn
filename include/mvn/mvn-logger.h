@@ -44,37 +44,37 @@ extern "C" {
  * \brief           MVN log priority levels
  */
 typedef enum {
-    MVN_LOG_VERBOSE = SDL_LOG_PRIORITY_VERBOSE,  /*!< Verbose logging for debugging */
-    MVN_LOG_DEBUG = SDL_LOG_PRIORITY_DEBUG,      /*!< Debug log level */
-    MVN_LOG_INFO = SDL_LOG_PRIORITY_INFO,        /*!< Information log level */
-    MVN_LOG_WARN = SDL_LOG_PRIORITY_WARN,        /*!< Warning log level */
-    MVN_LOG_ERROR = SDL_LOG_PRIORITY_ERROR,      /*!< Error log level */
+    MVN_LOG_VERBOSE  = SDL_LOG_PRIORITY_VERBOSE, /*!< Verbose logging for debugging */
+    MVN_LOG_DEBUG    = SDL_LOG_PRIORITY_DEBUG,   /*!< Debug log level */
+    MVN_LOG_INFO     = SDL_LOG_PRIORITY_INFO,    /*!< Information log level */
+    MVN_LOG_WARN     = SDL_LOG_PRIORITY_WARN,    /*!< Warning log level */
+    MVN_LOG_ERROR    = SDL_LOG_PRIORITY_ERROR,   /*!< Error log level */
     MVN_LOG_CRITICAL = SDL_LOG_PRIORITY_CRITICAL /*!< Critical log level */
 } mvn_log_level_t;
 
 /**
-* \brief           MVN log categories
-*/
+ * \brief           MVN log categories
+ */
 typedef enum {
     MVN_LOG_CATEGORY_DEFAULT = SDL_LOG_CATEGORY_APPLICATION, /*!< Default application category */
-    MVN_LOG_CATEGORY_ERROR = SDL_LOG_CATEGORY_ERROR,         /*!< Error category */
-    MVN_LOG_CATEGORY_SYSTEM = SDL_LOG_CATEGORY_SYSTEM,       /*!< System category */
-    MVN_LOG_CATEGORY_AUDIO = SDL_LOG_CATEGORY_AUDIO,         /*!< Audio category */
-    MVN_LOG_CATEGORY_VIDEO = SDL_LOG_CATEGORY_VIDEO,         /*!< Video category */
-    MVN_LOG_CATEGORY_RENDER = SDL_LOG_CATEGORY_RENDER,       /*!< Render category */
-    MVN_LOG_CATEGORY_INPUT = SDL_LOG_CATEGORY_INPUT,         /*!< Input category */
-    MVN_LOG_CATEGORY_CUSTOM = SDL_LOG_CATEGORY_CUSTOM        /*!< Custom category */
+    MVN_LOG_CATEGORY_ERROR   = SDL_LOG_CATEGORY_ERROR,       /*!< Error category */
+    MVN_LOG_CATEGORY_SYSTEM  = SDL_LOG_CATEGORY_SYSTEM,      /*!< System category */
+    MVN_LOG_CATEGORY_AUDIO   = SDL_LOG_CATEGORY_AUDIO,       /*!< Audio category */
+    MVN_LOG_CATEGORY_VIDEO   = SDL_LOG_CATEGORY_VIDEO,       /*!< Video category */
+    MVN_LOG_CATEGORY_RENDER  = SDL_LOG_CATEGORY_RENDER,      /*!< Render category */
+    MVN_LOG_CATEGORY_INPUT   = SDL_LOG_CATEGORY_INPUT,       /*!< Input category */
+    MVN_LOG_CATEGORY_CUSTOM  = SDL_LOG_CATEGORY_CUSTOM       /*!< Custom category */
 } mvn_log_category_t;
 
 bool mvn_logger_init(void);
 void mvn_logger_set_level(mvn_log_category_t category, mvn_log_level_t level);
 void mvn_logger_set_all_levels(mvn_log_level_t level);
-void mvn_log(mvn_log_category_t category, mvn_log_level_t priority, const char* fmt, ...);
-void mvn_log_info(const char* fmt, ...);
-void mvn_log_debug(const char* fmt, ...);
-void mvn_log_warn(const char* fmt, ...);
-void mvn_log_error(const char* fmt, ...);
-void mvn_log_critical(const char* fmt, ...);
+void mvn_log(mvn_log_category_t category, mvn_log_level_t priority, const char *fmt, ...);
+void mvn_log_info(const char *fmt, ...);
+void mvn_log_debug(const char *fmt, ...);
+void mvn_log_warn(const char *fmt, ...);
+void mvn_log_error(const char *fmt, ...);
+void mvn_log_critical(const char *fmt, ...);
 
 #ifdef __cplusplus
 }

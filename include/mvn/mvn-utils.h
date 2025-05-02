@@ -34,8 +34,10 @@
 #ifndef MVN_UTILS_H
 #define MVN_UTILS_H
 
-#include <SDL3/SDL.h>
 #include "mvn/mvn-list.h"
+
+#include <SDL3/SDL.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,11 +72,11 @@ extern "C" {
 #define MVN_FREE(ptr) SDL_free(ptr)
 #endif
 
-void mvn_set_random_seed(int32_t seed);
-int32_t mvn_get_random_value(int32_t min, int32_t max);
-void mvn_open_url(const char* url);
-mvn_list_t* mvn_load_random_sequence(int32_t count, int32_t min, int32_t max);
-void mvn_unload_random_sequence(mvn_list_t* sequence);
+void        mvn_set_random_seed(int32_t seed);
+int32_t     mvn_get_random_value(int32_t min, int32_t max);
+void        mvn_open_url(const char *url);
+mvn_list_t *mvn_load_random_sequence(int32_t count, int32_t min, int32_t max);
+void        mvn_unload_random_sequence(mvn_list_t *sequence);
 
 #ifdef __cplusplus
 }

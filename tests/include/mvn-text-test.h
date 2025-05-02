@@ -43,7 +43,7 @@ extern "C" {
  * \param[out]      failed: Pointer to integer to increment for failed tests
  * \param[out]      total: Pointer to integer to increment for total tests run
  */
-void run_text_tests(int* passed, int* failed, int* total);
+void run_text_tests(int *passed, int *failed, int *total);
 
 #ifdef __cplusplus
 }

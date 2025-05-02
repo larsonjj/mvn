@@ -11,51 +11,51 @@
  * Author:          Jake Larson
  */
 
-#include <stdio.h>
-#include <string.h>
-
 #include "mvn-test-utils.h"
 #include "mvn/mvn-hashmap.h"
 #include "mvn/mvn-types.h"
 
+#include <stdio.h>
+#include <string.h>
+
 /**
-  * \brief           Test basic hashmap initialization and freeing
-  * \return          1 on success, 0 on failure
-  */
-static int
-test_hashmap_init(void) {
+ * \brief           Test basic hashmap initialization and freeing
+ * \return          1 on success, 0 on failure
+ */
+static int test_hashmap_init(void)
+{
     // Test with default capacity (0)
-    mvn_hmap_t* hmap1 = MVN_HMAP_INIT(int, 0);
+    mvn_hmap_t *hmap1 = MVN_HMAP_INIT(int, 0);
     TEST_ASSERT(hmap1 != NULL, "Failed to initialize hashmap with default capacity");
     TEST_ASSERT(mvn_hmap_length(hmap1) == 0, "New hashmap should have length 0");
     mvn_hmap_free(hmap1);
 
     // Test with specific capacity
-    mvn_hmap_t* hmap2 = MVN_HMAP_INIT(int, 16);
+    mvn_hmap_t *hmap2 = MVN_HMAP_INIT(int, 16);
     TEST_ASSERT(hmap2 != NULL, "Failed to initialize hashmap with specific capacity");
     TEST_ASSERT(mvn_hmap_length(hmap2) == 0, "New hashmap should have length 0");
     mvn_hmap_free(hmap2);
 
     // Test with type-safe macro
-    mvn_hmap_t* hmap3 = MVN_HMAP_INIT(mvn_point_t, 8);
+    mvn_hmap_t *hmap3 = MVN_HMAP_INIT(mvn_point_t, 8);
     TEST_ASSERT(hmap3 != NULL, "Failed to initialize hashmap with type-safe macro");
     mvn_hmap_free(hmap3);
 
     // Test with invalid parameters
-    mvn_hmap_t* hmap4 = mvn_hmap_init(0, 10);
+    mvn_hmap_t *hmap4 = mvn_hmap_init(0, 10);
     TEST_ASSERT(hmap4 == NULL, "Hashmap initialization should fail with item_size = 0");
 
     return 1;
 }
 
 /**
-  * \brief           Test setting and getting values in the hashmap
-  * \return          1 on success, 0 on failure
-  */
-static int
-test_hashmap_set_get(void) {
+ * \brief           Test setting and getting values in the hashmap
+ * \return          1 on success, 0 on failure
+ */
+static int test_hashmap_set_get(void)
+{
     // Initialize hashmap for integers
-    mvn_hmap_t* hmap = MVN_HMAP_INIT(int, 8);
+    mvn_hmap_t *hmap = MVN_HMAP_INIT(int, 8);
     TEST_ASSERT(hmap != NULL, "Failed to initialize hashmap");
 
     // Test setting and getting simple values
@@ -69,10 +69,10 @@ test_hashmap_set_get(void) {
 
     TEST_ASSERT(mvn_hmap_length(hmap) == 3, "Hashmap should have 3 items");
 
-    int* retrieved1 = MVN_HMAP_GET(int, hmap, "key1");
-    int* retrieved2 = MVN_HMAP_GET(int, hmap, "key2");
-    int* retrieved3 = MVN_HMAP_GET(int, hmap, "key3");
-    int* not_found = MVN_HMAP_GET(int, hmap, "nonexistent");
+    int *retrieved1 = MVN_HMAP_GET(int, hmap, "key1");
+    int *retrieved2 = MVN_HMAP_GET(int, hmap, "key2");
+    int *retrieved3 = MVN_HMAP_GET(int, hmap, "key3");
+    int *not_found  = MVN_HMAP_GET(int, hmap, "nonexistent");
 
     TEST_ASSERT(retrieved1 != NULL, "Failed to get key1");
     TEST_ASSERT(retrieved2 != NULL, "Failed to get key2");
@@ -97,12 +97,12 @@ test_hashmap_set_get(void) {
 }
 
 /**
-  * \brief           Test deleting items from the hashmap
-  * \return          1 on success, 0 on failure
-  */
-static int
-test_hashmap_delete(void) {
-    mvn_hmap_t* hmap = MVN_HMAP_INIT(int, 8);
+ * \brief           Test deleting items from the hashmap
+ * \return          1 on success, 0 on failure
+ */
+static int test_hashmap_delete(void)
+{
+    mvn_hmap_t *hmap = MVN_HMAP_INIT(int, 8);
     TEST_ASSERT(hmap != NULL, "Failed to initialize hashmap");
 
     // Add some items
@@ -127,8 +127,8 @@ test_hashmap_delete(void) {
                 "Hashmap length should not change after failed deletion");
 
     // Test that other keys are still accessible
-    int* retrieved1 = MVN_HMAP_GET(int, hmap, "key1");
-    int* retrieved3 = MVN_HMAP_GET(int, hmap, "key3");
+    int *retrieved1 = MVN_HMAP_GET(int, hmap, "key1");
+    int *retrieved3 = MVN_HMAP_GET(int, hmap, "key3");
     TEST_ASSERT(retrieved1 != NULL && *retrieved1 == 42, "key1 should still be accessible");
     TEST_ASSERT(retrieved3 != NULL && *retrieved3 == -10, "key3 should still be accessible");
 
@@ -143,34 +143,34 @@ test_hashmap_delete(void) {
 }
 
 /**
-  * \brief           Test keys and values collections
-  * \return          1 on success, 0 on failure
-  */
-static int
-test_hashmap_keys_values(void) {
-    mvn_hmap_t* hmap = MVN_HMAP_INIT(int, 8);
+ * \brief           Test keys and values collections
+ * \return          1 on success, 0 on failure
+ */
+static int test_hashmap_keys_values(void)
+{
+    mvn_hmap_t *hmap = MVN_HMAP_INIT(int, 8);
     TEST_ASSERT(hmap != NULL, "Failed to initialize hashmap");
 
     // Add some items with predictable values
-    int values[5] = {10, 20, 30, 40, 50};
-    const char* keys[5] = {"key1", "key2", "key3", "key4", "key5"};
+    int         values[5] = {10, 20, 30, 40, 50};
+    const char *keys[5]   = {"key1", "key2", "key3", "key4", "key5"};
 
     for (int i = 0; i < 5; i++) {
         MVN_HMAP_SET(hmap, keys[i], int, values[i]);
     }
 
     // Test keys collection
-    mvn_list_t* key_list = mvn_hmap_keys(hmap);
+    mvn_list_t *key_list = mvn_hmap_keys(hmap);
     TEST_ASSERT(key_list != NULL, "Failed to get keys list");
     TEST_ASSERT(mvn_list_length(key_list) == 5, "Keys list should have 5 items");
 
     // Verify all keys are present (order may vary)
     bool keys_found[5] = {false};
     for (size_t i = 0; i < mvn_list_length(key_list); i++) {
-        char** key_ptr = MVN_LIST_GET(char*, key_list, i);
+        char **key_ptr = MVN_LIST_GET(char *, key_list, i);
         TEST_ASSERT(key_ptr != NULL, "Failed to get key from list");
 
-        const char* key = *key_ptr;
+        const char *key = *key_ptr;
         for (int j = 0; j < 5; j++) {
             if (SDL_strcmp(key, keys[j]) == 0) {
                 keys_found[j] = true;
@@ -185,14 +185,14 @@ test_hashmap_keys_values(void) {
     }
 
     // Test values collection
-    mvn_list_t* value_list = mvn_hmap_values(hmap);
+    mvn_list_t *value_list = mvn_hmap_values(hmap);
     TEST_ASSERT(value_list != NULL, "Failed to get values list");
     TEST_ASSERT(mvn_list_length(value_list) == 5, "Values list should have 5 items");
 
     // Verify all values are present (order may vary)
     bool values_found[5] = {false};
     for (size_t i = 0; i < mvn_list_length(value_list); i++) {
-        int* value = MVN_LIST_GET(int, value_list, i);
+        int *value = MVN_LIST_GET(int, value_list, i);
         TEST_ASSERT(value != NULL, "Failed to get value from list");
 
         for (int j = 0; j < 5; j++) {
@@ -216,13 +216,13 @@ test_hashmap_keys_values(void) {
 }
 
 /**
-  * \brief           Test complex data structures in hashmap
-  * \return          1 on success, 0 on failure
-  */
-static int
-test_hashmap_complex_types(void) {
+ * \brief           Test complex data structures in hashmap
+ * \return          1 on success, 0 on failure
+ */
+static int test_hashmap_complex_types(void)
+{
     // Test with Points
-    mvn_hmap_t* point_map = MVN_HMAP_INIT(mvn_point_t, 8);
+    mvn_hmap_t *point_map = MVN_HMAP_INIT(mvn_point_t, 8);
     TEST_ASSERT(point_map != NULL, "Failed to initialize point hashmap");
 
     mvn_point_t pt1 = {10, 20};
@@ -231,8 +231,8 @@ test_hashmap_complex_types(void) {
     MVN_HMAP_SET(point_map, "point1", mvn_point_t, pt1);
     MVN_HMAP_SET(point_map, "point2", mvn_point_t, pt2);
 
-    mvn_point_t* retrieved_p1 = MVN_HMAP_GET(mvn_point_t, point_map, "point1");
-    mvn_point_t* retrieved_p2 = MVN_HMAP_GET(mvn_point_t, point_map, "point2");
+    mvn_point_t *retrieved_p1 = MVN_HMAP_GET(mvn_point_t, point_map, "point1");
+    mvn_point_t *retrieved_p2 = MVN_HMAP_GET(mvn_point_t, point_map, "point2");
 
     TEST_ASSERT(retrieved_p1 != NULL, "Failed to get point1");
     TEST_ASSERT(retrieved_p2 != NULL, "Failed to get point2");
@@ -244,35 +244,35 @@ test_hashmap_complex_types(void) {
     mvn_hmap_free(point_map);
 
     // Test with Colors
-    mvn_hmap_t* color_map = MVN_HMAP_INIT(mvn_color_t, 8);
+    mvn_hmap_t *color_map = MVN_HMAP_INIT(mvn_color_t, 8);
     TEST_ASSERT(color_map != NULL, "Failed to initialize color hashmap");
 
-    mvn_color_t red = {1, 0, 0, 1};
-    mvn_color_t blue = {0, 0, 1, 1};
+    mvn_color_t red               = {1, 0, 0, 1};
+    mvn_color_t blue              = {0, 0, 1, 1};
     mvn_color_t transparent_green = {0, 1, 0, 125};
 
     MVN_HMAP_SET(color_map, "red", mvn_color_t, red);
     MVN_HMAP_SET(color_map, "blue", mvn_color_t, blue);
     MVN_HMAP_SET(color_map, "transparent_green", mvn_color_t, transparent_green);
 
-    mvn_color_t* retrieved_red = MVN_HMAP_GET(mvn_color_t, color_map, "red");
-    mvn_color_t* retrieved_blue = MVN_HMAP_GET(mvn_color_t, color_map, "blue");
-    mvn_color_t* retrieved_green = MVN_HMAP_GET(mvn_color_t, color_map, "transparent_green");
+    mvn_color_t *retrieved_red   = MVN_HMAP_GET(mvn_color_t, color_map, "red");
+    mvn_color_t *retrieved_blue  = MVN_HMAP_GET(mvn_color_t, color_map, "blue");
+    mvn_color_t *retrieved_green = MVN_HMAP_GET(mvn_color_t, color_map, "transparent_green");
 
     TEST_ASSERT(retrieved_red != NULL, "Failed to get red");
     TEST_ASSERT(retrieved_blue != NULL, "Failed to get blue");
     TEST_ASSERT(retrieved_green != NULL, "Failed to get transparent_green");
 
-    TEST_ASSERT(retrieved_red->r == 1 && retrieved_red->g == 0 && retrieved_red->b == 0
-                    && retrieved_red->a == 1,
+    TEST_ASSERT(retrieved_red->r == 1 && retrieved_red->g == 0 && retrieved_red->b == 0 &&
+                    retrieved_red->a == 1,
                 "Retrieved red has incorrect values");
 
-    TEST_ASSERT(retrieved_blue->r == 0 && retrieved_blue->g == 0 && retrieved_blue->b == 1
-                    && retrieved_blue->a == 1,
+    TEST_ASSERT(retrieved_blue->r == 0 && retrieved_blue->g == 0 && retrieved_blue->b == 1 &&
+                    retrieved_blue->a == 1,
                 "Retrieved blue has incorrect values");
 
-    TEST_ASSERT(retrieved_green->r == 0 && retrieved_green->g == 1 && retrieved_green->b == 0
-                    && retrieved_green->a == 125,
+    TEST_ASSERT(retrieved_green->r == 0 && retrieved_green->g == 1 && retrieved_green->b == 0 &&
+                    retrieved_green->a == 125,
                 "Retrieved transparent_green has incorrect values");
 
     mvn_hmap_free(color_map);
@@ -281,12 +281,12 @@ test_hashmap_complex_types(void) {
 }
 
 /**
-  * \brief           Test edge cases
-  * \return          1 on success, 0 on failure
-  */
-static int
-test_hashmap_edge_cases(void) {
-    mvn_hmap_t* hmap = MVN_HMAP_INIT(int, 2); // Small initial capacity to test resizing
+ * \brief           Test edge cases
+ * \return          1 on success, 0 on failure
+ */
+static int test_hashmap_edge_cases(void)
+{
+    mvn_hmap_t *hmap = MVN_HMAP_INIT(int, 2); // Small initial capacity to test resizing
     TEST_ASSERT(hmap != NULL, "Failed to initialize hashmap");
 
     // Test NULL parameters
@@ -312,14 +312,14 @@ test_hashmap_edge_cases(void) {
     TEST_ASSERT(mvn_hmap_keys(NULL) == NULL, "mvn_hmap_keys with NULL hmap should return NULL");
     TEST_ASSERT(mvn_hmap_values(NULL) == NULL, "mvn_hmap_values with NULL hmap should return NULL");
 
-        TEST_ASSERT(mvn_hmap_length(NULL) == 0, "mvn_hmap_length with NULL hmap should return 0");
-    
-        // Test inserting many items to trigger resizing
-    #define NUM_ITEMS 50 // Should trigger at least one resize with initial capacity 2
-        char keys[NUM_ITEMS][20];
-        int values[NUM_ITEMS];
-    
-        for (int i = 0; i < NUM_ITEMS; i++) {
+    TEST_ASSERT(mvn_hmap_length(NULL) == 0, "mvn_hmap_length with NULL hmap should return 0");
+
+    // Test inserting many items to trigger resizing
+#define NUM_ITEMS 50 // Should trigger at least one resize with initial capacity 2
+    char keys[NUM_ITEMS][20];
+    int  values[NUM_ITEMS];
+
+    for (int i = 0; i < NUM_ITEMS; i++) {
         snprintf(keys[i], sizeof(keys[i]), "key%d", i);
         values[i] = i * 10;
         MVN_HMAP_SET(hmap, keys[i], int, values[i]);
@@ -330,13 +330,13 @@ test_hashmap_edge_cases(void) {
 
     // Verify all items are accessible
     for (int i = 0; i < NUM_ITEMS; i++) {
-        int* value = MVN_HMAP_GET(int, hmap, keys[i]);
+        int *value = MVN_HMAP_GET(int, hmap, keys[i]);
         TEST_ASSERT(value != NULL, "Failed to get item after resize");
         TEST_ASSERT(*value == i * 10, "Retrieved value is incorrect after resize");
     }
 
     // Test empty hashmap behavior
-    mvn_hmap_t* empty_map = MVN_HMAP_INIT(int, 8);
+    mvn_hmap_t *empty_map = MVN_HMAP_INIT(int, 8);
     TEST_ASSERT(empty_map != NULL, "Failed to initialize empty hashmap");
 
     TEST_ASSERT(mvn_hmap_length(empty_map) == 0, "Empty hashmap should have length 0");
@@ -345,8 +345,8 @@ test_hashmap_edge_cases(void) {
     TEST_ASSERT(mvn_hmap_delete(empty_map, "any_key") == false,
                 "Deleting from empty hashmap should return false");
 
-    mvn_list_t* empty_keys = mvn_hmap_keys(empty_map);
-    mvn_list_t* empty_values = mvn_hmap_values(empty_map);
+    mvn_list_t *empty_keys   = mvn_hmap_keys(empty_map);
+    mvn_list_t *empty_values = mvn_hmap_values(empty_map);
 
     TEST_ASSERT(empty_keys != NULL, "mvn_hmap_keys should return an empty list, not NULL");
     TEST_ASSERT(empty_values != NULL, "mvn_hmap_values should return an empty list, not NULL");
@@ -363,14 +363,14 @@ test_hashmap_edge_cases(void) {
 }
 
 /**
-  * \brief           Run all hashmap tests
-  * \param[out] passed_tests Pointer to the number of passed tests
-  * \param[out] failed_tests Pointer to the number of failed tests
-  * \param[out] total_tests Pointer to the total number of tests
-  * \return          Number of passed tests
-  */
-int
-run_hashmap_tests(int* passed_tests, int* failed_tests, int* total_tests) {
+ * \brief           Run all hashmap tests
+ * \param[out] passed_tests Pointer to the number of passed tests
+ * \param[out] failed_tests Pointer to the number of failed tests
+ * \param[out] total_tests Pointer to the total number of tests
+ * \return          Number of passed tests
+ */
+int run_hashmap_tests(int *passed_tests, int *failed_tests, int *total_tests)
+{
     printf("\n===== HASHMAP TESTS =====\n\n");
 
     // Store the initial values to calculate the delta
@@ -393,11 +393,11 @@ run_hashmap_tests(int* passed_tests, int* failed_tests, int* total_tests) {
 }
 
 #if defined(MVN_HASHMAP_TEST_MAIN)
-int
-main(void) {
+int main(void)
+{
     int passed = 0;
     int failed = 0;
-    int total = 0;
+    int total  = 0;
 
     run_hashmap_tests(&passed, &failed, &total);
 

@@ -32,37 +32,40 @@
  */
 
 #include "mvn/mvn-core.h"
-#include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
+
 #include "mvn/mvn-file.h" // IWYU pragma: keep
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-string.h"
 #include "mvn/mvn-types.h"
 #include "mvn/mvn-utils.h"
 
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
+
+
 /* Static variables to hold the window and renderer */
-static mvn_window_t* g_window = NULL;
-static mvn_renderer_t* g_renderer = NULL;
-static mvn_text_engine_t* g_text_engine = NULL;
+static mvn_window_t *     g_window      = NULL;
+static mvn_renderer_t *   g_renderer    = NULL;
+static mvn_text_engine_t *g_text_engine = NULL;
 
 /* Static variables for timing */
-static uint64_t g_performance_frequency = 0; // Frequency of the performance counter
-static uint64_t g_start_time = 0;            // Time point when mvn_init was called
-static uint64_t g_last_frame_time = 0;       // Time point at the beginning of the last frame
-static uint64_t g_current_frame_time = 0;    // Time point at the end of the current frame
-static double g_delta_time = 0.0;            // Time elapsed for the last frame in seconds
-static int g_target_fps = 300;               // Target FPS (default 300)
-static double g_target_frame_time = 0.0;     // Minimum time per frame in seconds
-static int g_frame_counter = 0;              // Frames counted in the current second
-static uint64_t g_fps_timer = 0;             // Timer to track 1 second for FPS calculation
-static int g_current_fps = 0;                // Calculated FPS for the last second
+static uint64_t g_performance_frequency = 0;   // Frequency of the performance counter
+static uint64_t g_start_time            = 0;   // Time point when mvn_init was called
+static uint64_t g_last_frame_time       = 0;   // Time point at the beginning of the last frame
+static uint64_t g_current_frame_time    = 0;   // Time point at the end of the current frame
+static double   g_delta_time            = 0.0; // Time elapsed for the last frame in seconds
+static int      g_target_fps            = 300; // Target FPS (default 300)
+static double   g_target_frame_time     = 0.0; // Minimum time per frame in seconds
+static int      g_frame_counter         = 0;   // Frames counted in the current second
+static uint64_t g_fps_timer             = 0;   // Timer to track 1 second for FPS calculation
+static int      g_current_fps           = 0;   // Calculated FPS for the last second
 
 /**
  * \brief           Get the current version of the MVN engine
  * \return          Pointer to string containing version info, NULL on error
  */
-mvn_string_t*
-mvn_get_engine_version(void) {
+mvn_string_t *mvn_get_engine_version(void)
+{
     return mvn_string_from_cstr("0.1.0");
 }
 
@@ -74,8 +77,8 @@ mvn_get_engine_version(void) {
  * \param[in]       flags: SDL window flags, use 0 for default
  * \return          true on success, false on failure
  */
-bool
-mvn_init(int width, int height, const char* title, mvn_window_flags_t flags) {
+bool mvn_init(int width, int height, const char *title, mvn_window_flags_t flags)
+{
     // Initialize SDL first - needed for video and other features
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
         mvn_log_error("SDL initialization failed: %s", SDL_GetError());
@@ -131,10 +134,10 @@ mvn_init(int width, int height, const char* title, mvn_window_flags_t flags) {
 
     // Initialize timing variables
     g_performance_frequency = SDL_GetPerformanceFrequency();
-    g_start_time = SDL_GetPerformanceCounter();
-    g_last_frame_time = g_start_time;
-    g_current_frame_time = g_start_time;
-    g_fps_timer = g_start_time;
+    g_start_time            = SDL_GetPerformanceCounter();
+    g_last_frame_time       = g_start_time;
+    g_current_frame_time    = g_start_time;
+    g_fps_timer             = g_start_time;
     mvn_set_target_fps(300); // Set default target FPS
 
     return true;
@@ -143,8 +146,8 @@ mvn_init(int width, int height, const char* title, mvn_window_flags_t flags) {
 /**
  * \brief           Clean up the MVN framework resources
  */
-void
-mvn_quit(void) {
+void mvn_quit(void)
+{
     // Clean up in reverse order of creation
     if (g_renderer != NULL) {
         SDL_DestroyRenderer(g_renderer);
@@ -174,8 +177,8 @@ mvn_quit(void) {
  * \brief           Get the SDL window
  * \return          Pointer to the SDL window, NULL if not initialized
  */
-mvn_window_t*
-mvn_get_window(void) {
+mvn_window_t *mvn_get_window(void)
+{
     return g_window;
 }
 
@@ -183,8 +186,8 @@ mvn_get_window(void) {
  * \brief           Get the SDL renderer
  * \return          Pointer to the SDL renderer, NULL if not initialized
  */
-mvn_renderer_t*
-mvn_get_renderer(void) {
+mvn_renderer_t *mvn_get_renderer(void)
+{
     return g_renderer;
 }
 
@@ -192,8 +195,8 @@ mvn_get_renderer(void) {
  * \brief           Get the SDL_ttf text engine
  * \return          Pointer to the SDL_ttf text engine, NULL if not initialized
  */
-mvn_text_engine_t*
-mvn_get_text_engine(void) {
+mvn_text_engine_t *mvn_get_text_engine(void)
+{
     return g_text_engine;
 }
 
@@ -201,10 +204,10 @@ mvn_get_text_engine(void) {
  * \brief           Check if the window should close
  * \return          true if window should close, false otherwise
  */
-bool
-mvn_window_should_close(void) {
+bool mvn_window_should_close(void)
+{
     SDL_Event event;
-    bool should_close = false;
+    bool      should_close = false;
 
     /* Process all pending events */
     while (SDL_PollEvent(&event)) {
@@ -228,8 +231,8 @@ mvn_window_should_close(void) {
  * \brief           Begin drawing to the window and update frame timing
  * \return          true if successful, false on failure
  */
-bool
-mvn_begin_drawing(void) {
+bool mvn_begin_drawing(void)
+{
     if (g_renderer == NULL) {
         mvn_log_error("Cannot begin drawing: g_renderer is NULL");
         return false;
@@ -249,8 +252,8 @@ mvn_begin_drawing(void) {
  * \param[in]       color: Color to clear the background with
  * \return          true if successful, false on failure
  */
-bool
-mvn_clear_background(mvn_color_t color) {
+bool mvn_clear_background(mvn_color_t color)
+{
     if (g_renderer == NULL) {
         mvn_log_error("Cannot clear background: g_renderer is NULL");
         return false;
@@ -275,8 +278,8 @@ mvn_clear_background(mvn_color_t color) {
  * \brief           End drawing, present the rendered content, and manage frame timing/FPS
  * \return          true if successful, false on failure
  */
-bool
-mvn_end_drawing(void) {
+bool mvn_end_drawing(void)
+{
     if (g_renderer == NULL) {
         mvn_log_error("Cannot end drawing: g_renderer is NULL");
         return false;
@@ -287,8 +290,8 @@ mvn_end_drawing(void) {
 
     // --- Accurate Frame Limiting ---
     uint64_t frame_end_time = SDL_GetPerformanceCounter();
-    double elapsed_frame_time_seconds = (double)(frame_end_time - g_last_frame_time)
-                                        / (double)g_performance_frequency;
+    double   elapsed_frame_time_seconds =
+        (double)(frame_end_time - g_last_frame_time) / (double)g_performance_frequency;
 
     if (g_target_fps > 0 && elapsed_frame_time_seconds < g_target_frame_time) {
         double time_to_wait_seconds = g_target_frame_time - elapsed_frame_time_seconds;
@@ -296,16 +299,16 @@ mvn_end_drawing(void) {
         // Use SDL_Delay for most of the wait time, leave ~1.5ms for busy-wait
         const double busy_wait_threshold_seconds = 0.0015;
         if (time_to_wait_seconds > busy_wait_threshold_seconds) {
-            uint32_t delay_ms = (uint32_t)((time_to_wait_seconds - busy_wait_threshold_seconds)
-                                           * 1000.0);
+            uint32_t delay_ms =
+                (uint32_t)((time_to_wait_seconds - busy_wait_threshold_seconds) * 1000.0);
             if (delay_ms > 0) {
                 SDL_Delay(delay_ms);
             }
         }
 
         // Busy-wait for the remaining time for precision
-        uint64_t target_ticks = g_last_frame_time
-                                + (uint64_t)(g_target_frame_time * (double)g_performance_frequency);
+        uint64_t target_ticks =
+            g_last_frame_time + (uint64_t)(g_target_frame_time * (double)g_performance_frequency);
         while (SDL_GetPerformanceCounter() < target_ticks) {
             // Spin-lock briefly to free up CPU resources
         }
@@ -318,13 +321,13 @@ mvn_end_drawing(void) {
 
     // FPS calculation (uses the final current_frame_time)
     g_frame_counter++;
-    double time_since_fps_reset = (double)(g_current_frame_time - g_fps_timer)
-                                  / (double)g_performance_frequency;
+    double time_since_fps_reset =
+        (double)(g_current_frame_time - g_fps_timer) / (double)g_performance_frequency;
 
     if (time_since_fps_reset >= 1.0) {
-        g_current_fps = g_frame_counter;
+        g_current_fps   = g_frame_counter;
         g_frame_counter = 0;
-        g_fps_timer = g_current_frame_time; // Reset timer for the next second
+        g_fps_timer     = g_current_frame_time; // Reset timer for the next second
     }
 
     return true;
@@ -335,9 +338,9 @@ mvn_end_drawing(void) {
  * \note            Resizes monitor to match window resolution
  * \return          true on success, false on failure
  */
-bool
-mvn_toggle_fullscreen(void) {
-    mvn_window_t* window = mvn_get_window();
+bool mvn_toggle_fullscreen(void)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot toggle fullscreen: No window available");
         return false;
@@ -360,17 +363,17 @@ mvn_toggle_fullscreen(void) {
  * \note            Resizes window to match monitor resolution
  * \return          true on success, false on failure
  */
-bool
-mvn_toggle_borderless_windowed(void) {
-    mvn_window_t* window = mvn_get_window();
+bool mvn_toggle_borderless_windowed(void)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot toggle borderless windowed mode: No window available");
         return false;
     }
 
-    SDL_WindowFlags flags = SDL_GetWindowFlags(window);
-    bool is_borderless = flags & SDL_WINDOW_BORDERLESS;
-    bool is_fullscreen = flags & SDL_WINDOW_FULLSCREEN;
+    SDL_WindowFlags flags         = SDL_GetWindowFlags(window);
+    bool            is_borderless = flags & SDL_WINDOW_BORDERLESS;
+    bool            is_fullscreen = flags & SDL_WINDOW_FULLSCREEN;
 
     // If in fullscreen, exit fullscreen first
     if (is_fullscreen) {
@@ -389,8 +392,8 @@ mvn_toggle_borderless_windowed(void) {
     // If switching to borderless, resize to match monitor
     if (!is_borderless) {
         mvn_display_id_t monitor = mvn_get_current_monitor();
-        int32_t width = mvn_get_monitor_width(monitor);
-        int32_t height = mvn_get_monitor_height(monitor);
+        int32_t          width   = mvn_get_monitor_width(monitor);
+        int32_t          height  = mvn_get_monitor_height(monitor);
         if (width > 0 && height > 0) {
             SDL_SetWindowSize(window, width, height);
             SDL_SetWindowPosition(window, 0, 0);
@@ -404,9 +407,9 @@ mvn_toggle_borderless_windowed(void) {
  * \brief           Set window state: maximized, if resizable
  * \return          true on success, false on failure
  */
-bool
-mvn_maximize_window(void) {
-    mvn_window_t* window = mvn_get_window();
+bool mvn_maximize_window(void)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot maximize window: No window available");
         return false;
@@ -430,9 +433,9 @@ mvn_maximize_window(void) {
  * \brief           Set window state: minimized, if resizable
  * \return          true on success, false on failure
  */
-bool
-mvn_minimize_window(void) {
-    mvn_window_t* window = mvn_get_window();
+bool mvn_minimize_window(void)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot minimize window: No window available");
         return false;
@@ -450,9 +453,9 @@ mvn_minimize_window(void) {
  * \brief           Set window state: not minimized/maximized
  * \return          true on success, false on failure
  */
-bool
-mvn_restore_window(void) {
-    mvn_window_t* window = mvn_get_window();
+bool mvn_restore_window(void)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot restore window: No window available");
         return false;
@@ -470,9 +473,9 @@ mvn_restore_window(void) {
  * \brief           Get current monitor where window is placed
  * \return          ID of the monitor where window is placed, 0 if not found
  */
-mvn_display_id_t
-mvn_get_current_monitor(void) {
-    mvn_window_t* window = mvn_get_window();
+mvn_display_id_t mvn_get_current_monitor(void)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot get current monitor: No window available");
         return 0;
@@ -487,8 +490,8 @@ mvn_get_current_monitor(void) {
  * \param[in]       monitor: Monitor ID
  * \return          Monitor position as mvn_fpoint_t
  */
-mvn_fpoint_t
-mvn_get_monitor_position(mvn_display_id_t monitor) {
+mvn_fpoint_t mvn_get_monitor_position(mvn_display_id_t monitor)
+{
     mvn_fpoint_t position = {0, 0};
 
     if (monitor <= 0) {
@@ -513,8 +516,8 @@ mvn_get_monitor_position(mvn_display_id_t monitor) {
  * \param[in]       monitor: Monitor ID
  * \return          Width of the monitor in pixels, 0 on failure
  */
-int32_t
-mvn_get_monitor_width(mvn_display_id_t monitor) {
+int32_t mvn_get_monitor_width(mvn_display_id_t monitor)
+{
     if (monitor <= 0) {
         mvn_log_error("Invalid monitor ID: %d", monitor);
         return 0;
@@ -534,8 +537,8 @@ mvn_get_monitor_width(mvn_display_id_t monitor) {
  * \param[in]       monitor: Monitor ID
  * \return          Height of the monitor in pixels, 0 on failure
  */
-int32_t
-mvn_get_monitor_height(mvn_display_id_t monitor) {
+int32_t mvn_get_monitor_height(mvn_display_id_t monitor)
+{
     if (monitor <= 0) {
         mvn_log_error("Invalid monitor ID: %d", monitor);
         return 0;
@@ -554,9 +557,9 @@ mvn_get_monitor_height(mvn_display_id_t monitor) {
  * \brief           Set icon for window (single image, RGBA 32bit)
  * \param[in]       image: Surface with icon image
  */
-void
-mvn_set_window_icon(mvn_image_t* image) {
-    mvn_window_t* window = mvn_get_window();
+void mvn_set_window_icon(mvn_image_t *image)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot set window icon: No window available");
         return;
@@ -574,9 +577,9 @@ mvn_set_window_icon(mvn_image_t* image) {
  * \brief           Set title for window
  * \param[in]       title: New title for window
  */
-void
-mvn_set_window_title(const char* title) {
-    mvn_window_t* window = mvn_get_window();
+void mvn_set_window_title(const char *title)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot set window title: No window available");
         return;
@@ -595,9 +598,9 @@ mvn_set_window_title(const char* title) {
  * \param[in]       x: New x position
  * \param[in]       y: New y position
  */
-void
-mvn_set_window_position(int32_t x, int32_t y) {
-    mvn_window_t* window = mvn_get_window();
+void mvn_set_window_position(int32_t x, int32_t y)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot set window position: No window available");
         return;
@@ -614,9 +617,9 @@ mvn_set_window_position(int32_t x, int32_t y) {
  * \brief           Set monitor for the current window
  * \param[in]       monitor: Monitor ID to move window to
  */
-void
-mvn_set_window_monitor(mvn_display_id_t monitor) {
-    mvn_window_t* window = mvn_get_window();
+void mvn_set_window_monitor(mvn_display_id_t monitor)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot set window monitor: No window available");
         return;
@@ -655,9 +658,9 @@ mvn_set_window_monitor(mvn_display_id_t monitor) {
  * \param[in]       height: Minimum height of the window
  * \note            Only works with resizable windows (MVN_WINDOW_RESIZABLE)
  */
-void
-mvn_set_window_min_size(int32_t width, int32_t height) {
-    mvn_window_t* window = mvn_get_window();
+void mvn_set_window_min_size(int32_t width, int32_t height)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot set window minimum size: No window available");
         return;
@@ -677,9 +680,9 @@ mvn_set_window_min_size(int32_t width, int32_t height) {
  * \param[in]       height: Maximum height of the window
  * \note            Only works with resizable windows (MVN_WINDOW_RESIZABLE)
  */
-void
-mvn_set_window_max_size(int32_t width, int32_t height) {
-    mvn_window_t* window = mvn_get_window();
+void mvn_set_window_max_size(int32_t width, int32_t height)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot set window maximum size: No window available");
         return;
@@ -699,9 +702,9 @@ mvn_set_window_max_size(int32_t width, int32_t height) {
  * \param[in]       height: New height of the window
  * \note            This is an asynchronous request and may not take effect immediately
  */
-void
-mvn_set_window_size(int32_t width, int32_t height) {
-    mvn_window_t* window = mvn_get_window();
+void mvn_set_window_size(int32_t width, int32_t height)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot set window size: No window available");
         return;
@@ -719,9 +722,9 @@ mvn_set_window_size(int32_t width, int32_t height) {
  * \return          true on success, false on failure
  * \note            Requires a window with SDL_WINDOW_TRANSPARENT flag
  */
-bool
-mvn_set_window_opacity(float opacity) {
-    mvn_window_t* window = mvn_get_window();
+bool mvn_set_window_opacity(float opacity)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot set window opacity: No window available");
         return false;
@@ -750,9 +753,9 @@ mvn_set_window_opacity(float opacity) {
 /**
  * \brief           Set window as focused
  */
-void
-mvn_set_window_focused(void) {
-    mvn_window_t* window = mvn_get_window();
+void mvn_set_window_focused(void)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot set window focus: No window available");
         return;
@@ -765,8 +768,8 @@ mvn_set_window_focused(void) {
  * \brief           Get current screen width
  * \return          Width of the current screen in pixels
  */
-int32_t
-mvn_get_screen_width(void) {
+int32_t mvn_get_screen_width(void)
+{
     mvn_display_id_t display = SDL_GetPrimaryDisplay();
     if (display == 0) {
         mvn_log_error("Failed to get primary display: %s", SDL_GetError());
@@ -786,8 +789,8 @@ mvn_get_screen_width(void) {
  * \brief           Get current screen height
  * \return          Height of the current screen in pixels
  */
-int32_t
-mvn_get_screen_height(void) {
+int32_t mvn_get_screen_height(void)
+{
     mvn_display_id_t display = SDL_GetPrimaryDisplay();
     if (display == 0) {
         mvn_log_error("Failed to get primary display: %s", SDL_GetError());
@@ -807,9 +810,9 @@ mvn_get_screen_height(void) {
  * \brief           Get current render width
  * \return          Width of the renderer in pixels (accounts for high DPI)
  */
-int32_t
-mvn_get_render_width(void) {
-    mvn_renderer_t* renderer = mvn_get_renderer();
+int32_t mvn_get_render_width(void)
+{
+    mvn_renderer_t *renderer = mvn_get_renderer();
     if (renderer == NULL) {
         mvn_log_error("Cannot get render width: No renderer available");
         return 0;
@@ -829,9 +832,9 @@ mvn_get_render_width(void) {
  * \brief           Get current render height
  * \return          Height of the renderer in pixels (accounts for high DPI)
  */
-int32_t
-mvn_get_render_height(void) {
-    mvn_renderer_t* renderer = mvn_get_renderer();
+int32_t mvn_get_render_height(void)
+{
+    mvn_renderer_t *renderer = mvn_get_renderer();
     if (renderer == NULL) {
         mvn_log_error("Cannot get render height: No renderer available");
         return 0;
@@ -851,10 +854,10 @@ mvn_get_render_height(void) {
  * \brief           Get number of connected monitors
  * \return          Number of monitors connected to the system
  */
-int32_t
-mvn_get_monitor_count(void) {
-    int count = 0;
-    SDL_DisplayID* displays = SDL_GetDisplays(&count);
+int32_t mvn_get_monitor_count(void)
+{
+    int            count    = 0;
+    SDL_DisplayID *displays = SDL_GetDisplays(&count);
 
     if (displays == NULL) {
         mvn_log_error("Failed to get displays: %s", SDL_GetError());
@@ -870,15 +873,15 @@ mvn_get_monitor_count(void) {
  * \param[in]       monitor: Monitor ID
  * \return          Refresh rate of the monitor in Hz, 0 on failure
  */
-int32_t
-mvn_get_monitor_refresh_rate(mvn_display_id_t monitor) {
+int32_t mvn_get_monitor_refresh_rate(mvn_display_id_t monitor)
+{
     if (monitor == 0) {
         mvn_log_error("Cannot get monitor refresh rate: Invalid monitor ID");
         return 0;
     }
 
     // Get the current display mode
-    const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(monitor);
+    const SDL_DisplayMode *mode = SDL_GetCurrentDisplayMode(monitor);
     if (mode == NULL) {
         mvn_log_error("Failed to get current display mode: %s", SDL_GetError());
         return 0;
@@ -892,10 +895,10 @@ mvn_get_monitor_refresh_rate(mvn_display_id_t monitor) {
  * \brief           Get window position on monitor
  * \return          Window position as mvn_fpoint_t
  */
-mvn_fpoint_t
-mvn_get_window_position(void) {
-    mvn_fpoint_t position = {0.0f, 0.0f};
-    mvn_window_t* window = mvn_get_window();
+mvn_fpoint_t mvn_get_window_position(void)
+{
+    mvn_fpoint_t  position = {0.0f, 0.0f};
+    mvn_window_t *window   = mvn_get_window();
 
     if (window == NULL) {
         mvn_log_error("Cannot get window position: No window available");
@@ -915,10 +918,10 @@ mvn_get_window_position(void) {
  * \brief           Get window scale DPI factor
  * \return          Window scale DPI factor as mvn_fpoint_t
  */
-mvn_fpoint_t
-mvn_get_window_scale_dpi(void) {
-    mvn_fpoint_t scale = {1.0f, 1.0f};
-    mvn_window_t* window = mvn_get_window();
+mvn_fpoint_t mvn_get_window_scale_dpi(void)
+{
+    mvn_fpoint_t  scale  = {1.0f, 1.0f};
+    mvn_window_t *window = mvn_get_window();
 
     if (window == NULL) {
         mvn_log_error("Cannot get window scale DPI: No window available");
@@ -927,8 +930,8 @@ mvn_get_window_scale_dpi(void) {
 
     // SDL3 provides a single scale factor that applies to both dimensions
     float factor = SDL_GetWindowDisplayScale(window);
-    scale.x = factor;
-    scale.y = factor;
+    scale.x      = factor;
+    scale.y      = factor;
 
     return scale;
 }
@@ -938,14 +941,14 @@ mvn_get_window_scale_dpi(void) {
  * \param[in]       monitor: Monitor ID
  * \return          Name of the monitor, NULL on failure
  */
-mvn_string_t*
-mvn_get_monitor_name(mvn_display_id_t monitor) {
+mvn_string_t *mvn_get_monitor_name(mvn_display_id_t monitor)
+{
     if (monitor == 0) {
         mvn_log_error("Cannot get monitor name: Invalid monitor ID");
         return NULL;
     }
 
-    const char* name = SDL_GetDisplayName(monitor);
+    const char *name = SDL_GetDisplayName(monitor);
     if (name == NULL) {
         mvn_log_error("Failed to get monitor name: %s", SDL_GetError());
         return NULL;
@@ -957,16 +960,16 @@ mvn_get_monitor_name(mvn_display_id_t monitor) {
 /**
  * \brief           Show the cursor
  */
-void
-mvn_show_cursor(void) {
+void mvn_show_cursor(void)
+{
     SDL_ShowCursor();
 }
 
 /**
  * \brief           Hide the cursor
  */
-void
-mvn_hide_cursor(void) {
+void mvn_hide_cursor(void)
+{
     SDL_HideCursor();
 }
 
@@ -974,17 +977,17 @@ mvn_hide_cursor(void) {
  * \brief           Check if cursor is hidden
  * \return          true if cursor is hidden, false otherwise
  */
-bool
-mvn_is_cursor_hidden(void) {
+bool mvn_is_cursor_hidden(void)
+{
     return !SDL_CursorVisible();
 }
 
 /**
  * \brief           Enable cursor (unlock cursor)
  */
-void
-mvn_enable_cursor(void) {
-    mvn_window_t* window = mvn_get_window();
+void mvn_enable_cursor(void)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot enable cursor: No window available");
         return;
@@ -998,9 +1001,9 @@ mvn_enable_cursor(void) {
 /**
  * \brief           Disable cursor (lock cursor)
  */
-void
-mvn_disable_cursor(void) {
-    mvn_window_t* window = mvn_get_window();
+void mvn_disable_cursor(void)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot disable cursor: No window available");
         return;
@@ -1015,16 +1018,16 @@ mvn_disable_cursor(void) {
  * \brief           Check if cursor is on the screen
  * \return          true if cursor is on screen, false otherwise
  */
-bool
-mvn_is_cursor_on_screen(void) {
-    mvn_window_t* window = mvn_get_window();
+bool mvn_is_cursor_on_screen(void)
+{
+    mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
         mvn_log_error("Cannot check if cursor is on screen: No window available");
         return false;
     }
 
-    int window_w;
-    int window_h;
+    int   window_w;
+    int   window_h;
     float mouse_x;
     float mouse_y;
 
@@ -1045,8 +1048,8 @@ mvn_is_cursor_on_screen(void) {
  * \brief           Set target FPS (maximum frame rate)
  * \param[in]       fps: Target frames per second (0 or negative means uncapped)
  */
-void
-mvn_set_target_fps(int fps) {
+void mvn_set_target_fps(int fps)
+{
     g_target_fps = fps;
     if (g_target_fps <= 0) {
         g_target_frame_time = 0.0; // Uncapped
@@ -1059,8 +1062,8 @@ mvn_set_target_fps(int fps) {
  * \brief           Get time in seconds for the last frame drawn (delta time)
  * \return          Time elapsed for the last frame in seconds
  */
-float
-mvn_get_frame_time(void) {
+float mvn_get_frame_time(void)
+{
     return (float)g_delta_time;
 }
 
@@ -1068,8 +1071,8 @@ mvn_get_frame_time(void) {
  * \brief           Get elapsed time in seconds since mvn_init() was called
  * \return          Total elapsed time in seconds
  */
-double
-mvn_get_time(void) {
+double mvn_get_time(void)
+{
     if (g_performance_frequency == 0) {
         return 0.0; // Avoid division by zero if not initialized
     }
@@ -1081,7 +1084,7 @@ mvn_get_time(void) {
  * \brief           Get current FPS (frames per second)
  * \return          Current calculated FPS
  */
-int
-mvn_get_fps(void) {
+int mvn_get_fps(void)
+{
     return g_current_fps;
 }

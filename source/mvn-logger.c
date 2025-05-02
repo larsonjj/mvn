@@ -32,14 +32,16 @@
  */
 
 #include "mvn/mvn-logger.h"
+
 #include <SDL3/SDL.h>
 
+
 /**
-  * \brief           Initialize the MVN logger
-  * \return          true on success, false on failure
-  */
-bool
-mvn_logger_init(void) {
+ * \brief           Initialize the MVN logger
+ * \return          true on success, false on failure
+ */
+bool mvn_logger_init(void)
+{
     // Set default log levels for each category
     mvn_logger_set_level(MVN_LOG_CATEGORY_DEFAULT, MVN_LOG_INFO);
     mvn_logger_set_level(MVN_LOG_CATEGORY_ERROR, MVN_LOG_ERROR);
@@ -61,33 +63,33 @@ mvn_logger_init(void) {
 }
 
 /**
-  * \brief           Set minimum log level for a specific category
-  * \param[in]       category: Log category to set level for
-  * \param[in]       level: Minimum priority level to log
-  */
-void
-mvn_logger_set_level(mvn_log_category_t category, mvn_log_level_t level) {
+ * \brief           Set minimum log level for a specific category
+ * \param[in]       category: Log category to set level for
+ * \param[in]       level: Minimum priority level to log
+ */
+void mvn_logger_set_level(mvn_log_category_t category, mvn_log_level_t level)
+{
     SDL_SetLogPriority((SDL_LogCategory)category, (SDL_LogPriority)level);
 }
 
 /**
-  * \brief           Set minimum log level for all categories
-  * \param[in]       level: Minimum priority level to log
-  */
-void
-mvn_logger_set_all_levels(mvn_log_level_t level) {
+ * \brief           Set minimum log level for all categories
+ * \param[in]       level: Minimum priority level to log
+ */
+void mvn_logger_set_all_levels(mvn_log_level_t level)
+{
     SDL_SetLogPriorities((SDL_LogPriority)level);
 }
 
 /**
-  * \brief           Log a message with specified category and priority
-  * \param[in]       category: Category for the log message
-  * \param[in]       priority: Priority level for the message
-  * \param[in]       fmt: Formatting string for the log message
-  * \param[in]       ...: Variable arguments for the format string
-  */
-void
-mvn_log(mvn_log_category_t category, mvn_log_level_t priority, const char* fmt, ...) {
+ * \brief           Log a message with specified category and priority
+ * \param[in]       category: Category for the log message
+ * \param[in]       priority: Priority level for the message
+ * \param[in]       fmt: Formatting string for the log message
+ * \param[in]       ...: Variable arguments for the format string
+ */
+void mvn_log(mvn_log_category_t category, mvn_log_level_t priority, const char *fmt, ...)
+{
     va_list args;
     va_start(args, fmt);
     SDL_LogMessageV((SDL_LogCategory)category, (SDL_LogPriority)priority, fmt, args);
@@ -95,12 +97,12 @@ mvn_log(mvn_log_category_t category, mvn_log_level_t priority, const char* fmt, 
 }
 
 /**
-  * \brief           Log an information message (INFO level)
-  * \param[in]       fmt: Formatting string for the log message
-  * \param[in]       ...: Variable arguments for the format string
-  */
-void
-mvn_log_info(const char* fmt, ...) {
+ * \brief           Log an information message (INFO level)
+ * \param[in]       fmt: Formatting string for the log message
+ * \param[in]       ...: Variable arguments for the format string
+ */
+void mvn_log_info(const char *fmt, ...)
+{
     va_list args;
     va_start(args, fmt);
     SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, fmt, args);
@@ -108,12 +110,12 @@ mvn_log_info(const char* fmt, ...) {
 }
 
 /**
-  * \brief           Log a debug message (DEBUG level)
-  * \param[in]       fmt: Formatting string for the log message
-  * \param[in]       ...: Variable arguments for the format string
-  */
-void
-mvn_log_debug(const char* fmt, ...) {
+ * \brief           Log a debug message (DEBUG level)
+ * \param[in]       fmt: Formatting string for the log message
+ * \param[in]       ...: Variable arguments for the format string
+ */
+void mvn_log_debug(const char *fmt, ...)
+{
     va_list args;
     va_start(args, fmt);
     SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, fmt, args);
@@ -121,12 +123,12 @@ mvn_log_debug(const char* fmt, ...) {
 }
 
 /**
-  * \brief           Log a warning message (WARN level)
-  * \param[in]       fmt: Formatting string for the log message
-  * \param[in]       ...: Variable arguments for the format string
-  */
-void
-mvn_log_warn(const char* fmt, ...) {
+ * \brief           Log a warning message (WARN level)
+ * \param[in]       fmt: Formatting string for the log message
+ * \param[in]       ...: Variable arguments for the format string
+ */
+void mvn_log_warn(const char *fmt, ...)
+{
     va_list args;
     va_start(args, fmt);
     SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_WARN, fmt, args);
@@ -134,12 +136,12 @@ mvn_log_warn(const char* fmt, ...) {
 }
 
 /**
-  * \brief           Log an error message (ERROR level)
-  * \param[in]       fmt: Formatting string for the log message
-  * \param[in]       ...: Variable arguments for the format string
-  */
-void
-mvn_log_error(const char* fmt, ...) {
+ * \brief           Log an error message (ERROR level)
+ * \param[in]       fmt: Formatting string for the log message
+ * \param[in]       ...: Variable arguments for the format string
+ */
+void mvn_log_error(const char *fmt, ...)
+{
     va_list args;
     va_start(args, fmt);
     SDL_LogMessageV(SDL_LOG_CATEGORY_ERROR, SDL_LOG_PRIORITY_ERROR, fmt, args);
@@ -147,12 +149,12 @@ mvn_log_error(const char* fmt, ...) {
 }
 
 /**
-  * \brief           Log a critical message (CRITICAL level)
-  * \param[in]       fmt: Formatting string for the log message
-  * \param[in]       ...: Variable arguments for the format string
-  */
-void
-mvn_log_critical(const char* fmt, ...) {
+ * \brief           Log a critical message (CRITICAL level)
+ * \param[in]       fmt: Formatting string for the log message
+ * \param[in]       ...: Variable arguments for the format string
+ */
+void mvn_log_critical(const char *fmt, ...)
+{
     va_list args;
     va_start(args, fmt);
     SDL_LogMessageV(SDL_LOG_CATEGORY_ERROR, SDL_LOG_PRIORITY_CRITICAL, fmt, args);

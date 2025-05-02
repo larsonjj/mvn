@@ -34,24 +34,30 @@
 #ifndef MVN_TEXT_H
 #define MVN_TEXT_H
 
+#include "mvn/mvn-types.h"
+
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include "mvn/mvn-types.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
 /* Function declarations */
-TTF_Font* mvn_load_font(const char* fileName, float size);
-TTF_Font* mvn_load_font_ex(const char* fileName, float size, const int* codePoints,
-                           int codePointCount);
-void mvn_unload_font(TTF_Font* font);
+TTF_Font *mvn_load_font(const char *fileName, float size);
+TTF_Font *
+     mvn_load_font_ex(const char *fileName, float size, const int *codePoints, int codePointCount);
+void mvn_unload_font(TTF_Font *font);
 void mvn_set_text_line_spacing(int32_t spacing);
-int32_t mvn_measure_text(TTF_Font* font, const char* text, float spacing);
-void mvn_draw_text(TTF_Font* font, const char* text, mvn_fpoint_t position, mvn_color_t tint);
-void mvn_draw_text_pro(TTF_Font* font, const char* text, mvn_fpoint_t position, mvn_fpoint_t origin,
-                       float rotation, mvn_color_t tint);
+int32_t mvn_measure_text(TTF_Font *font, const char *text, float spacing);
+void    mvn_draw_text(TTF_Font *font, const char *text, mvn_fpoint_t position, mvn_color_t tint);
+void    mvn_draw_text_pro(TTF_Font *   font,
+                          const char * text,
+                          mvn_fpoint_t position,
+                          mvn_fpoint_t origin,
+                          float        rotation,
+                          mvn_color_t  tint);
 
 #ifdef __cplusplus
 }

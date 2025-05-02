@@ -31,20 +31,23 @@
  * Author:          Jake Larson
  */
 
+#include "mvn/mvn-texture.h"
+
+#include "mvn/mvn-logger.h"
+
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
-#include "mvn/mvn-logger.h"
-#include "mvn/mvn-texture.h"
+
 
 /**
  * \brief           Load an image from the assets directory
  * \param[in]       filename: Name of the image file in assets/images/ directory
  * \return          Surface with loaded image, NULL on failure
  */
-mvn_image_t*
-mvn_load_image(const char* filename) {
-    char path[512];
-    mvn_image_t* surface = NULL;
+mvn_image_t *mvn_load_image(const char *filename)
+{
+    char         path[512];
+    mvn_image_t *surface = NULL;
 
     // Construct path to the asset file
     SDL_snprintf(path, sizeof(path), "%s", filename);
@@ -63,8 +66,8 @@ mvn_load_image(const char* filename) {
  * \brief           Unload an image surface
  * \param[in]       surface: Surface to be unloaded
  */
-void
-mvn_unload_image(mvn_image_t* surface) {
+void mvn_unload_image(mvn_image_t *surface)
+{
     if (surface != NULL) {
         SDL_DestroySurface(surface);
     }
@@ -76,9 +79,9 @@ mvn_unload_image(mvn_image_t* surface) {
  * \param[in]       surface: Surface to convert to texture
  * \return          Texture created from surface, NULL on failure
  */
-mvn_texture_t*
-mvn_image_to_texture(mvn_renderer_t* renderer, mvn_image_t* surface) {
-    mvn_texture_t* texture = NULL;
+mvn_texture_t *mvn_image_to_texture(mvn_renderer_t *renderer, mvn_image_t *surface)
+{
+    mvn_texture_t *texture = NULL;
 
     // Validate parameters
     if (renderer == NULL || surface == NULL) {
@@ -102,10 +105,10 @@ mvn_image_to_texture(mvn_renderer_t* renderer, mvn_image_t* surface) {
  * \param[in]       filename: Name of the image file to load
  * \return          Texture created from loaded image, NULL on failure
  */
-mvn_texture_t*
-mvn_load_texture(mvn_renderer_t* renderer, const char* filename) {
-    mvn_image_t* surface = NULL;
-    mvn_texture_t* texture = NULL;
+mvn_texture_t *mvn_load_texture(mvn_renderer_t *renderer, const char *filename)
+{
+    mvn_image_t *  surface = NULL;
+    mvn_texture_t *texture = NULL;
 
     // Load the image first
     surface = mvn_load_image(filename);
@@ -137,8 +140,8 @@ mvn_load_texture(mvn_renderer_t* renderer, const char* filename) {
  * \brief           Unload a texture
  * \param[in]       texture: Texture to be unloaded
  */
-void
-mvn_unload_texture(mvn_texture_t* texture) {
+void mvn_unload_texture(mvn_texture_t *texture)
+{
     if (texture != NULL) {
         SDL_DestroyTexture(texture);
     }
@@ -151,15 +154,15 @@ mvn_unload_texture(mvn_texture_t* texture) {
  * \param[in]       posY: Y position to draw texture
  * \param[in]       tint: Color tint to apply to the texture
  */
-void
-mvn_draw_texture(mvn_texture_t* texture, int32_t posX, int32_t posY, mvn_color_t tint) {
+void mvn_draw_texture(mvn_texture_t *texture, int32_t posX, int32_t posY, mvn_color_t tint)
+{
     if (texture == NULL) {
         return;
     }
 
-    float width;
-    float height;
-    mvn_renderer_t* renderer;
+    float           width;
+    float           height;
+    mvn_renderer_t *renderer;
 
     // Get the texture's renderer and dimensions
     if (SDL_GetTextureSize(texture, &width, &height)) {
@@ -183,8 +186,8 @@ mvn_draw_texture(mvn_texture_t* texture, int32_t posX, int32_t posY, mvn_color_t
  * \param[in]       position: Position (as mvn_fpoint_t) to draw texture
  * \param[in]       tint: Color tint to apply to the texture
  */
-void
-mvn_draw_texture_v(mvn_texture_t* texture, mvn_fpoint_t position, mvn_color_t tint) {
+void mvn_draw_texture_v(mvn_texture_t *texture, mvn_fpoint_t position, mvn_color_t tint)
+{
     mvn_draw_texture(texture, (int)position.x, (int)position.y, tint);
 }
 
@@ -196,16 +199,19 @@ mvn_draw_texture_v(mvn_texture_t* texture, mvn_fpoint_t position, mvn_color_t ti
  * \param[in]       scale: Scale factor (1.0f for default)
  * \param[in]       tint: Color tint to apply to the texture
  */
-void
-mvn_draw_texture_ex(mvn_texture_t* texture, mvn_fpoint_t position, float rotation, float scale,
-                    mvn_color_t tint) {
+void mvn_draw_texture_ex(mvn_texture_t *texture,
+                         mvn_fpoint_t   position,
+                         float          rotation,
+                         float          scale,
+                         mvn_color_t    tint)
+{
     if (texture == NULL) {
         return;
     }
 
-    float width;
-    float height;
-    mvn_renderer_t* renderer;
+    float           width;
+    float           height;
+    mvn_renderer_t *renderer;
 
     // Get the texture's renderer and dimensions
     if (SDL_GetTextureSize(texture, &width, &height)) {
@@ -234,14 +240,16 @@ mvn_draw_texture_ex(mvn_texture_t* texture, mvn_fpoint_t position, float rotatio
  * \param[in]       position: Position (as mvn_fpoint_t) to draw texture
  * \param[in]       tint: Color tint to apply to the texture
  */
-void
-mvn_draw_texture_rec(mvn_texture_t* texture, mvn_frect_t source, mvn_fpoint_t position,
-                     mvn_color_t tint) {
+void mvn_draw_texture_rec(mvn_texture_t *texture,
+                          mvn_frect_t    source,
+                          mvn_fpoint_t   position,
+                          mvn_color_t    tint)
+{
     if (texture == NULL) {
         return;
     }
 
-    mvn_renderer_t* renderer = SDL_GetRendererFromTexture(texture);
+    mvn_renderer_t *renderer = SDL_GetRendererFromTexture(texture);
     if (renderer != NULL) {
         // Apply the tint color
         SDL_SetTextureColorMod(texture, tint.r, tint.g, tint.b);
@@ -264,14 +272,18 @@ mvn_draw_texture_rec(mvn_texture_t* texture, mvn_frect_t source, mvn_fpoint_t po
  * \param[in]       rotation: Rotation in degrees
  * \param[in]       tint: Color tint to apply to the texture
  */
-void
-mvn_draw_texture_pro(mvn_texture_t* texture, mvn_frect_t source, mvn_frect_t dest,
-                     mvn_fpoint_t origin, float rotation, mvn_color_t tint) {
+void mvn_draw_texture_pro(mvn_texture_t *texture,
+                          mvn_frect_t    source,
+                          mvn_frect_t    dest,
+                          mvn_fpoint_t   origin,
+                          float          rotation,
+                          mvn_color_t    tint)
+{
     if (texture == NULL) {
         return;
     }
 
-    mvn_renderer_t* renderer = SDL_GetRendererFromTexture(texture);
+    mvn_renderer_t *renderer = SDL_GetRendererFromTexture(texture);
     if (renderer != NULL) {
         // Apply the tint color
         SDL_SetTextureColorMod(texture, tint.r, tint.g, tint.b);
@@ -281,8 +293,8 @@ mvn_draw_texture_pro(mvn_texture_t* texture, mvn_frect_t source, mvn_frect_t des
         mvn_frect_t destf = {.x = dest.x, .y = dest.y, .w = dest.w, .h = dest.h};
 
         // Render the texture with all parameters
-        SDL_RenderTextureRotated(renderer, texture, &source, &destf, rotation, &origin,
-                                 SDL_FLIP_NONE);
+        SDL_RenderTextureRotated(
+            renderer, texture, &source, &destf, rotation, &origin, SDL_FLIP_NONE);
     }
 }
 
@@ -295,15 +307,19 @@ mvn_draw_texture_pro(mvn_texture_t* texture, mvn_frect_t source, mvn_frect_t des
  * \param[in]       rotation: Rotation in degrees
  * \param[in]       tint: Color tint to apply to the texture
  */
-void
-mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mvn_frect_t dest,
-                        mvn_fpoint_t origin, float rotation, mvn_color_t tint) {
+void mvn_draw_texture_npatch(mvn_texture_t *   texture,
+                             mvn_npatch_info_t nPatchInfo,
+                             mvn_frect_t       dest,
+                             mvn_fpoint_t      origin,
+                             float             rotation,
+                             mvn_color_t       tint)
+{
     // Check for invalid parameters
     if (!texture || dest.w <= 0 || dest.h <= 0) {
         return;
     }
 
-    mvn_renderer_t* renderer = SDL_GetRendererFromTexture(texture);
+    mvn_renderer_t *renderer = SDL_GetRendererFromTexture(texture);
     if (!renderer) {
         return;
     }
@@ -326,9 +342,9 @@ mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mv
     float sourceH = (float)nPatchInfo.source.h;
 
     // Calculate corners dimensions
-    float leftWidth = (float)nPatchInfo.left;
-    float rightWidth = (float)nPatchInfo.right;
-    float topHeight = (float)nPatchInfo.top;
+    float leftWidth    = (float)nPatchInfo.left;
+    float rightWidth   = (float)nPatchInfo.right;
+    float topHeight    = (float)nPatchInfo.top;
     float bottomHeight = (float)nPatchInfo.bottom;
 
     // Ensure that border dimensions don't exceed the texture size
@@ -345,7 +361,7 @@ mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mv
     }
 
     // Calculate center dimensions
-    float centerWidth = sourceW - leftWidth - rightWidth;
+    float centerWidth  = sourceW - leftWidth - rightWidth;
     float centerHeight = sourceH - topHeight - bottomHeight;
 
     // Calculate destination dimensions
@@ -357,12 +373,12 @@ mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mv
     // Dimension values for drawing
     mvn_frect_t sourceRects[9];
     mvn_frect_t destRects[9];
-    int drawCount = 0;
+    int         drawCount = 0;
 
     // Initialize all rects (needed for certain layouts)
     for (int i = 0; i < 9; i++) {
         sourceRects[i] = (mvn_frect_t){0, 0, 0, 0};
-        destRects[i] = (mvn_frect_t){0, 0, 0, 0};
+        destRects[i]   = (mvn_frect_t){0, 0, 0, 0};
     }
 
     // Setup based on layout type
@@ -374,31 +390,32 @@ mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mv
             // Top-center
             sourceRects[1] = (mvn_frect_t){sourceX + leftWidth, sourceY, centerWidth, topHeight};
             // Top-right
-            sourceRects[2] = (mvn_frect_t){sourceX + leftWidth + centerWidth, sourceY, rightWidth,
-                                           topHeight};
+            sourceRects[2] =
+                (mvn_frect_t){sourceX + leftWidth + centerWidth, sourceY, rightWidth, topHeight};
 
             // Middle-left
             sourceRects[3] = (mvn_frect_t){sourceX, sourceY + topHeight, leftWidth, centerHeight};
             // Middle-center
-            sourceRects[4] = (mvn_frect_t){sourceX + leftWidth, sourceY + topHeight, centerWidth,
-                                           centerHeight};
+            sourceRects[4] =
+                (mvn_frect_t){sourceX + leftWidth, sourceY + topHeight, centerWidth, centerHeight};
             // Middle-right
-            sourceRects[5] = (mvn_frect_t){sourceX + leftWidth + centerWidth, sourceY + topHeight,
-                                           rightWidth, centerHeight};
+            sourceRects[5] = (mvn_frect_t){
+                sourceX + leftWidth + centerWidth, sourceY + topHeight, rightWidth, centerHeight};
 
             // Bottom-left
-            sourceRects[6] = (mvn_frect_t){sourceX, sourceY + topHeight + centerHeight, leftWidth,
-                                           bottomHeight};
+            sourceRects[6] =
+                (mvn_frect_t){sourceX, sourceY + topHeight + centerHeight, leftWidth, bottomHeight};
             // Bottom-center
-            sourceRects[7] = (mvn_frect_t){sourceX + leftWidth, sourceY + topHeight + centerHeight,
-                                           centerWidth, bottomHeight};
+            sourceRects[7] = (mvn_frect_t){
+                sourceX + leftWidth, sourceY + topHeight + centerHeight, centerWidth, bottomHeight};
             // Bottom-right
             sourceRects[8] = (mvn_frect_t){sourceX + leftWidth + centerWidth,
-                                           sourceY + topHeight + centerHeight, rightWidth,
+                                           sourceY + topHeight + centerHeight,
+                                           rightWidth,
                                            bottomHeight};
 
             // Calculate destination rectangles
-            float stretchedCenterWidth = destW - leftWidth - rightWidth;
+            float stretchedCenterWidth  = destW - leftWidth - rightWidth;
             float stretchedCenterHeight = destH - topHeight - bottomHeight;
 
             if (stretchedCenterWidth < 0) {
@@ -422,29 +439,33 @@ mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mv
             // Top-center
             destRects[1] = (mvn_frect_t){destX + leftWidth, destY, stretchedCenterWidth, topHeight};
             // Top-right
-            destRects[2] = (mvn_frect_t){destX + leftWidth + stretchedCenterWidth, destY,
-                                         rightWidth, topHeight};
+            destRects[2] = (mvn_frect_t){
+                destX + leftWidth + stretchedCenterWidth, destY, rightWidth, topHeight};
 
             // Middle-left
-            destRects[3] = (mvn_frect_t){destX, destY + topHeight, leftWidth,
-                                         stretchedCenterHeight};
+            destRects[3] =
+                (mvn_frect_t){destX, destY + topHeight, leftWidth, stretchedCenterHeight};
             // Middle-center
-            destRects[4] = (mvn_frect_t){destX + leftWidth, destY + topHeight, stretchedCenterWidth,
-                                         stretchedCenterHeight};
+            destRects[4] = (mvn_frect_t){
+                destX + leftWidth, destY + topHeight, stretchedCenterWidth, stretchedCenterHeight};
             // Middle-right
             destRects[5] = (mvn_frect_t){destX + leftWidth + stretchedCenterWidth,
-                                         destY + topHeight, rightWidth, stretchedCenterHeight};
+                                         destY + topHeight,
+                                         rightWidth,
+                                         stretchedCenterHeight};
 
             // Bottom-left
-            destRects[6] = (mvn_frect_t){destX, destY + topHeight + stretchedCenterHeight,
-                                         leftWidth, bottomHeight};
+            destRects[6] = (mvn_frect_t){
+                destX, destY + topHeight + stretchedCenterHeight, leftWidth, bottomHeight};
             // Bottom-center
             destRects[7] = (mvn_frect_t){destX + leftWidth,
                                          destY + topHeight + stretchedCenterHeight,
-                                         stretchedCenterWidth, bottomHeight};
+                                         stretchedCenterWidth,
+                                         bottomHeight};
             // Bottom-right
             destRects[8] = (mvn_frect_t){destX + leftWidth + stretchedCenterWidth,
-                                         destY + topHeight + stretchedCenterHeight, rightWidth,
+                                         destY + topHeight + stretchedCenterHeight,
+                                         rightWidth,
                                          bottomHeight};
 
             drawCount = 9;
@@ -457,8 +478,8 @@ mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mv
             // Center
             sourceRects[1] = (mvn_frect_t){sourceX + leftWidth, sourceY, centerWidth, sourceH};
             // Right
-            sourceRects[2] = (mvn_frect_t){sourceX + leftWidth + centerWidth, sourceY, rightWidth,
-                                           sourceH};
+            sourceRects[2] =
+                (mvn_frect_t){sourceX + leftWidth + centerWidth, sourceY, rightWidth, sourceH};
 
             float stretchedCenterWidth = destW - leftWidth - rightWidth;
 
@@ -474,8 +495,8 @@ mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mv
             // Center
             destRects[1] = (mvn_frect_t){destX + leftWidth, destY, stretchedCenterWidth, destH};
             // Right
-            destRects[2] = (mvn_frect_t){destX + leftWidth + stretchedCenterWidth, destY,
-                                         rightWidth, destH};
+            destRects[2] =
+                (mvn_frect_t){destX + leftWidth + stretchedCenterWidth, destY, rightWidth, destH};
 
             drawCount = 3;
             break;
@@ -487,8 +508,8 @@ mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mv
             // Center
             sourceRects[1] = (mvn_frect_t){sourceX, sourceY + topHeight, sourceW, centerHeight};
             // Bottom
-            sourceRects[2] = (mvn_frect_t){sourceX, sourceY + topHeight + centerHeight, sourceW,
-                                           bottomHeight};
+            sourceRects[2] =
+                (mvn_frect_t){sourceX, sourceY + topHeight + centerHeight, sourceW, bottomHeight};
 
             float stretchedCenterHeight = destH - topHeight - bottomHeight;
 
@@ -504,8 +525,8 @@ mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mv
             // Center
             destRects[1] = (mvn_frect_t){destX, destY + topHeight, destW, stretchedCenterHeight};
             // Bottom
-            destRects[2] = (mvn_frect_t){destX, destY + topHeight + stretchedCenterHeight, destW,
-                                         bottomHeight};
+            destRects[2] = (mvn_frect_t){
+                destX, destY + topHeight + stretchedCenterHeight, destW, bottomHeight};
 
             drawCount = 3;
             break;
@@ -520,8 +541,13 @@ mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mv
         // For each patch
         for (int i = 0; i < drawCount; i++) {
             // Draw the current patch with rotation around the specified origin
-            SDL_RenderTextureRotated(renderer, texture, &sourceRects[i], &destRects[i], rotation,
-                                     &centerPoint, SDL_FLIP_NONE);
+            SDL_RenderTextureRotated(renderer,
+                                     texture,
+                                     &sourceRects[i],
+                                     &destRects[i],
+                                     rotation,
+                                     &centerPoint,
+                                     SDL_FLIP_NONE);
         }
     } else {
         // No rotation needed, simply render each patch

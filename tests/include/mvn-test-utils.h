@@ -25,8 +25,11 @@ extern "C" {
 #define TEST_ASSERT_FLOAT_EQ(actual, expected, message)                                            \
     do {                                                                                           \
         if (fabsf((actual) - (expected)) > FLOAT_EPSILON) {                                        \
-            printf("FAILED: %s\nExpected: %f, Got: %f\nLine: %d\n", message, (double)(expected),   \
-                   (double)(actual), __LINE__);                                                    \
+            printf("FAILED: %s\nExpected: %f, Got: %f\nLine: %d\n",                                \
+                   message,                                                                        \
+                   (double)(expected),                                                             \
+                   (double)(actual),                                                               \
+                   __LINE__);                                                                      \
             return 0;                                                                              \
         }                                                                                          \
     } while (0)
@@ -34,8 +37,11 @@ extern "C" {
 #define TEST_ASSERT_DOUBLE_EQ(actual, expected, message)                                           \
     do {                                                                                           \
         if (fabs((actual) - (expected)) > DOUBLE_EPSILON) {                                        \
-            printf("FAILED: %s\nExpected: %.16f, Got: %.16f\nLine: %d\n", message, (expected),     \
-                   (actual), __LINE__);                                                            \
+            printf("FAILED: %s\nExpected: %.16f, Got: %.16f\nLine: %d\n",                          \
+                   message,                                                                        \
+                   (expected),                                                                     \
+                   (actual),                                                                       \
+                   __LINE__);                                                                      \
             return 0;                                                                              \
         }                                                                                          \
     } while (0)
@@ -47,17 +53,17 @@ extern "C" {
     do {                                                                                           \
         printf("Running test: %s\n", #test_func);                                                  \
         if (test_func()) {                                                                         \
-            printf("✅ PASSED: %s\n", #test_func);                                                 \
+            printf("✅ PASSED: %s\n", #test_func);                                                  \
             (*passed_tests)++;                                                                     \
         } else {                                                                                   \
-            printf("❌ FAILED: %s\n", #test_func);                                                 \
+            printf("❌ FAILED: %s\n", #test_func);                                                  \
             (*failed_tests)++;                                                                     \
         }                                                                                          \
     } while (0)
 
 // Convenience function to print test summary
-static inline void
-print_test_summary(int total_tests, int passed_tests, int failed_tests) {
+static inline void print_test_summary(int total_tests, int passed_tests, int failed_tests)
+{
     printf("Test summary:\n");
     printf("  Total tests: %d\n", total_tests);
     printf("  Passed: %d\n", passed_tests);

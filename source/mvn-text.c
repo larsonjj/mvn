@@ -32,11 +32,14 @@
  */
 
 #include "mvn/mvn-text.h"
-#include <SDL3/SDL.h>
-#include <SDL3_ttf/SDL_ttf.h>
+
 #include "mvn/mvn-core.h"
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-types.h"
+
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+
 
 /* Private variables */
 static int32_t mvn_line_spacing = 0;
@@ -47,10 +50,10 @@ static int32_t mvn_line_spacing = 0;
  * \param[in]       size: Size of the font in points
  * \return          Font handle on success, NULL on failure
  */
-TTF_Font*
-mvn_load_font(const char* fileName, float size) {
-    char path[512];
-    TTF_Font* font = NULL;
+TTF_Font *mvn_load_font(const char *fileName, float size)
+{
+    char      path[512];
+    TTF_Font *font = NULL;
 
     // Construct path to the font file
     SDL_snprintf(path, sizeof(path), "%s", fileName);
@@ -72,10 +75,11 @@ mvn_load_font(const char* fileName, float size) {
  * \param[in]       codePointCount: Number of codepoints in the array
  * \return          Font handle on success, NULL on failure
  */
-TTF_Font*
-mvn_load_font_ex(const char* fileName, float size, const int* codePoints, int codePointCount) {
-    char path[512];
-    TTF_Font* font = NULL;
+TTF_Font *
+mvn_load_font_ex(const char *fileName, float size, const int *codePoints, int codePointCount)
+{
+    char      path[512];
+    TTF_Font *font = NULL;
 
     // Construct path to the font file
     SDL_snprintf(path, sizeof(path), "%s", fileName);
@@ -104,8 +108,8 @@ mvn_load_font_ex(const char* fileName, float size, const int* codePoints, int co
  * \brief           Unload a font previously loaded with mvn_load_font
  * \param[in]       font: Font to unload
  */
-void
-mvn_unload_font(TTF_Font* font) {
+void mvn_unload_font(TTF_Font *font)
+{
     if (font != NULL) {
         TTF_CloseFont(font);
     }
@@ -115,8 +119,8 @@ mvn_unload_font(TTF_Font* font) {
  * \brief           Set vertical line spacing when drawing text with line-breaks
  * \param[in]       spacing: Spacing value in pixels
  */
-void
-mvn_set_text_line_spacing(int32_t spacing) {
+void mvn_set_text_line_spacing(int32_t spacing)
+{
     mvn_line_spacing = spacing;
 }
 
@@ -127,11 +131,11 @@ mvn_set_text_line_spacing(int32_t spacing) {
  * \param[in]       spacing: Character spacing
  * \return          Width of the measured text in pixels
  */
-int32_t
-mvn_measure_text(TTF_Font* font, const char* text, float spacing) {
-    size_t length = 0;
+int32_t mvn_measure_text(TTF_Font *font, const char *text, float spacing)
+{
+    size_t  length    = 0;
     int32_t max_width = 0; // Unbounded
-    size_t measured_length;
+    size_t  measured_length;
     int32_t measured_width;
 
     if (font == NULL || text == NULL) {
@@ -161,10 +165,10 @@ mvn_measure_text(TTF_Font* font, const char* text, float spacing) {
  * \param[in]       position: Position (as mvn_fpoint_t) to draw text
  * \param[in]       tint: Color tint to apply to the text
  */
-void
-mvn_draw_text(TTF_Font* font, const char* text, mvn_fpoint_t position, mvn_color_t tint) {
-    TTF_Text* text_obj;
-    mvn_text_engine_t* text_engine;
+void mvn_draw_text(TTF_Font *font, const char *text, mvn_fpoint_t position, mvn_color_t tint)
+{
+    TTF_Text *         text_obj;
+    mvn_text_engine_t *text_engine;
 
     if (text == NULL || text[0] == '\0' || font == NULL) {
         return;
@@ -185,8 +189,11 @@ mvn_draw_text(TTF_Font* font, const char* text, mvn_fpoint_t position, mvn_color
     }
 
     /* Apply text settings */
-    TTF_SetTextColorFloat(text_obj, (float)tint.r / 255.0f, (float)tint.g / 255.0f,
-                          (float)tint.b / 255.0f, (float)tint.a / 255.0f);
+    TTF_SetTextColorFloat(text_obj,
+                          (float)tint.r / 255.0f,
+                          (float)tint.g / 255.0f,
+                          (float)tint.b / 255.0f,
+                          (float)tint.a / 255.0f);
 
     /* Draw the text */
     if (!TTF_DrawRendererText(text_obj, position.x, position.y)) {
@@ -206,14 +213,18 @@ mvn_draw_text(TTF_Font* font, const char* text, mvn_fpoint_t position, mvn_color
  * \param[in]       rotation: Rotation in degrees
  * \param[in]       tint: Color tint to apply to the text
  */
-void
-mvn_draw_text_pro(TTF_Font* font, const char* text, mvn_fpoint_t position, mvn_fpoint_t origin,
-                  float rotation, mvn_color_t tint) {
-    mvn_image_t* surface;
-    mvn_texture_t* texture;
-    mvn_renderer_t* renderer;
-    mvn_frect_t dest;
-    mvn_fpoint_t center;
+void mvn_draw_text_pro(TTF_Font *   font,
+                       const char * text,
+                       mvn_fpoint_t position,
+                       mvn_fpoint_t origin,
+                       float        rotation,
+                       mvn_color_t  tint)
+{
+    mvn_image_t *   surface;
+    mvn_texture_t * texture;
+    mvn_renderer_t *renderer;
+    mvn_frect_t     dest;
+    mvn_fpoint_t    center;
 
     if (text == NULL || text[0] == '\0' || font == NULL) {
         return;

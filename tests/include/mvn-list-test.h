@@ -5,7 +5,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int run_list_tests(int* passed, int* failed, int* total);
+int run_list_tests(int *passed, int *failed, int *total);
 
 #ifdef __cplusplus
 }

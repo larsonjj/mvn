@@ -34,26 +34,28 @@
 #ifndef MVN_FILE_H
 #define MVN_FILE_H
 
-#include <SDL3/SDL.h>
 #include "mvn/mvn-string.h"
+
+#include <SDL3/SDL.h>
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-bool mvn_file_exists(const char* fileName);
-bool mvn_directory_exists(const char* dirPath);
-bool mvn_is_file_extension(const char* fileName, const char* ext);
-int32_t mvn_get_file_length(const char* fileName);
-mvn_string_t* mvn_get_file_extension(const char* fileName);
-mvn_string_t* mvn_get_file_name(const char* filePath);
-mvn_string_t* mvn_get_file_name_without_ext(const char* filePath);
-mvn_string_t* mvn_get_directory_path(const char* filePath);
-mvn_string_t* mvn_get_parent_directory_path(const char* dirPath);
-mvn_string_t* mvn_get_application_directory(void);
-bool mvn_is_path_file(const char* path);
-bool mvn_is_path_directory(const char* path);
-long mvn_get_file_mod_time(const char* fileName);
+bool          mvn_file_exists(const char *fileName);
+bool          mvn_directory_exists(const char *dirPath);
+bool          mvn_is_file_extension(const char *fileName, const char *ext);
+int32_t       mvn_get_file_length(const char *fileName);
+mvn_string_t *mvn_get_file_extension(const char *fileName);
+mvn_string_t *mvn_get_file_name(const char *filePath);
+mvn_string_t *mvn_get_file_name_without_ext(const char *filePath);
+mvn_string_t *mvn_get_directory_path(const char *filePath);
+mvn_string_t *mvn_get_parent_directory_path(const char *dirPath);
+mvn_string_t *mvn_get_application_directory(void);
+bool          mvn_is_path_file(const char *path);
+bool          mvn_is_path_directory(const char *path);
+long          mvn_get_file_mod_time(const char *fileName);
 
 #ifdef __cplusplus
 }

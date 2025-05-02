@@ -11,11 +11,12 @@
  * Author:          Jake Larson
  */
 
+#include "mvn-test-utils.h"
+#include "mvn/mvn-texture.h"
+
 #include <stdio.h>
 #include <string.h>
 
-#include "mvn-test-utils.h"
-#include "mvn/mvn-texture.h"
 
 /**
  * \brief           Run all image tests
@@ -24,15 +25,15 @@
  * \param[out] total Pointer to the total number of tests
  * \return          Number of passed tests
  */
-static int
-test_image_load(void) {
-    mvn_image_t* surface = NULL;
-    const char* test_image_name = "char-1.png";
-    char test_image_path[256];
-    int result = 1; // Default to success
+static int test_image_load(void)
+{
+    mvn_image_t *surface         = NULL;
+    const char * test_image_name = "char-1.png";
+    char         test_image_path[256];
+    int          result = 1; // Default to success
 
     // Get the test assets directory from environment variable
-    const char* assets_dir = ASSET_DIR;
+    const char *assets_dir = ASSET_DIR;
     if (!assets_dir) {
         assets_dir = ""; // Fallback default path
     }
@@ -60,11 +61,11 @@ test_image_load(void) {
 }
 
 /**
-  * \brief           Run all texture tests
-  * \return          Number of tests that passed
-  */
-int
-run_texture_tests(int* passed_tests, int* failed_tests, int* total_tests) {
+ * \brief           Run all texture tests
+ * \return          Number of tests that passed
+ */
+int run_texture_tests(int *passed_tests, int *failed_tests, int *total_tests)
+{
     printf("\n===== TEXTURE TESTS =====\n\n");
 
     int passed_before = *passed_tests;
@@ -81,11 +82,11 @@ run_texture_tests(int* passed_tests, int* failed_tests, int* total_tests) {
 }
 
 #if defined(MVN_TEXTURES_TEST_MAIN)
-int
-main(void) {
+int main(void)
+{
     int passed = 0;
     int failed = 0;
-    int total = 0;
+    int total  = 0;
 
     run_texture_tests(&passed, &failed, &total);
 

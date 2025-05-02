@@ -3,16 +3,19 @@
  * \brief           Implementation of dynamic array list for MVN game framework
  */
 
-#include <SDL3/SDL.h>
 #include "mvn/mvn-list.h"
+
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-utils.h"
 
+#include <SDL3/SDL.h>
+
+
 /* Default initial capacity if none is specified */
-#define MVN_LIST_DEFAULT_CAPACITY  8
+#define MVN_LIST_DEFAULT_CAPACITY 8
 
 /* Growth factor when resizing */
-#define MVN_LIST_GROWTH_FACTOR     2
+#define MVN_LIST_GROWTH_FACTOR 2
 
 /* Stack buffer size for small item temporary storage */
 #define MVN_LIST_STACK_BUFFER_SIZE 64
@@ -23,8 +26,8 @@
  * \param[in]       initial_capacity: Initial capacity (0 for default)
  * \return          New list or NULL on failure
  */
-mvn_list_t*
-mvn_list_init(size_t item_size, size_t initial_capacity) {
+mvn_list_t *mvn_list_init(size_t item_size, size_t initial_capacity)
+{
     if (item_size == 0) {
         mvn_log_error("Cannot create list with item_size 0");
         return NULL;
@@ -42,7 +45,7 @@ mvn_list_init(size_t item_size, size_t initial_capacity) {
     }
 
     /* Allocate list structure */
-    mvn_list_t* list = MVN_MALLOC(sizeof(mvn_list_t));
+    mvn_list_t *list = MVN_MALLOC(sizeof(mvn_list_t));
     if (!list) {
         mvn_log_error("Failed to allocate memory for list");
         return NULL;
@@ -58,8 +61,8 @@ mvn_list_init(size_t item_size, size_t initial_capacity) {
     }
 
     list->item_size = item_size;
-    list->length = 0;
-    list->capacity = initial_capacity;
+    list->length    = 0;
+    list->capacity  = initial_capacity;
 
     mvn_log_debug("List initialized with item_size=%zu, capacity=%zu", item_size, initial_capacity);
     return list;
@@ -69,8 +72,8 @@ mvn_list_init(size_t item_size, size_t initial_capacity) {
  * \brief           Free a list and all its resources
  * \param[in]       list: List to free
  */
-void
-mvn_list_free(mvn_list_t* list) {
+void mvn_list_free(mvn_list_t *list)
+{
     if (!list) {
         return;
     }
@@ -88,8 +91,8 @@ mvn_list_free(mvn_list_t* list) {
  * \param[in]       list: List to query
  * \return          Number of items in the list
  */
-size_t
-mvn_list_length(const mvn_list_t* list) {
+size_t mvn_list_length(const mvn_list_t *list)
+{
     if (!list) {
         return 0;
     }
@@ -102,8 +105,8 @@ mvn_list_length(const mvn_list_t* list) {
  * \param[in]       capacity: Desired minimum capacity
  * \return          true on success, false on failure
  */
-bool
-mvn_list_reserve(mvn_list_t* list, size_t capacity) {
+bool mvn_list_reserve(mvn_list_t *list, size_t capacity)
+{
     if (!list) {
         return false;
     }
@@ -121,8 +124,8 @@ mvn_list_reserve(mvn_list_t* list, size_t capacity) {
  * \param[in]       new_capacity: New capacity
  * \return          true on success, false on failure
  */
-bool
-mvn_list_resize(mvn_list_t* list, size_t new_capacity) {
+bool mvn_list_resize(mvn_list_t *list, size_t new_capacity)
+{
     if (!list) {
         mvn_log_error("Cannot resize NULL list");
         return false;
@@ -133,7 +136,7 @@ mvn_list_resize(mvn_list_t* list, size_t new_capacity) {
         /* Allow resizing to 0 capacity if length is also 0, effectively freeing data */
         if (list->length == 0) {
             MVN_FREE(list->data);
-            list->data = NULL;
+            list->data     = NULL;
             list->capacity = 0;
             mvn_log_debug("List resized to 0 capacity");
             return true;
@@ -163,20 +166,20 @@ mvn_list_resize(mvn_list_t* list, size_t new_capacity) {
         return false;
     }
 
-    void* new_data = MVN_REALLOC(list->data, new_capacity * list->item_size);
+    void *new_data = MVN_REALLOC(list->data, new_capacity * list->item_size);
     if (!new_data) {
         /* If realloc fails for 0 capacity, it's not necessarily an error if length is 0 */
         if (new_capacity == 0 && list->length == 0) {
-             list->data = NULL; /* Data is freed by REALLOC(ptr, 0) */
-             list->capacity = 0;
-             mvn_log_debug("List resized to 0 capacity (realloc returned NULL)");
-             return true;
+            list->data     = NULL; /* Data is freed by REALLOC(ptr, 0) */
+            list->capacity = 0;
+            mvn_log_debug("List resized to 0 capacity (realloc returned NULL)");
+            return true;
         }
         mvn_log_error("Failed to resize list to capacity %zu", new_capacity);
         return false;
     }
 
-    list->data = new_data;
+    list->data     = new_data;
     list->capacity = new_capacity;
 
     mvn_log_debug("List resized to capacity %zu", new_capacity);
@@ -188,8 +191,8 @@ mvn_list_resize(mvn_list_t* list, size_t new_capacity) {
  * \param[in]       list: List to check capacity for
  * \return          true if capacity is sufficient or was successfully increased, false on failure
  */
-static bool
-mvn_list_ensure_capacity(mvn_list_t* list) {
+static bool mvn_list_ensure_capacity(mvn_list_t *list)
+{
     if (list->length >= list->capacity) {
         size_t new_capacity = list->capacity * MVN_LIST_GROWTH_FACTOR;
         if (new_capacity == 0) {
@@ -206,13 +209,13 @@ mvn_list_ensure_capacity(mvn_list_t* list) {
  * \param[in]       index: Index of the item to get
  * \return          Pointer to the item or NULL if index is out of bounds
  */
-void*
-mvn_list_get(const mvn_list_t* list, size_t index) {
+void *mvn_list_get(const mvn_list_t *list, size_t index)
+{
     if (!list || index >= list->length) {
         return NULL;
     }
 
-    return (char*)list->data + (index * list->item_size);
+    return (char *)list->data + (index * list->item_size);
 }
 
 /**
@@ -222,13 +225,13 @@ mvn_list_get(const mvn_list_t* list, size_t index) {
  * \param[in]       item: Item to set
  * \return          true on success, false on failure
  */
-bool
-mvn_list_set(mvn_list_t* list, size_t index, const void* item) {
+bool mvn_list_set(mvn_list_t *list, size_t index, const void *item)
+{
     if (!list || !item || index >= list->length) {
         return false;
     }
 
-    void* dest = (char*)list->data + (index * list->item_size);
+    void *dest = (char *)list->data + (index * list->item_size);
     SDL_memcpy(dest, item, list->item_size);
     return true;
 }
@@ -239,8 +242,8 @@ mvn_list_set(mvn_list_t* list, size_t index, const void* item) {
  * \param[in]       item: Item to add
  * \return          true on success, false on failure
  */
-bool
-mvn_list_push(mvn_list_t* list, const void* item) {
+bool mvn_list_push(mvn_list_t *list, const void *item)
+{
     if (!list || !item) {
         mvn_log_error("Invalid parameters for list push");
         return false;
@@ -250,7 +253,7 @@ mvn_list_push(mvn_list_t* list, const void* item) {
         return false;
     }
 
-    void* dest = (char*)list->data + (list->length * list->item_size);
+    void *dest = (char *)list->data + (list->length * list->item_size);
     SDL_memcpy(dest, item, list->item_size);
     list->length++;
 
@@ -264,8 +267,8 @@ mvn_list_push(mvn_list_t* list, const void* item) {
  * \param[in]       count: Number of items to add
  * \return          true on success, false on failure
  */
-bool
-mvn_list_push_batch(mvn_list_t* list, const void* items, size_t count) {
+bool mvn_list_push_batch(mvn_list_t *list, const void *items, size_t count)
+{
     if (!list || !items || count == 0) {
         return false;
     }
@@ -282,7 +285,7 @@ mvn_list_push_batch(mvn_list_t* list, const void* items, size_t count) {
     }
 
     /* Copy all items at once */
-    void* dest = (char*)list->data + (list->length * list->item_size);
+    void *dest = (char *)list->data + (list->length * list->item_size);
     SDL_memcpy(dest, items, count * list->item_size);
     list->length += count;
 
@@ -295,8 +298,8 @@ mvn_list_push_batch(mvn_list_t* list, const void* items, size_t count) {
  * \param[out]      out_item: Output buffer for the popped item (can be NULL)
  * \return          true on success, false on failure
  */
-bool
-mvn_list_pop(mvn_list_t* list, void* out_item) {
+bool mvn_list_pop(mvn_list_t *list, void *out_item)
+{
     if (!list || list->length == 0) {
         return false;
     }
@@ -304,7 +307,7 @@ mvn_list_pop(mvn_list_t* list, void* out_item) {
     list->length--;
 
     if (out_item) {
-        void* src = (char*)list->data + (list->length * list->item_size);
+        void *src = (char *)list->data + (list->length * list->item_size);
         SDL_memcpy(out_item, src, list->item_size);
     }
 
@@ -317,8 +320,8 @@ mvn_list_pop(mvn_list_t* list, void* out_item) {
  * \param[in]       item: Item to add
  * \return          true on success, false on failure
  */
-bool
-mvn_list_unshift(mvn_list_t* list, const void* item) {
+bool mvn_list_unshift(mvn_list_t *list, const void *item)
+{
     if (!list || !item) {
         mvn_log_error("Invalid parameters for list unshift");
         return false;
@@ -330,8 +333,8 @@ mvn_list_unshift(mvn_list_t* list, const void* item) {
 
     /* Shift existing items right by one position */
     if (list->length > 0) {
-        void* src = list->data;
-        void* dest = (char*)list->data + list->item_size;
+        void *src  = list->data;
+        void *dest = (char *)list->data + list->item_size;
 
         /* For small lists or large items, directly use memmove */
         SDL_memmove(dest, src, list->length * list->item_size);
@@ -350,8 +353,8 @@ mvn_list_unshift(mvn_list_t* list, const void* item) {
  * \param[out]      out_item: Output buffer for the shifted item (can be NULL)
  * \return          true on success, false on failure
  */
-bool
-mvn_list_shift(mvn_list_t* list, void* out_item) {
+bool mvn_list_shift(mvn_list_t *list, void *out_item)
+{
     if (!list || list->length == 0) {
         return false;
     }
@@ -363,8 +366,8 @@ mvn_list_shift(mvn_list_t* list, void* out_item) {
 
     /* Shift remaining items left by one position */
     if (list->length > 1) {
-        void* dest = list->data;
-        void* src = (char*)list->data + list->item_size;
+        void *dest = list->data;
+        void *src  = (char *)list->data + list->item_size;
         SDL_memmove(dest, src, (list->length - 1) * list->item_size);
     }
 
@@ -379,8 +382,8 @@ mvn_list_shift(mvn_list_t* list, void* out_item) {
  * \param[in]       end: End index (exclusive), use -1 for end of list
  * \return          New list with sliced items or NULL on failure
  */
-mvn_list_t*
-mvn_list_slice(const mvn_list_t* list, size_t start, size_t end) {
+mvn_list_t *mvn_list_slice(const mvn_list_t *list, size_t start, size_t end)
+{
     if (!list) {
         mvn_log_error("Cannot slice NULL list");
         return NULL;
@@ -393,23 +396,23 @@ mvn_list_slice(const mvn_list_t* list, size_t start, size_t end) {
 
     /* Validate indices */
     if (start > list->length || start > end) {
-        mvn_log_error("Invalid slice indices: start=%zu, end=%zu, length=%zu", start, end,
-                      list->length);
+        mvn_log_error(
+            "Invalid slice indices: start=%zu, end=%zu, length=%zu", start, end, list->length);
         return NULL;
     }
 
     size_t slice_length = end - start;
 
     /* Create new list with exact capacity needed */
-    mvn_list_t* result = mvn_list_init(list->item_size,
-                                       slice_length > 0 ? slice_length : MVN_LIST_DEFAULT_CAPACITY);
+    mvn_list_t *result =
+        mvn_list_init(list->item_size, slice_length > 0 ? slice_length : MVN_LIST_DEFAULT_CAPACITY);
     if (!result) {
         return NULL;
     }
 
     /* Copy slice data */
     if (slice_length > 0) {
-        void* src = (char*)list->data + (start * list->item_size);
+        void *src = (char *)list->data + (start * list->item_size);
         SDL_memcpy(result->data, src, slice_length * list->item_size);
         result->length = slice_length;
     }
@@ -423,8 +426,8 @@ mvn_list_slice(const mvn_list_t* list, size_t start, size_t end) {
  * \param[in]       list2: Second list
  * \return          New list containing items from both lists or NULL on failure
  */
-mvn_list_t*
-mvn_list_concat(const mvn_list_t* list1, const mvn_list_t* list2) {
+mvn_list_t *mvn_list_concat(const mvn_list_t *list1, const mvn_list_t *list2)
+{
     if (!list1 || !list2) {
         mvn_log_error("Cannot concatenate NULL lists");
         return NULL;
@@ -438,7 +441,7 @@ mvn_list_concat(const mvn_list_t* list1, const mvn_list_t* list2) {
     size_t total_length = list1->length + list2->length;
 
     /* Create new list with exact capacity needed */
-    mvn_list_t* result = mvn_list_init(list1->item_size,
+    mvn_list_t *result = mvn_list_init(list1->item_size,
                                        total_length > 0 ? total_length : MVN_LIST_DEFAULT_CAPACITY);
     if (!result) {
         return NULL;
@@ -452,7 +455,7 @@ mvn_list_concat(const mvn_list_t* list1, const mvn_list_t* list2) {
 
     /* Copy data from second list */
     if (list2->length > 0) {
-        void* dest = (char*)result->data + (list1->length * list1->item_size);
+        void *dest = (char *)result->data + (list1->length * list1->item_size);
         SDL_memcpy(dest, list2->data, list2->length * list2->item_size);
         result->length += list2->length;
     }
@@ -465,15 +468,15 @@ mvn_list_concat(const mvn_list_t* list1, const mvn_list_t* list2) {
  * \param[in]       list: List to clone
  * \return          New copy of the list or NULL on failure
  */
-mvn_list_t*
-mvn_list_clone(const mvn_list_t* list) {
+mvn_list_t *mvn_list_clone(const mvn_list_t *list)
+{
     if (!list) {
         mvn_log_error("Cannot clone NULL list");
         return NULL;
     }
 
     /* Create new list with same capacity */
-    mvn_list_t* result = mvn_list_init(list->item_size, list->capacity);
+    mvn_list_t *result = mvn_list_init(list->item_size, list->capacity);
     if (!result) {
         return NULL;
     }
@@ -492,8 +495,8 @@ mvn_list_clone(const mvn_list_t* list) {
  * \param[in]       list: List to reverse
  * \return          true on success, false on failure
  */
-bool
-mvn_list_reverse(mvn_list_t* list) {
+bool mvn_list_reverse(mvn_list_t *list)
+{
     if (!list) {
         mvn_log_error("Cannot reverse NULL list");
         return false;
@@ -503,8 +506,8 @@ mvn_list_reverse(mvn_list_t* list) {
         return true; /* Nothing to do */
     }
 
-    char temp_storage[MVN_LIST_STACK_BUFFER_SIZE]; /* Stack buffer for small items */
-    void* temp = temp_storage;
+    char  temp_storage[MVN_LIST_STACK_BUFFER_SIZE]; /* Stack buffer for small items */
+    void *temp = temp_storage;
 
     /* Only allocate heap memory if item size is too large for stack */
     if (list->item_size > sizeof(temp_storage)) {
@@ -517,8 +520,8 @@ mvn_list_reverse(mvn_list_t* list) {
 
     /* Swap elements from both ends moving toward the center */
     for (size_t i = 0; i < list->length / 2; i++) {
-        void* a = (char*)list->data + (i * list->item_size);
-        void* b = (char*)list->data + ((list->length - 1 - i) * list->item_size);
+        void *a = (char *)list->data + (i * list->item_size);
+        void *b = (char *)list->data + ((list->length - 1 - i) * list->item_size);
 
         SDL_memcpy(temp, a, list->item_size);
         SDL_memcpy(a, b, list->item_size);
@@ -537,8 +540,8 @@ mvn_list_reverse(mvn_list_t* list) {
  * \param[in]       compare: Comparison function
  * \return          true on success, false on failure
  */
-bool
-mvn_list_sort(mvn_list_t* list, mvn_list_compare_fn compare) {
+bool mvn_list_sort(mvn_list_t *list, mvn_list_compare_fn compare)
+{
     if (!list || !compare) {
         mvn_log_error("Invalid parameters for list sort");
         return false;
@@ -560,8 +563,8 @@ mvn_list_sort(mvn_list_t* list, mvn_list_compare_fn compare) {
  * \param[in]       user_data: User data to pass to the filter function
  * \return          New list with filtered items or NULL on failure
  */
-mvn_list_t*
-mvn_list_filter(const mvn_list_t* list, mvn_list_filter_fn filter, void* user_data) {
+mvn_list_t *mvn_list_filter(const mvn_list_t *list, mvn_list_filter_fn filter, void *user_data)
+{
     if (!list || !filter) {
         mvn_log_error("Invalid parameters for list filter");
         return NULL;
@@ -570,15 +573,15 @@ mvn_list_filter(const mvn_list_t* list, mvn_list_filter_fn filter, void* user_da
     /* First, count matching elements to optimize allocation */
     size_t match_count = 0;
     for (size_t i = 0; i < list->length; i++) {
-        void* item = (char*)list->data + (i * list->item_size);
+        void *item = (char *)list->data + (i * list->item_size);
         if (filter(item, user_data)) {
             match_count++;
         }
     }
 
     /* Create new list with exact needed capacity */
-    mvn_list_t* result = mvn_list_init(list->item_size,
-                                       match_count > 0 ? match_count : MVN_LIST_DEFAULT_CAPACITY);
+    mvn_list_t *result =
+        mvn_list_init(list->item_size, match_count > 0 ? match_count : MVN_LIST_DEFAULT_CAPACITY);
     if (!result) {
         return NULL;
     }
@@ -592,9 +595,9 @@ mvn_list_filter(const mvn_list_t* list, mvn_list_filter_fn filter, void* user_da
         } else {
             /* Otherwise add items one by one */
             for (size_t i = 0; i < list->length; i++) {
-                void* item = (char*)list->data + (i * list->item_size);
+                void *item = (char *)list->data + (i * list->item_size);
                 if (filter(item, user_data)) {
-                    void* dest = (char*)result->data + (result->length * list->item_size);
+                    void *dest = (char *)result->data + (result->length * list->item_size);
                     SDL_memcpy(dest, item, list->item_size);
                     result->length++;
                 }
@@ -610,8 +613,8 @@ mvn_list_filter(const mvn_list_t* list, mvn_list_filter_fn filter, void* user_da
  * \param[in]       list: List to clear
  * \return          true on success, false on failure
  */
-bool
-mvn_list_clear(mvn_list_t* list) {
+bool mvn_list_clear(mvn_list_t *list)
+{
     if (!list) {
         return false;
     }
@@ -625,8 +628,8 @@ mvn_list_clear(mvn_list_t* list) {
  * \param[in]       list: List to trim
  * \return          true on success, false on failure
  */
-bool
-mvn_list_trim(mvn_list_t* list) {
+bool mvn_list_trim(mvn_list_t *list)
+{
     if (!list) {
         return false;
     }

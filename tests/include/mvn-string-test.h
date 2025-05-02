@@ -6,7 +6,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int run_string_tests(int* passed_tests, int* failed_tests, int* total_tests);
+int run_string_tests(int *passed_tests, int *failed_tests, int *total_tests);
 
 #ifdef __cplusplus
 }

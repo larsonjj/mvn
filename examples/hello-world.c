@@ -36,8 +36,8 @@
 /**
  * \brief           Main application entry point
  */
-int
-main(void) {
+int main(void)
+{
     /* Initialize SDL */
     if (!mvn_init(800, 600, "MVN Hello World Example", 0)) {
         return 1;
@@ -46,7 +46,7 @@ main(void) {
     mvn_logger_init();
 
     /* Display Engine Version */
-    mvn_string_t* version = mvn_get_engine_version();
+    mvn_string_t *version = mvn_get_engine_version();
     mvn_log_info("MVN Engine Version: %s", mvn_string_to_cstr(version));
 
     while (!mvn_window_should_close()) {

@@ -3,24 +3,27 @@
  * \brief           Implementation of dynamic string for MVN game framework
  */
 
-#include <SDL3/SDL.h>
+#include "mvn/mvn-string.h"
+
 #include "mvn/mvn-list.h"
 #include "mvn/mvn-logger.h"
-#include "mvn/mvn-string.h"
 #include "mvn/mvn-utils.h"
+
+#include <SDL3/SDL.h>
+
 
 /* Default initial capacity if none is specified */
 #define MVN_STRING_DEFAULT_CAPACITY 16
 
 /* Growth factor when resizing */
-#define MVN_STRING_GROWTH_FACTOR    2
+#define MVN_STRING_GROWTH_FACTOR 2
 
 /* Empty string constant for safety */
 static const char EMPTY_STRING[] = "";
 
 /* Helper function prototypes */
-static bool mvn_string_ensure_capacity(mvn_string_t* str, size_t needed_capacity);
-static bool mvn_string_resize(mvn_string_t* str, size_t new_capacity);
+static bool mvn_string_ensure_capacity(mvn_string_t *str, size_t needed_capacity);
+static bool mvn_string_resize(mvn_string_t *str, size_t new_capacity);
 static bool is_whitespace(char character);
 
 /**
@@ -28,13 +31,13 @@ static bool is_whitespace(char character);
  * \param[in]       str: String to clone
  * \return          New string or NULL on failure
  */
-mvn_string_t*
-mvn_string_clone(const mvn_string_t* str) {
+mvn_string_t *mvn_string_clone(const mvn_string_t *str)
+{
     if (!str) {
         return NULL;
     }
 
-    mvn_string_t* clone = mvn_string_init(str->capacity);
+    mvn_string_t *clone = mvn_string_init(str->capacity);
     if (!clone) {
         return NULL;
     }
@@ -49,14 +52,14 @@ mvn_string_clone(const mvn_string_t* str) {
  * \brief           Helper function to free resources in a list of strings
  * \param[in]       list: List containing mvn_string_t* elements
  */
-static void
-mvn_free_string_list(mvn_list_t* list) {
+static void mvn_free_string_list(mvn_list_t *list)
+{
     if (!list) {
         return;
     }
 
     for (size_t i = 0; i < mvn_list_length(list); ++i) {
-        mvn_string_t** item = MVN_LIST_GET(mvn_string_t*, list, i);
+        mvn_string_t **item = MVN_LIST_GET(mvn_string_t *, list, i);
         if (item && *item) {
             mvn_string_free(*item);
         }
@@ -69,15 +72,15 @@ mvn_free_string_list(mvn_list_t* list) {
  * \param[in]       initial_capacity: Initial capacity for the string buffer
  * \return          Newly created string or NULL on failure
  */
-mvn_string_t*
-mvn_string_init(size_t initial_capacity) {
+mvn_string_t *mvn_string_init(size_t initial_capacity)
+{
     /* Use default capacity if not specified */
     if (initial_capacity == 0) {
         initial_capacity = MVN_STRING_DEFAULT_CAPACITY;
     }
 
     /* Allocate string structure */
-    mvn_string_t* str = MVN_MALLOC(sizeof(mvn_string_t));
+    mvn_string_t *str = MVN_MALLOC(sizeof(mvn_string_t));
     if (!str) {
         mvn_log_error("Failed to allocate memory for string");
         return NULL;
@@ -92,8 +95,8 @@ mvn_string_init(size_t initial_capacity) {
     }
 
     /* Initialize with empty string */
-    str->data[0] = '\0';
-    str->length = 0;
+    str->data[0]  = '\0';
+    str->length   = 0;
     str->capacity = initial_capacity;
 
     mvn_log_debug("String initialized with capacity=%zu", initial_capacity);
@@ -105,16 +108,16 @@ mvn_string_init(size_t initial_capacity) {
  * \param[in]       cstr: C string to copy
  * \return          Newly created string or NULL on failure
  */
-mvn_string_t*
-mvn_string_from_cstr(const char* cstr) {
+mvn_string_t *mvn_string_from_cstr(const char *cstr)
+{
     if (!cstr) {
         cstr = EMPTY_STRING;
     }
 
-    size_t len = SDL_strlen(cstr);
+    size_t len             = SDL_strlen(cstr);
     size_t needed_capacity = len + 1; /* +1 for null terminator */
 
-    mvn_string_t* str = mvn_string_init(needed_capacity);
+    mvn_string_t *str = mvn_string_init(needed_capacity);
     if (!str) {
         return NULL;
     }
@@ -129,8 +132,8 @@ mvn_string_from_cstr(const char* cstr) {
  * \brief           Free a string and all its resources
  * \param[in]       str: String to free
  */
-void
-mvn_string_free(mvn_string_t* str) {
+void mvn_string_free(mvn_string_t *str)
+{
     if (!str) {
         return;
     }
@@ -149,8 +152,8 @@ mvn_string_free(mvn_string_t* str) {
  * \param[in]       needed_capacity: Minimum required capacity
  * \return          true on success, false on failure
  */
-static bool
-mvn_string_ensure_capacity(mvn_string_t* str, size_t needed_capacity) {
+static bool mvn_string_ensure_capacity(mvn_string_t *str, size_t needed_capacity)
+{
     if (!str) {
         mvn_log_error("NULL string provided to ensure_capacity");
         return false;
@@ -174,8 +177,8 @@ mvn_string_ensure_capacity(mvn_string_t* str, size_t needed_capacity) {
  * \param[in]       new_capacity: New capacity for the string
  * \return          true on success, false on failure
  */
-static bool
-mvn_string_resize(mvn_string_t* str, size_t new_capacity) {
+static bool mvn_string_resize(mvn_string_t *str, size_t new_capacity)
+{
     if (!str) {
         mvn_log_error("NULL string provided to resize");
         return false;
@@ -186,13 +189,13 @@ mvn_string_resize(mvn_string_t* str, size_t new_capacity) {
         new_capacity = str->length + 1;
     }
 
-    char* new_data = MVN_REALLOC(str->data, new_capacity);
+    char *new_data = MVN_REALLOC(str->data, new_capacity);
     if (!new_data) {
         mvn_log_error("Failed to resize string to capacity %zu", new_capacity);
         return false;
     }
 
-    str->data = new_data;
+    str->data     = new_data;
     str->capacity = new_capacity;
 
     mvn_log_debug("String resized to capacity %zu", new_capacity);
@@ -204,8 +207,8 @@ mvn_string_resize(mvn_string_t* str, size_t new_capacity) {
  * \param[in]       str: String to get length of
  * \return          Length of the string, 0 if str is NULL
  */
-size_t
-mvn_string_length(const mvn_string_t* str) {
+size_t mvn_string_length(const mvn_string_t *str)
+{
     if (!str) {
         return 0;
     }
@@ -217,8 +220,8 @@ mvn_string_length(const mvn_string_t* str) {
  * \param[in]       str: String to get C string from
  * \return          C string, empty string if str is NULL
  */
-const char*
-mvn_string_to_cstr(const mvn_string_t* str) {
+const char *mvn_string_to_cstr(const mvn_string_t *str)
+{
     if (!str || !str->data) {
         return EMPTY_STRING;
     }
@@ -231,8 +234,8 @@ mvn_string_to_cstr(const mvn_string_t* str) {
  * \param[in]       str2: Second string
  * \return          New string with concatenated content or NULL on failure
  */
-mvn_string_t*
-mvn_string_concat(const mvn_string_t* str1, const mvn_string_t* str2) {
+mvn_string_t *mvn_string_concat(const mvn_string_t *str1, const mvn_string_t *str2)
+{
     if (!str1) {
         return str2 ? mvn_string_from_cstr(mvn_string_to_cstr(str2)) : NULL;
     }
@@ -240,11 +243,11 @@ mvn_string_concat(const mvn_string_t* str1, const mvn_string_t* str2) {
         return mvn_string_from_cstr(mvn_string_to_cstr(str1));
     }
 
-    size_t len1 = str1->length;
-    size_t len2 = str2->length;
+    size_t len1      = str1->length;
+    size_t len2      = str2->length;
     size_t total_len = len1 + len2;
 
-    mvn_string_t* result = mvn_string_init(total_len + 1);
+    mvn_string_t *result = mvn_string_init(total_len + 1);
     if (!result) {
         return NULL;
     }
@@ -252,7 +255,7 @@ mvn_string_concat(const mvn_string_t* str1, const mvn_string_t* str2) {
     SDL_memcpy(result->data, str1->data, len1);
     SDL_memcpy(result->data + len1, str2->data, len2);
     result->data[total_len] = '\0';
-    result->length = total_len;
+    result->length          = total_len;
 
     return result;
 }
@@ -263,8 +266,8 @@ mvn_string_concat(const mvn_string_t* str1, const mvn_string_t* str2) {
  * \param[in]       cstr: C string to append
  * \return          true on success, false on failure
  */
-bool
-mvn_string_append(mvn_string_t* str, const char* cstr) {
+bool mvn_string_append(mvn_string_t *str, const char *cstr)
+{
     if (!str || !cstr) {
         return false;
     }
@@ -291,8 +294,8 @@ mvn_string_append(mvn_string_t* str, const char* cstr) {
  * \param[in]       suffix: Suffix to check for
  * \return          true if string ends with suffix, false otherwise
  */
-bool
-mvn_string_ends_with(const mvn_string_t* str, const char* suffix) {
+bool mvn_string_ends_with(const mvn_string_t *str, const char *suffix)
+{
     if (!str || !suffix) {
         return false;
     }
@@ -315,8 +318,8 @@ mvn_string_ends_with(const mvn_string_t* str, const char* suffix) {
  * \param[in]       prefix: Prefix to check for
  * \return          true if string starts with prefix, false otherwise
  */
-bool
-mvn_string_starts_with(const mvn_string_t* str, const char* prefix) {
+bool mvn_string_starts_with(const mvn_string_t *str, const char *prefix)
+{
     if (!str || !prefix) {
         return false;
     }
@@ -339,8 +342,8 @@ mvn_string_starts_with(const mvn_string_t* str, const char* prefix) {
  * \param[in]       substr: Substring to check for
  * \return          true if string includes substring, false otherwise
  */
-bool
-mvn_string_includes(const mvn_string_t* str, const char* substr) {
+bool mvn_string_includes(const mvn_string_t *str, const char *substr)
+{
     if (!str || !substr) {
         return false;
     }
@@ -359,8 +362,8 @@ mvn_string_includes(const mvn_string_t* str, const char* substr) {
  * \param[in]       pad_char: Character to use for padding
  * \return          New padded string or NULL on failure
  */
-mvn_string_t*
-mvn_string_pad_end(const mvn_string_t* str, size_t target_length, char pad_char) {
+mvn_string_t *mvn_string_pad_end(const mvn_string_t *str, size_t target_length, char pad_char)
+{
     if (!str) {
         return NULL;
     }
@@ -369,7 +372,7 @@ mvn_string_pad_end(const mvn_string_t* str, size_t target_length, char pad_char)
         return mvn_string_clone(str); /* No padding needed */
     }
 
-    mvn_string_t* result = mvn_string_init(target_length + 1);
+    mvn_string_t *result = mvn_string_init(target_length + 1);
     if (!result) {
         return NULL;
     }
@@ -383,7 +386,7 @@ mvn_string_pad_end(const mvn_string_t* str, size_t target_length, char pad_char)
     }
 
     result->data[target_length] = '\0';
-    result->length = target_length;
+    result->length              = target_length;
 
     return result;
 }
@@ -395,8 +398,8 @@ mvn_string_pad_end(const mvn_string_t* str, size_t target_length, char pad_char)
  * \param[in]       pad_char: Character to use for padding
  * \return          New padded string or NULL on failure
  */
-mvn_string_t*
-mvn_string_pad_start(const mvn_string_t* str, size_t target_length, char pad_char) {
+mvn_string_t *mvn_string_pad_start(const mvn_string_t *str, size_t target_length, char pad_char)
+{
     if (!str) {
         return NULL;
     }
@@ -405,7 +408,7 @@ mvn_string_pad_start(const mvn_string_t* str, size_t target_length, char pad_cha
         return mvn_string_clone(str); /* No padding needed */
     }
 
-    mvn_string_t* result = mvn_string_init(target_length + 1);
+    mvn_string_t *result = mvn_string_init(target_length + 1);
     if (!result) {
         return NULL;
     }
@@ -430,8 +433,8 @@ mvn_string_pad_start(const mvn_string_t* str, size_t target_length, char pad_cha
  * \param[in]       count: Number of times to repeat the string
  * \return          New repeated string or NULL on failure
  */
-mvn_string_t*
-mvn_string_repeat(const mvn_string_t* str, size_t count) {
+mvn_string_t *mvn_string_repeat(const mvn_string_t *str, size_t count)
+{
     // Explicitly handle NULL input string first
     if (!str) {
         return NULL;
@@ -446,19 +449,19 @@ mvn_string_repeat(const mvn_string_t* str, size_t count) {
         return mvn_string_from_cstr(str->data);
     }
 
-    size_t result_len = str->length * count;
-    mvn_string_t* result = mvn_string_init(result_len + 1);
+    size_t        result_len = str->length * count;
+    mvn_string_t *result     = mvn_string_init(result_len + 1);
     if (!result) {
         return NULL;
     }
 
-    char* dest = result->data;
+    char *dest = result->data;
     for (size_t i = 0; i < count; i++) {
         SDL_memcpy(dest, str->data, str->length);
         dest += str->length;
     }
 
-    *dest = '\0';
+    *dest          = '\0';
     result->length = result_len;
 
     return result;
@@ -471,24 +474,25 @@ mvn_string_repeat(const mvn_string_t* str, size_t count) {
  * \param[in]       replacement: Replacement string
  * \return          New string with replacement or NULL on failure
  */
-mvn_string_t*
-mvn_string_replace(const mvn_string_t* str, const char* search, const char* replacement) {
+mvn_string_t *
+mvn_string_replace(const mvn_string_t *str, const char *search, const char *replacement)
+{
     if (!str || !search || !replacement) {
         return NULL;
     }
 
-    const char* pos = SDL_strstr(str->data, search);
+    const char *pos = SDL_strstr(str->data, search);
     if (!pos) {
         return mvn_string_clone(str); /* No match found */
     }
 
-    size_t search_len = SDL_strlen(search);
+    size_t search_len  = SDL_strlen(search);
     size_t replace_len = SDL_strlen(replacement);
-    size_t prefix_len = pos - str->data;
-    size_t suffix_len = str->length - prefix_len - search_len;
-    size_t result_len = prefix_len + replace_len + suffix_len;
+    size_t prefix_len  = pos - str->data;
+    size_t suffix_len  = str->length - prefix_len - search_len;
+    size_t result_len  = prefix_len + replace_len + suffix_len;
 
-    mvn_string_t* result = mvn_string_init(result_len + 1);
+    mvn_string_t *result = mvn_string_init(result_len + 1);
     if (!result) {
         return NULL;
     }
@@ -500,7 +504,8 @@ mvn_string_replace(const mvn_string_t* str, const char* search, const char* repl
     SDL_memcpy(result->data + prefix_len, replacement, replace_len);
 
     /* Copy suffix */
-    SDL_memcpy(result->data + prefix_len + replace_len, pos + search_len,
+    SDL_memcpy(result->data + prefix_len + replace_len,
+               pos + search_len,
                suffix_len + 1); /* Include null terminator */
 
     result->length = result_len;
@@ -515,8 +520,9 @@ mvn_string_replace(const mvn_string_t* str, const char* search, const char* repl
  * \param[in]       replacement: Replacement string
  * \return          New string with all replacements or NULL on failure
  */
-mvn_string_t*
-mvn_string_replace_all(const mvn_string_t* str, const char* search, const char* replacement) {
+mvn_string_t *
+mvn_string_replace_all(const mvn_string_t *str, const char *search, const char *replacement)
+{
     if (!str || !search || !replacement) {
         return NULL;
     }
@@ -529,8 +535,8 @@ mvn_string_replace_all(const mvn_string_t* str, const char* search, const char* 
     size_t replace_len = SDL_strlen(replacement);
 
     /* First, count occurrences to calculate final size */
-    size_t count = 0;
-    const char* pos = str->data;
+    size_t      count = 0;
+    const char *pos   = str->data;
 
     while ((pos = SDL_strstr(pos, search)) != NULL) {
         count++;
@@ -541,16 +547,16 @@ mvn_string_replace_all(const mvn_string_t* str, const char* search, const char* 
         return mvn_string_from_cstr(str->data); /* No matches */
     }
 
-    size_t result_len = str->length + ((replace_len - search_len) * count);
-    mvn_string_t* result = mvn_string_init(result_len + 1);
+    size_t        result_len = str->length + ((replace_len - search_len) * count);
+    mvn_string_t *result     = mvn_string_init(result_len + 1);
     if (!result) {
         return NULL;
     }
 
     /* Perform replacements */
-    char* dest = result->data;
-    const char* src = str->data;
-    const char* next_pos;
+    char *      dest = result->data;
+    const char *src  = str->data;
+    const char *next_pos;
 
     while ((next_pos = SDL_strstr(src, search)) != NULL) {
         size_t chunk_len = next_pos - src;
@@ -580,13 +586,13 @@ mvn_string_replace_all(const mvn_string_t* str, const char* search, const char* 
  * \param[in]       delimiter: Delimiter to split by
  * \return          List of strings or NULL on failure
  */
-struct mvn_list_t*
-mvn_string_split(const mvn_string_t* str, const char* delimiter) {
+struct mvn_list_t *mvn_string_split(const mvn_string_t *str, const char *delimiter)
+{
     if (!str || !delimiter) {
         return NULL;
     }
 
-    struct mvn_list_t* list = mvn_list_init(sizeof(mvn_string_t*), 0);
+    struct mvn_list_t *list = mvn_list_init(sizeof(mvn_string_t *), 0);
     if (!list) {
         mvn_log_error("Failed to create list for string split");
         return NULL;
@@ -595,8 +601,8 @@ mvn_string_split(const mvn_string_t* str, const char* delimiter) {
     size_t delim_len = SDL_strlen(delimiter);
     if (delim_len == 0 || str->length == 0) {
         /* Empty delimiter or empty string - return list with just the original string */
-        mvn_string_t* copy = mvn_string_from_cstr(str->data);
-        if (!copy || !mvn_list_push(list, (const void*)&copy)) {
+        mvn_string_t *copy = mvn_string_from_cstr(str->data);
+        if (!copy || !mvn_list_push(list, (const void *)&copy)) {
             mvn_log_error("Failed to add string to split list");
             if (copy) {
                 mvn_string_free(copy);
@@ -607,23 +613,23 @@ mvn_string_split(const mvn_string_t* str, const char* delimiter) {
         return list;
     }
 
-    const char* start = str->data;
-    const char* end = NULL;
+    const char *start = str->data;
+    const char *end   = NULL;
 
     while ((end = SDL_strstr(start, delimiter)) != NULL) {
         size_t part_len = end - start;
 
         /* Create string for this part */
-        mvn_string_t* part = mvn_string_init(part_len + 1);
+        mvn_string_t *part = mvn_string_init(part_len + 1);
         if (!part) {
             mvn_free_string_list(list);
             return NULL;
         }
         SDL_memcpy(part->data, start, part_len);
         part->data[part_len] = '\0';
-        part->length = part_len;
+        part->length         = part_len;
 
-        if (!mvn_list_push(list, (const void*)&part)) {
+        if (!mvn_list_push(list, (const void *)&part)) {
             mvn_string_free(part);
             mvn_free_string_list(list);
             return NULL;
@@ -633,8 +639,8 @@ mvn_string_split(const mvn_string_t* str, const char* delimiter) {
     }
 
     /* Add final part (always add, even if empty) */
-    mvn_string_t* part = mvn_string_from_cstr(start);
-    if (!part || !mvn_list_push(list, (const void*)&part)) {
+    mvn_string_t *part = mvn_string_from_cstr(start);
+    if (!part || !mvn_list_push(list, (const void *)&part)) {
         if (part) {
             mvn_string_free(part);
         }
@@ -650,13 +656,13 @@ mvn_string_split(const mvn_string_t* str, const char* delimiter) {
  * \param[in]       str: String to convert
  * \return          New string in lowercase or NULL on failure
  */
-mvn_string_t*
-mvn_string_to_lowercase(const mvn_string_t* str) {
+mvn_string_t *mvn_string_to_lowercase(const mvn_string_t *str)
+{
     if (!str) {
         return NULL;
     }
 
-    mvn_string_t* result = mvn_string_init(str->length + 1);
+    mvn_string_t *result = mvn_string_init(str->length + 1);
     if (!result) {
         return NULL;
     }
@@ -666,7 +672,7 @@ mvn_string_to_lowercase(const mvn_string_t* str) {
     }
 
     result->data[str->length] = '\0';
-    result->length = str->length;
+    result->length            = str->length;
 
     return result;
 }
@@ -676,13 +682,13 @@ mvn_string_to_lowercase(const mvn_string_t* str) {
  * \param[in]       str: String to convert
  * \return          New string in uppercase or NULL on failure
  */
-mvn_string_t*
-mvn_string_to_uppercase(const mvn_string_t* str) {
+mvn_string_t *mvn_string_to_uppercase(const mvn_string_t *str)
+{
     if (!str) {
         return NULL;
     }
 
-    mvn_string_t* result = mvn_string_init(str->length + 1);
+    mvn_string_t *result = mvn_string_init(str->length + 1);
     if (!result) {
         return NULL;
     }
@@ -692,7 +698,7 @@ mvn_string_to_uppercase(const mvn_string_t* str) {
     }
 
     result->data[str->length] = '\0';
-    result->length = str->length;
+    result->length            = str->length;
 
     return result;
 }
@@ -702,10 +708,10 @@ mvn_string_to_uppercase(const mvn_string_t* str) {
  * \param[in]       character: Character to check
  * \return          true if character is whitespace, false otherwise
  */
-static bool
-is_whitespace(char character) {
-    return character == ' ' || character == '\t' || character == '\n' || character == '\r'
-           || character == '\f' || character == '\v';
+static bool is_whitespace(char character)
+{
+    return character == ' ' || character == '\t' || character == '\n' || character == '\r' ||
+           character == '\f' || character == '\v';
 }
 
 /**
@@ -713,8 +719,8 @@ is_whitespace(char character) {
  * \param[in]       str: String to trim
  * \return          New trimmed string or NULL on failure
  */
-mvn_string_t*
-mvn_string_trim(const mvn_string_t* str) {
+mvn_string_t *mvn_string_trim(const mvn_string_t *str)
+{
     if (!str) {
         return NULL;
     }
@@ -741,15 +747,15 @@ mvn_string_trim(const mvn_string_t* str) {
     }
 
     /* Create result with trimmed substring */
-    size_t result_len = end - start + 1;
-    mvn_string_t* result = mvn_string_init(result_len + 1);
+    size_t        result_len = end - start + 1;
+    mvn_string_t *result     = mvn_string_init(result_len + 1);
     if (!result) {
         return NULL;
     }
 
     SDL_memcpy(result->data, str->data + start, result_len);
     result->data[result_len] = '\0';
-    result->length = result_len;
+    result->length           = result_len;
 
     return result;
 }
@@ -759,8 +765,8 @@ mvn_string_trim(const mvn_string_t* str) {
  * \param[in]       str: String to trim
  * \return          New trimmed string or NULL on failure
  */
-mvn_string_t*
-mvn_string_trim_end(const mvn_string_t* str) {
+mvn_string_t *mvn_string_trim_end(const mvn_string_t *str)
+{
     if (!str) {
         return NULL;
     }
@@ -780,15 +786,15 @@ mvn_string_trim_end(const mvn_string_t* str) {
     }
 
     /* Create result with trimmed substring */
-    size_t result_len = end + 1;
-    mvn_string_t* result = mvn_string_init(result_len + 1);
+    size_t        result_len = end + 1;
+    mvn_string_t *result     = mvn_string_init(result_len + 1);
     if (!result) {
         return NULL;
     }
 
     SDL_memcpy(result->data, str->data, result_len);
     result->data[result_len] = '\0';
-    result->length = result_len;
+    result->length           = result_len;
 
     return result;
 }
@@ -798,8 +804,8 @@ mvn_string_trim_end(const mvn_string_t* str) {
  * \param[in]       str: String to trim
  * \return          New trimmed string or NULL on failure
  */
-mvn_string_t*
-mvn_string_trim_start(const mvn_string_t* str) {
+mvn_string_t *mvn_string_trim_start(const mvn_string_t *str)
+{
     if (!str) {
         return NULL;
     }
@@ -819,15 +825,15 @@ mvn_string_trim_start(const mvn_string_t* str) {
     }
 
     /* Create result with trimmed substring */
-    size_t result_len = str->length - start;
-    mvn_string_t* result = mvn_string_init(result_len + 1);
+    size_t        result_len = str->length - start;
+    mvn_string_t *result     = mvn_string_init(result_len + 1);
     if (!result) {
         return NULL;
     }
 
     SDL_memcpy(result->data, str->data + start, result_len);
     result->data[result_len] = '\0';
-    result->length = result_len;
+    result->length           = result_len;
 
     return result;
 }
@@ -839,16 +845,16 @@ mvn_string_trim_start(const mvn_string_t* str) {
  * \param[in]       length: Length of substring
  * \return          New substring or NULL on failure
  */
-mvn_string_t*
-mvn_string_substring(const mvn_string_t* str, size_t start, size_t length) {
+mvn_string_t *mvn_string_substring(const mvn_string_t *str, size_t start, size_t length)
+{
     if (!str) {
         return NULL;
     }
 
     /* Validate indices */
     if (start > str->length) {
-        mvn_log_error("Invalid substring start index: start=%zu, string_length=%zu", start,
-                      str->length);
+        mvn_log_error(
+            "Invalid substring start index: start=%zu, string_length=%zu", start, str->length);
         // Return empty string for invalid start past the end
         return mvn_string_init(0);
     }
@@ -863,14 +869,14 @@ mvn_string_substring(const mvn_string_t* str, size_t start, size_t length) {
         return mvn_string_init(0);
     }
 
-    mvn_string_t* result = mvn_string_init(length + 1);
+    mvn_string_t *result = mvn_string_init(length + 1);
     if (!result) {
         return NULL;
     }
 
     SDL_memcpy(result->data, str->data + start, length);
     result->data[length] = '\0';
-    result->length = length;
+    result->length       = length;
 
     return result;
 }
@@ -881,8 +887,8 @@ mvn_string_substring(const mvn_string_t* str, size_t start, size_t length) {
  * \param[in]       str2: Second string to compare
  * \return          true if strings are equal, false otherwise
  */
-bool
-mvn_string_compare(const mvn_string_t* str1, const mvn_string_t* str2) {
+bool mvn_string_compare(const mvn_string_t *str1, const mvn_string_t *str2)
+{
     if (str1 == NULL || str2 == NULL) {
         return false;
     }
@@ -897,8 +903,8 @@ mvn_string_compare(const mvn_string_t* str1, const mvn_string_t* str2) {
  * \param[in]       str: String to get capacity of
  * \return          Capacity of the string, or 0 on NULL input
  */
-size_t
-mvn_string_capacity(const mvn_string_t* str) {
+size_t mvn_string_capacity(const mvn_string_t *str)
+{
     if (!str) {
         return 0;
     }
@@ -909,12 +915,12 @@ mvn_string_capacity(const mvn_string_t* str) {
  * \brief           Clear the string (set length to 0)
  * \param[in]       str: String to clear
  */
-void
-mvn_string_clear(mvn_string_t* str) {
+void mvn_string_clear(mvn_string_t *str)
+{
     if (!str || !str->data) {
         return;
     }
-    
-    str->length = 0;
+
+    str->length  = 0;
     str->data[0] = '\0';
 }

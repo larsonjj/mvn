@@ -11,38 +11,38 @@
  * Author:          Jake Larson
  */
 
-#include <stdio.h>
-#include <string.h>
-
 #include "mvn-test-utils.h"
 #include "mvn/mvn-list.h"
 #include "mvn/mvn-types.h"
+
+#include <stdio.h>
+#include <string.h>
 
 /**
  * \brief           Test basic list initialization and freeing
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_init(void) {
+static int test_list_init(void)
+{
     // Test with default capacity (0)
-    mvn_list_t* list1 = MVN_LIST_INIT(int, 0);
+    mvn_list_t *list1 = MVN_LIST_INIT(int, 0);
     TEST_ASSERT(list1 != NULL, "Failed to initialize list with default capacity");
     TEST_ASSERT(mvn_list_length(list1) == 0, "New list should have length 0");
     mvn_list_free(list1);
 
     // Test with specific capacity
-    mvn_list_t* list2 = MVN_LIST_INIT(int, 16);
+    mvn_list_t *list2 = MVN_LIST_INIT(int, 16);
     TEST_ASSERT(list2 != NULL, "Failed to initialize list with specific capacity");
     TEST_ASSERT(mvn_list_length(list2) == 0, "New list should have length 0");
     mvn_list_free(list2);
 
     // Test with type-safe macro
-    mvn_list_t* list3 = MVN_LIST_INIT(mvn_point_t, 8);
+    mvn_list_t *list3 = MVN_LIST_INIT(mvn_point_t, 8);
     TEST_ASSERT(list3 != NULL, "Failed to initialize list with type-safe macro");
     mvn_list_free(list3);
 
     // Test with invalid parameters
-    mvn_list_t* list4 = mvn_list_init(0, 10);
+    mvn_list_t *list4 = mvn_list_init(0, 10);
     TEST_ASSERT(list4 == NULL, "List initialization should fail with item_size = 0");
 
     return 1;
@@ -52,9 +52,9 @@ test_list_init(void) {
  * \brief           Test push and pop operations
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_push_pop(void) {
-    mvn_list_t* list = MVN_LIST_INIT(int, 4);
+static int test_list_push_pop(void)
+{
+    mvn_list_t *list = MVN_LIST_INIT(int, 4);
     TEST_ASSERT(list != NULL, "Failed to initialize list");
 
     // Test pushing items
@@ -66,7 +66,7 @@ test_list_push_pop(void) {
 
     // Test getting items
     for (int idx = 0; idx < 5; idx++) {
-        int* value = MVN_LIST_GET(int, list, idx);
+        int *value = MVN_LIST_GET(int, list, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from list");
         TEST_ASSERT(*value == values[idx], "Retrieved value is incorrect");
     }
@@ -97,9 +97,9 @@ test_list_push_pop(void) {
  * \brief           Test unshift and shift operations
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_unshift_shift(void) {
-    mvn_list_t* list = MVN_LIST_INIT(int, 4);
+static int test_list_unshift_shift(void)
+{
+    mvn_list_t *list = MVN_LIST_INIT(int, 4);
     TEST_ASSERT(list != NULL, "Failed to initialize list");
 
     // Test unshifting items
@@ -110,7 +110,7 @@ test_list_unshift_shift(void) {
                     "List length incorrect after unshift");
 
         // Verify the item was added to the beginning
-        int* first = MVN_LIST_GET(int, list, 0);
+        int *first = MVN_LIST_GET(int, list, 0);
         TEST_ASSERT(first != NULL, "Failed to get first value from list");
         TEST_ASSERT(*first == values[idx], "Unshifted value is incorrect");
     }
@@ -144,9 +144,9 @@ test_list_unshift_shift(void) {
  * \brief           Test get and set operations
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_get_set(void) {
-    mvn_list_t* list = MVN_LIST_INIT(int, 4);
+static int test_list_get_set(void)
+{
+    mvn_list_t *list = MVN_LIST_INIT(int, 4);
     TEST_ASSERT(list != NULL, "Failed to initialize list");
 
     // Add some items
@@ -157,7 +157,7 @@ test_list_get_set(void) {
 
     // Test get with valid index
     for (int idx = 0; idx < 4; idx++) {
-        int* value = MVN_LIST_GET(int, list, idx);
+        int *value = MVN_LIST_GET(int, list, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from list");
         TEST_ASSERT(*value == values[idx], "Retrieved value is incorrect");
     }
@@ -174,7 +174,7 @@ test_list_get_set(void) {
     for (int idx = 0; idx < 4; idx++) {
         int temp_set_value = new_value + idx;
         MVN_LIST_SET(list, idx, int, temp_set_value);
-        int* value = MVN_LIST_GET(int, list, idx);
+        int *value = MVN_LIST_GET(int, list, idx);
         TEST_ASSERT(value != NULL, "Failed to get value after set");
         TEST_ASSERT(*value == temp_set_value, "Set value is incorrect");
     }
@@ -197,9 +197,9 @@ test_list_get_set(void) {
  * \brief           Test slice operation
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_slice(void) {
-    mvn_list_t* list = MVN_LIST_INIT(int, 10);
+static int test_list_slice(void)
+{
+    mvn_list_t *list = MVN_LIST_INIT(int, 10);
     TEST_ASSERT(list != NULL, "Failed to initialize list");
 
     // Add some items
@@ -209,44 +209,44 @@ test_list_slice(void) {
     }
 
     // Test slice with valid indices
-    mvn_list_t* slice1 = mvn_list_slice(list, 2, 5);
+    mvn_list_t *slice1 = mvn_list_slice(list, 2, 5);
     TEST_ASSERT(slice1 != NULL, "Failed to create slice");
     TEST_ASSERT(mvn_list_length(slice1) == 3, "Slice length is incorrect");
 
     // Verify slice contents (30, 40, 50)
     for (int idx = 0; idx < 3; idx++) {
-        int* value = MVN_LIST_GET(int, slice1, idx);
+        int *value = MVN_LIST_GET(int, slice1, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from slice");
         TEST_ASSERT(*value == values[idx + 2], "Slice value is incorrect");
     }
 
     // Test slice to end with -1
-    mvn_list_t* slice2 = mvn_list_slice(list, 7, (size_t)-1);
+    mvn_list_t *slice2 = mvn_list_slice(list, 7, (size_t)-1);
     TEST_ASSERT(slice2 != NULL, "Failed to create slice to end");
     TEST_ASSERT(mvn_list_length(slice2) == 3, "Slice to end length is incorrect");
 
     // Verify slice contents (80, 90, 100)
     for (int idx = 0; idx < 3; idx++) {
-        int* value = MVN_LIST_GET(int, slice2, idx);
+        int *value = MVN_LIST_GET(int, slice2, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from slice to end");
         TEST_ASSERT(*value == values[idx + 7], "Slice to end value is incorrect");
     }
 
     // Test empty slice
-    mvn_list_t* slice3 = mvn_list_slice(list, 3, 3);
+    mvn_list_t *slice3 = mvn_list_slice(list, 3, 3);
     TEST_ASSERT(slice3 != NULL, "Failed to create empty slice");
     TEST_ASSERT(mvn_list_length(slice3) == 0, "Empty slice should have length 0");
 
     // Test invalid slice (start > end)
-    mvn_list_t* slice4 = mvn_list_slice(list, 5, 3);
+    mvn_list_t *slice4 = mvn_list_slice(list, 5, 3);
     TEST_ASSERT(slice4 == NULL, "Slice with start > end should fail");
 
     // Test invalid slice (start > length)
-    mvn_list_t* slice5 = mvn_list_slice(list, 11, 15);
+    mvn_list_t *slice5 = mvn_list_slice(list, 11, 15);
     TEST_ASSERT(slice5 == NULL, "Slice with start > length should fail");
 
     // Test slice from NULL list
-    mvn_list_t* slice6 = mvn_list_slice(NULL, 0, 3);
+    mvn_list_t *slice6 = mvn_list_slice(NULL, 0, 3);
     TEST_ASSERT(slice6 == NULL, "Slice from NULL list should fail");
 
     mvn_list_free(slice1);
@@ -260,10 +260,10 @@ test_list_slice(void) {
  * \brief           Test concat operation
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_concat(void) {
-    mvn_list_t* list1 = MVN_LIST_INIT(int, 3);
-    mvn_list_t* list2 = MVN_LIST_INIT(int, 3);
+static int test_list_concat(void)
+{
+    mvn_list_t *list1 = MVN_LIST_INIT(int, 3);
+    mvn_list_t *list2 = MVN_LIST_INIT(int, 3);
     TEST_ASSERT(list1 != NULL && list2 != NULL, "Failed to initialize lists");
 
     // Add items to first list
@@ -279,38 +279,38 @@ test_list_concat(void) {
     }
 
     // Concatenate lists
-    mvn_list_t* concat = mvn_list_concat(list1, list2);
+    mvn_list_t *concat = mvn_list_concat(list1, list2);
     TEST_ASSERT(concat != NULL, "Failed to concatenate lists");
     TEST_ASSERT(mvn_list_length(concat) == 6, "Concatenated list length is incorrect");
 
     // Verify concatenated list (10, 20, 30, 40, 50, 60)
     for (int idx = 0; idx < 3; idx++) {
-        int* value = MVN_LIST_GET(int, concat, idx);
+        int *value = MVN_LIST_GET(int, concat, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from concatenated list");
         TEST_ASSERT(*value == values1[idx], "Concatenated list value is incorrect");
     }
 
     for (int idx = 0; idx < 3; idx++) {
-        int* value = MVN_LIST_GET(int, concat, idx + 3);
+        int *value = MVN_LIST_GET(int, concat, idx + 3);
         TEST_ASSERT(value != NULL, "Failed to get value from concatenated list");
         TEST_ASSERT(*value == values2[idx], "Concatenated list value is incorrect");
     }
 
     // Test concat with empty lists
-    mvn_list_t* empty1 = MVN_LIST_INIT(int, 0);
-    mvn_list_t* empty2 = MVN_LIST_INIT(int, 0);
+    mvn_list_t *empty1 = MVN_LIST_INIT(int, 0);
+    mvn_list_t *empty2 = MVN_LIST_INIT(int, 0);
     TEST_ASSERT(empty1 != NULL && empty2 != NULL, "Failed to initialize empty lists");
 
-    mvn_list_t* empty_concat = mvn_list_concat(empty1, empty2);
+    mvn_list_t *empty_concat = mvn_list_concat(empty1, empty2);
     TEST_ASSERT(empty_concat != NULL, "Failed to concatenate empty lists");
     TEST_ASSERT(mvn_list_length(empty_concat) == 0, "Empty concatenated list should have length 0");
 
     // Test concat with one empty list
-    mvn_list_t* half_concat1 = mvn_list_concat(list1, empty1);
+    mvn_list_t *half_concat1 = mvn_list_concat(list1, empty1);
     TEST_ASSERT(half_concat1 != NULL, "Failed to concatenate with empty list");
     TEST_ASSERT(mvn_list_length(half_concat1) == 3, "Half concatenated list length is incorrect");
 
-    mvn_list_t* half_concat2 = mvn_list_concat(empty2, list2);
+    mvn_list_t *half_concat2 = mvn_list_concat(empty2, list2);
     TEST_ASSERT(half_concat2 != NULL, "Failed to concatenate with empty list");
     TEST_ASSERT(mvn_list_length(half_concat2) == 3, "Half concatenated list length is incorrect");
 
@@ -333,9 +333,9 @@ test_list_concat(void) {
  * \brief           Test clone operation
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_clone(void) {
-    mvn_list_t* list = MVN_LIST_INIT(int, 5);
+static int test_list_clone(void)
+{
+    mvn_list_t *list = MVN_LIST_INIT(int, 5);
     TEST_ASSERT(list != NULL, "Failed to initialize list");
 
     // Add some items
@@ -345,14 +345,14 @@ test_list_clone(void) {
     }
 
     // Clone the list
-    mvn_list_t* clone = mvn_list_clone(list);
+    mvn_list_t *clone = mvn_list_clone(list);
     TEST_ASSERT(clone != NULL, "Failed to clone list");
     TEST_ASSERT(mvn_list_length(clone) == 5, "Clone length is incorrect");
 
     // Verify clone contents
     for (int idx = 0; idx < 5; idx++) {
-        int* orig_value = MVN_LIST_GET(int, list, idx);
-        int* clone_value = MVN_LIST_GET(int, clone, idx);
+        int *orig_value  = MVN_LIST_GET(int, list, idx);
+        int *clone_value = MVN_LIST_GET(int, clone, idx);
 
         TEST_ASSERT(orig_value != NULL && clone_value != NULL,
                     "Failed to get values from original or clone");
@@ -366,8 +366,8 @@ test_list_clone(void) {
     }
 
     // Test clone empty list
-    mvn_list_t* empty = MVN_LIST_INIT(int, 0);
-    mvn_list_t* empty_clone = mvn_list_clone(empty);
+    mvn_list_t *empty       = MVN_LIST_INIT(int, 0);
+    mvn_list_t *empty_clone = mvn_list_clone(empty);
     TEST_ASSERT(empty_clone != NULL, "Failed to clone empty list");
     TEST_ASSERT(mvn_list_length(empty_clone) == 0, "Empty clone should have length 0");
 
@@ -385,9 +385,9 @@ test_list_clone(void) {
  * \brief           Test resize operation
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_resize(void) {
-    mvn_list_t* list = MVN_LIST_INIT(int, 3);
+static int test_list_resize(void)
+{
+    mvn_list_t *list = MVN_LIST_INIT(int, 3);
     TEST_ASSERT(list != NULL, "Failed to initialize list");
 
     // Add some items to fill the initial capacity
@@ -409,13 +409,13 @@ test_list_resize(void) {
     TEST_ASSERT(mvn_list_length(list) == 7, "List length incorrect after resize and additions");
 
     for (int idx = 0; idx < 3; idx++) {
-        int* value = MVN_LIST_GET(int, list, idx);
+        int *value = MVN_LIST_GET(int, list, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from resized list");
         TEST_ASSERT(*value == values[idx], "Value in resized list is incorrect");
     }
 
     for (int idx = 0; idx < 4; idx++) {
-        int* value = MVN_LIST_GET(int, list, idx + 3);
+        int *value = MVN_LIST_GET(int, list, idx + 3);
         TEST_ASSERT(value != NULL, "Failed to get value from resized list");
         TEST_ASSERT(*value == more_values[idx], "Value in resized list is incorrect");
     }
@@ -437,9 +437,9 @@ test_list_resize(void) {
  * \brief           Test reverse operation
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_reverse(void) {
-    mvn_list_t* list = MVN_LIST_INIT(int, 5);
+static int test_list_reverse(void)
+{
+    mvn_list_t *list = MVN_LIST_INIT(int, 5);
     TEST_ASSERT(list != NULL, "Failed to initialize list");
 
     // Add some items
@@ -453,23 +453,23 @@ test_list_reverse(void) {
 
     // Verify reversed contents (50, 40, 30, 20, 10)
     for (int idx = 0; idx < 5; idx++) {
-        int* value = MVN_LIST_GET(int, list, idx);
+        int *value = MVN_LIST_GET(int, list, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from reversed list");
         TEST_ASSERT(*value == values[4 - idx], "Reversed value is incorrect");
     }
 
     // Test reverse with single item
-    mvn_list_t* single = MVN_LIST_INIT(int, 1);
-    int single_value = 42;
+    mvn_list_t *single       = MVN_LIST_INIT(int, 1);
+    int         single_value = 42;
     MVN_LIST_PUSH(single, int, single_value);
 
     TEST_ASSERT(mvn_list_reverse(single), "Failed to reverse single-item list");
-    int* result = MVN_LIST_GET(int, single, 0);
+    int *result = MVN_LIST_GET(int, single, 0);
     TEST_ASSERT(result != NULL && *result == 42,
                 "Single item should remain unchanged after reverse");
 
     // Test reverse with empty list
-    mvn_list_t* empty = MVN_LIST_INIT(int, 0);
+    mvn_list_t *empty = MVN_LIST_INIT(int, 0);
     TEST_ASSERT(mvn_list_reverse(empty), "Failed to reverse empty list");
     TEST_ASSERT(mvn_list_length(empty) == 0, "Empty list should remain empty after reverse");
 
@@ -486,10 +486,10 @@ test_list_reverse(void) {
  * \brief           Compare function for sorting
  * \return          Negative if a < b, 0 if a == b, positive if a > b
  */
-static int
-compare_ints(const void* ptr_a, const void* ptr_b) {
-    const int* int_a = (const int*)ptr_a;
-    const int* int_b = (const int*)ptr_b;
+static int compare_ints(const void *ptr_a, const void *ptr_b)
+{
+    const int *int_a = (const int *)ptr_a;
+    const int *int_b = (const int *)ptr_b;
     return *int_a - *int_b;
 }
 
@@ -497,10 +497,10 @@ compare_ints(const void* ptr_a, const void* ptr_b) {
  * \brief           Reverse compare function for sorting
  * \return          Negative if a > b, 0 if a == b, positive if a < b
  */
-static int
-compare_ints_reverse(const void* a, const void* b) {
-    const int* int_a = (const int*)a;
-    const int* int_b = (const int*)b;
+static int compare_ints_reverse(const void *a, const void *b)
+{
+    const int *int_a = (const int *)a;
+    const int *int_b = (const int *)b;
     return *int_b - *int_a;
 }
 
@@ -508,9 +508,9 @@ compare_ints_reverse(const void* a, const void* b) {
  * \brief           Test sort operation
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_sort(void) {
-    mvn_list_t* list = MVN_LIST_INIT(int, 7);
+static int test_list_sort(void)
+{
+    mvn_list_t *list = MVN_LIST_INIT(int, 7);
     TEST_ASSERT(list != NULL, "Failed to initialize list");
 
     // Add items in unsorted order
@@ -525,7 +525,7 @@ test_list_sort(void) {
     // Verify sorted contents (10, 20, 30, 40, 50, 60, 70)
     int sorted[] = {10, 20, 30, 40, 50, 60, 70};
     for (int idx = 0; idx < 7; idx++) {
-        int* value = MVN_LIST_GET(int, list, idx);
+        int *value = MVN_LIST_GET(int, list, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from sorted list");
         TEST_ASSERT(*value == sorted[idx], "Sorted value is incorrect");
     }
@@ -535,22 +535,22 @@ test_list_sort(void) {
 
     // Verify reverse sorted contents (70, 60, 50, 40, 30, 20, 10)
     for (int idx = 0; idx < 7; idx++) {
-        int* value = MVN_LIST_GET(int, list, idx);
+        int *value = MVN_LIST_GET(int, list, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from reverse sorted list");
         TEST_ASSERT(*value == sorted[6 - idx], "Reverse sorted value is incorrect");
     }
 
     // Test sort with single item
-    mvn_list_t* single = MVN_LIST_INIT(int, 1);
-    int single_value = 42;
+    mvn_list_t *single       = MVN_LIST_INIT(int, 1);
+    int         single_value = 42;
     MVN_LIST_PUSH(single, int, single_value);
 
     TEST_ASSERT(mvn_list_sort(single, compare_ints), "Failed to sort single-item list");
-    int* result = MVN_LIST_GET(int, single, 0);
+    int *result = MVN_LIST_GET(int, single, 0);
     TEST_ASSERT(result != NULL && *result == 42, "Single item should remain unchanged after sort");
 
     // Test sort with empty list
-    mvn_list_t* empty = MVN_LIST_INIT(int, 0);
+    mvn_list_t *empty = MVN_LIST_INIT(int, 0);
     TEST_ASSERT(mvn_list_sort(empty, compare_ints), "Failed to sort empty list");
     TEST_ASSERT(mvn_list_length(empty) == 0, "Empty list should remain empty after sort");
 
@@ -570,10 +570,10 @@ test_list_sort(void) {
  * \brief           Filter function that keeps even numbers
  * \return          true to keep item, false to filter out
  */
-static bool
-filter_even(const void* item, void* user_data) {
+static bool filter_even(const void *item, void *user_data)
+{
     (void)user_data; // Mark parameter as unused
-    const int* value = (const int*)item;
+    const int *value = (const int *)item;
     return (*value % 2) == 0;
 }
 
@@ -581,10 +581,10 @@ filter_even(const void* item, void* user_data) {
  * \brief           Filter function with user data
  * \return          true to keep item, false to filter out
  */
-static bool
-filter_greater_than(const void* item, void* user_data) {
-    const int* value = (const int*)item;
-    const int* threshold = (const int*)user_data;
+static bool filter_greater_than(const void *item, void *user_data)
+{
+    const int *value     = (const int *)item;
+    const int *threshold = (const int *)user_data;
     return *value > *threshold;
 }
 
@@ -592,9 +592,9 @@ filter_greater_than(const void* item, void* user_data) {
  * \brief           Test filter operation
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_filter(void) {
-    mvn_list_t* list = MVN_LIST_INIT(int, 10);
+static int test_list_filter(void)
+{
+    mvn_list_t *list = MVN_LIST_INIT(int, 10);
     TEST_ASSERT(list != NULL, "Failed to initialize list");
 
     // Add some items
@@ -604,35 +604,35 @@ test_list_filter(void) {
     }
 
     // Filter for even numbers
-    mvn_list_t* evens = mvn_list_filter(list, filter_even, NULL);
+    mvn_list_t *evens = mvn_list_filter(list, filter_even, NULL);
     TEST_ASSERT(evens != NULL, "Failed to filter list");
     TEST_ASSERT(mvn_list_length(evens) == 5, "Filtered list length is incorrect");
 
     // Verify filtered contents (2, 4, 6, 8, 10)
     int expected[] = {2, 4, 6, 8, 10};
     for (int idx = 0; idx < 5; idx++) {
-        int* value = MVN_LIST_GET(int, evens, idx);
+        int *value = MVN_LIST_GET(int, evens, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from filtered list");
         TEST_ASSERT(*value == expected[idx], "Filtered value is incorrect");
     }
 
     // Test filter with user data
-    int threshold = 7;
-    mvn_list_t* greater = mvn_list_filter(list, filter_greater_than, &threshold);
+    int         threshold = 7;
+    mvn_list_t *greater   = mvn_list_filter(list, filter_greater_than, &threshold);
     TEST_ASSERT(greater != NULL, "Failed to filter list with user data");
     TEST_ASSERT(mvn_list_length(greater) == 3, "Filtered list length is incorrect");
 
     // Verify filtered contents (8, 9, 10)
     int expected2[] = {8, 9, 10};
     for (int idx = 0; idx < 3; idx++) {
-        int* value = MVN_LIST_GET(int, greater, idx);
+        int *value = MVN_LIST_GET(int, greater, idx);
         TEST_ASSERT(value != NULL, "Failed to get value from filtered list");
         TEST_ASSERT(*value == expected2[idx], "Filtered value is incorrect");
     }
 
     // Test filter with empty list
-    mvn_list_t* empty = MVN_LIST_INIT(int, 0);
-    mvn_list_t* empty_filtered = mvn_list_filter(empty, filter_even, NULL);
+    mvn_list_t *empty          = MVN_LIST_INIT(int, 0);
+    mvn_list_t *empty_filtered = mvn_list_filter(empty, filter_even, NULL);
     TEST_ASSERT(empty_filtered != NULL, "Failed to filter empty list");
     TEST_ASSERT(mvn_list_length(empty_filtered) == 0, "Empty filtered list should have length 0");
 
@@ -654,10 +654,10 @@ test_list_filter(void) {
  * \brief           Test complex data structures
  * \return          1 on success, 0 on failure
  */
-static int
-test_list_complex_types(void) {
+static int test_list_complex_types(void)
+{
     // Test with points
-    mvn_list_t* points = MVN_LIST_INIT(mvn_point_t, 3);
+    mvn_list_t *points = MVN_LIST_INIT(mvn_point_t, 3);
     TEST_ASSERT(points != NULL, "Failed to initialize points list");
 
     mvn_point_t pnt1 = {10, 20};
@@ -671,9 +671,9 @@ test_list_complex_types(void) {
     TEST_ASSERT(mvn_list_length(points) == 3, "Points list length is incorrect");
 
     // Verify contents
-    mvn_point_t* point1 = MVN_LIST_GET(mvn_point_t, points, 0);
-    mvn_point_t* point2 = MVN_LIST_GET(mvn_point_t, points, 1);
-    mvn_point_t* point3 = MVN_LIST_GET(mvn_point_t, points, 2);
+    mvn_point_t *point1 = MVN_LIST_GET(mvn_point_t, points, 0);
+    mvn_point_t *point2 = MVN_LIST_GET(mvn_point_t, points, 1);
+    mvn_point_t *point3 = MVN_LIST_GET(mvn_point_t, points, 2);
 
     TEST_ASSERT(point1 != NULL && point2 != NULL && point3 != NULL,
                 "Failed to get points from list");
@@ -683,10 +683,10 @@ test_list_complex_types(void) {
     TEST_ASSERT(point3->x == 50 && point3->y == 60, "Point 3 has incorrect values");
 
     // Test with colors
-    mvn_list_t* colors = MVN_LIST_INIT(mvn_color_t, 2);
+    mvn_list_t *colors = MVN_LIST_INIT(mvn_color_t, 2);
     TEST_ASSERT(colors != NULL, "Failed to initialize colors list");
 
-    mvn_color_t red = {1, 0, 0, 1};
+    mvn_color_t red  = {1, 0, 0, 1};
     mvn_color_t blue = {0, 0, 1, 1};
 
     MVN_LIST_PUSH(colors, mvn_color_t, red);
@@ -695,8 +695,8 @@ test_list_complex_types(void) {
     TEST_ASSERT(mvn_list_length(colors) == 2, "Colors list length is incorrect");
 
     // Verify contents
-    mvn_color_t* color1 = MVN_LIST_GET(mvn_color_t, colors, 0);
-    mvn_color_t* color2 = MVN_LIST_GET(mvn_color_t, colors, 1);
+    mvn_color_t *color1 = MVN_LIST_GET(mvn_color_t, colors, 0);
+    mvn_color_t *color2 = MVN_LIST_GET(mvn_color_t, colors, 1);
 
     TEST_ASSERT(color1 != NULL && color2 != NULL, "Failed to get colors from list");
 
@@ -717,8 +717,8 @@ test_list_complex_types(void) {
  * \param[out] total_tests Pointer to the total number of tests
  * \return          Number of passed tests
  */
-int
-run_list_tests(int* passed_tests, int* failed_tests, int* total_tests) {
+int run_list_tests(int *passed_tests, int *failed_tests, int *total_tests)
+{
     printf("\n===== LIST TESTS =====\n\n");
 
     int passed_before = *passed_tests;
@@ -746,11 +746,11 @@ run_list_tests(int* passed_tests, int* failed_tests, int* total_tests) {
 }
 
 #if defined(MVN_LIST_TEST_MAIN)
-int
-main(void) {
+int main(void)
+{
     int passed = 0;
     int failed = 0;
-    int total = 0;
+    int total  = 0;
 
     run_list_tests(&passed, &failed, &total);
 

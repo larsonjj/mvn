@@ -37,7 +37,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-void run_file_tests(int* passed, int* failed, int* total);
+void run_file_tests(int *passed, int *failed, int *total);
 
 #ifdef __cplusplus
 }

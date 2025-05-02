@@ -31,15 +31,17 @@
  * Author:          Jake Larson
  */
 
-#include <SDL3/SDL.h>
 #include "mvn/mvn-utils.h"
+
+#include <SDL3/SDL.h>
+
 
 /**
  * \brief           Set the seed for the random number generator
  * \param[in]       seed: Seed value to set
  */
-void
-mvn_set_random_seed(int32_t seed) {
+void mvn_set_random_seed(int32_t seed)
+{
     SDL_srand((unsigned int)seed);
 }
 
@@ -49,12 +51,12 @@ mvn_set_random_seed(int32_t seed) {
  * \param[in]       max: Maximum value (inclusive)
  * \return          Random value in the specified range
  */
-int32_t
-mvn_get_random_value(int32_t min, int32_t max) {
+int32_t mvn_get_random_value(int32_t min, int32_t max)
+{
     if (min > max) {
         int32_t tmp = max;
-        max = min;
-        min = tmp;
+        max         = min;
+        min         = tmp;
     }
 
     uint32_t random_value = SDL_rand(max);
@@ -65,8 +67,8 @@ mvn_get_random_value(int32_t min, int32_t max) {
  * \brief           Open URL with default system browser (if available)
  * \param[in]       url: URL to open
  */
-void
-mvn_open_url(const char* url) {
+void mvn_open_url(const char *url)
+{
     if (!SDL_OpenURL(url)) {
         SDL_Log("Failed to open URL %s: %s", url, SDL_GetError());
     }
@@ -79,8 +81,8 @@ mvn_open_url(const char* url) {
  * \param[in]       max: Maximum value (inclusive)
  * \return          MVN list containing unique random values or NULL on failure
  */
-mvn_list_t*
-mvn_load_random_sequence(int32_t count, int32_t min, int32_t max) {
+mvn_list_t *mvn_load_random_sequence(int32_t count, int32_t min, int32_t max)
+{
     if (count <= 0 || min > max) {
         return NULL;
     }
@@ -91,7 +93,7 @@ mvn_load_random_sequence(int32_t count, int32_t min, int32_t max) {
     }
 
     /* Create a list to store the sequence */
-    mvn_list_t* list = MVN_LIST_INIT(int32_t, count);
+    mvn_list_t *list = MVN_LIST_INIT(int32_t, count);
     if (list == NULL) {
         return NULL;
     }
@@ -103,7 +105,7 @@ mvn_load_random_sequence(int32_t count, int32_t min, int32_t max) {
         /* Check if value already exists in the list */
         bool exists = false;
         for (size_t i = 0; i < mvn_list_length(list); i++) {
-            int32_t* existing = MVN_LIST_GET(int32_t, list, i);
+            int32_t *existing = MVN_LIST_GET(int32_t, list, i);
             if (existing && *existing == value) {
                 exists = true;
                 break;
@@ -123,8 +125,8 @@ mvn_load_random_sequence(int32_t count, int32_t min, int32_t max) {
  * \brief           Unload random values sequence
  * \param[in]       sequence: Pointer to sequence list to free
  */
-void
-mvn_unload_random_sequence(mvn_list_t* sequence) {
+void mvn_unload_random_sequence(mvn_list_t *sequence)
+{
     if (sequence != NULL) {
         mvn_list_free(sequence);
     }

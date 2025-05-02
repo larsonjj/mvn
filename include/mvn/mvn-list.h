@@ -16,40 +16,40 @@ extern "C" {
  * \brief           Dynamic array list structure
  */
 typedef struct mvn_list_t {
-    void* data;       /*!< Pointer to the array of items */
+    void * data;      /*!< Pointer to the array of items */
     size_t item_size; /*!< Size of each item in bytes */
     size_t length;    /*!< Current number of items */
     size_t capacity;  /*!< Current allocated capacity */
 } mvn_list_t;
 
-mvn_list_t* mvn_list_init(size_t item_size, size_t initial_capacity);
-void mvn_list_free(mvn_list_t* list);
-size_t mvn_list_length(const mvn_list_t* list);
-bool mvn_list_push(mvn_list_t* list, const void* item);
-bool mvn_list_pop(mvn_list_t* list, void* out_item);
-bool mvn_list_unshift(mvn_list_t* list, const void* item);
-bool mvn_list_shift(mvn_list_t* list, void* out_item);
-void* mvn_list_get(const mvn_list_t* list, size_t index);
-bool mvn_list_set(mvn_list_t* list, size_t index, const void* item);
-mvn_list_t* mvn_list_slice(const mvn_list_t* list, size_t start, size_t end);
-mvn_list_t* mvn_list_concat(const mvn_list_t* list1, const mvn_list_t* list2);
-mvn_list_t* mvn_list_clone(const mvn_list_t* list);
-bool mvn_list_resize(mvn_list_t* list, size_t new_capacity);
-bool mvn_list_reverse(mvn_list_t* list);
+mvn_list_t *mvn_list_init(size_t item_size, size_t initial_capacity);
+void        mvn_list_free(mvn_list_t *list);
+size_t      mvn_list_length(const mvn_list_t *list);
+bool        mvn_list_push(mvn_list_t *list, const void *item);
+bool        mvn_list_pop(mvn_list_t *list, void *out_item);
+bool        mvn_list_unshift(mvn_list_t *list, const void *item);
+bool        mvn_list_shift(mvn_list_t *list, void *out_item);
+void *      mvn_list_get(const mvn_list_t *list, size_t index);
+bool        mvn_list_set(mvn_list_t *list, size_t index, const void *item);
+mvn_list_t *mvn_list_slice(const mvn_list_t *list, size_t start, size_t end);
+mvn_list_t *mvn_list_concat(const mvn_list_t *list1, const mvn_list_t *list2);
+mvn_list_t *mvn_list_clone(const mvn_list_t *list);
+bool        mvn_list_resize(mvn_list_t *list, size_t new_capacity);
+bool        mvn_list_reverse(mvn_list_t *list);
 
 /**
  * \brief           Sort function typedef
  */
-typedef int (*mvn_list_compare_fn)(const void*, const void*);
+typedef int (*mvn_list_compare_fn)(const void *, const void *);
 
-bool mvn_list_sort(mvn_list_t* list, mvn_list_compare_fn compare);
+bool mvn_list_sort(mvn_list_t *list, mvn_list_compare_fn compare);
 
 /**
  * \brief           Filter function typedef
  */
-typedef bool (*mvn_list_filter_fn)(const void* item, void* user_data);
+typedef bool (*mvn_list_filter_fn)(const void *item, void *user_data);
 
-mvn_list_t* mvn_list_filter(const mvn_list_t* list, mvn_list_filter_fn filter, void* user_data);
+mvn_list_t *mvn_list_filter(const mvn_list_t *list, mvn_list_filter_fn filter, void *user_data);
 
 /* Type-safe wrapper macros */
 
@@ -60,7 +60,7 @@ mvn_list_t* mvn_list_filter(const mvn_list_t* list, mvn_list_filter_fn filter, v
  * \return          Initialized list
  * \hideinitializer
  */
-#define MVN_LIST_INIT(T, capacity)   mvn_list_init(sizeof(T), (capacity))
+#define MVN_LIST_INIT(T, capacity) mvn_list_init(sizeof(T), (capacity))
 
 /**
  * \brief           Get the typed pointer to an element at index
@@ -70,7 +70,7 @@ mvn_list_t* mvn_list_filter(const mvn_list_t* list, mvn_list_filter_fn filter, v
  * \return          Typed pointer to the element
  * \hideinitializer
  */
-#define MVN_LIST_GET(T, list, index) ((T*)mvn_list_get((list), (index)))
+#define MVN_LIST_GET(T, list, index) ((T *)mvn_list_get((list), (index)))
 
 /**
  * \brief           Push an element to the list

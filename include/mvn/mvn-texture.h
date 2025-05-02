@@ -34,8 +34,10 @@
 #ifndef MVN_TEXTURES_H
 #define MVN_TEXTURES_H
 
-#include <SDL3/SDL.h>
 #include "mvn/mvn-types.h"
+
+#include <SDL3/SDL.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,32 +53,45 @@ typedef enum {
 } mvn_npatch_layout_t;
 
 /**
-* \brief           N-patch information structure
-*/
+ * \brief           N-patch information structure
+ */
 typedef struct mvn_npatch_info_t {
-    mvn_rect_t source;          /*!< Texture source rectangle */
-    int32_t left;               /*!< Left border offset */
-    int32_t top;                /*!< Top border offset */
-    int32_t right;              /*!< Right border offset */
-    int32_t bottom;             /*!< Bottom border offset */
+    mvn_rect_t          source; /*!< Texture source rectangle */
+    int32_t             left;   /*!< Left border offset */
+    int32_t             top;    /*!< Top border offset */
+    int32_t             right;  /*!< Right border offset */
+    int32_t             bottom; /*!< Bottom border offset */
     mvn_npatch_layout_t layout; /*!< Layout of the n-patch: 3x3, 1x3 or 3x1 */
 } mvn_npatch_info_t;
 
-mvn_image_t* mvn_load_image(const char* filename);
-void mvn_unload_image(mvn_image_t* surface);
-mvn_texture_t* mvn_image_to_texture(mvn_renderer_t* renderer, mvn_image_t* surface);
-mvn_texture_t* mvn_load_texture(mvn_renderer_t* renderer, const char* filename);
-void mvn_unload_texture(mvn_texture_t* texture);
-void mvn_draw_texture(mvn_texture_t* texture, int32_t posX, int32_t posY, mvn_color_t tint);
-void mvn_draw_texture_v(mvn_texture_t* texture, mvn_fpoint_t position, mvn_color_t tint);
-void mvn_draw_texture_ex(mvn_texture_t* texture, mvn_fpoint_t position, float rotation, float scale,
-                         mvn_color_t tint);
-void mvn_draw_texture_rec(mvn_texture_t* texture, mvn_frect_t source, mvn_fpoint_t position,
-                          mvn_color_t tint);
-void mvn_draw_texture_pro(mvn_texture_t* texture, mvn_frect_t source, mvn_frect_t dest,
-                          mvn_fpoint_t origin, float rotation, mvn_color_t tint);
-void mvn_draw_texture_npatch(mvn_texture_t* texture, mvn_npatch_info_t nPatchInfo, mvn_frect_t dest,
-                             mvn_fpoint_t origin, float rotation, mvn_color_t tint);
+mvn_image_t *  mvn_load_image(const char *filename);
+void           mvn_unload_image(mvn_image_t *surface);
+mvn_texture_t *mvn_image_to_texture(mvn_renderer_t *renderer, mvn_image_t *surface);
+mvn_texture_t *mvn_load_texture(mvn_renderer_t *renderer, const char *filename);
+void           mvn_unload_texture(mvn_texture_t *texture);
+void mvn_draw_texture(mvn_texture_t *texture, int32_t posX, int32_t posY, mvn_color_t tint);
+void mvn_draw_texture_v(mvn_texture_t *texture, mvn_fpoint_t position, mvn_color_t tint);
+void mvn_draw_texture_ex(mvn_texture_t *texture,
+                         mvn_fpoint_t   position,
+                         float          rotation,
+                         float          scale,
+                         mvn_color_t    tint);
+void mvn_draw_texture_rec(mvn_texture_t *texture,
+                          mvn_frect_t    source,
+                          mvn_fpoint_t   position,
+                          mvn_color_t    tint);
+void mvn_draw_texture_pro(mvn_texture_t *texture,
+                          mvn_frect_t    source,
+                          mvn_frect_t    dest,
+                          mvn_fpoint_t   origin,
+                          float          rotation,
+                          mvn_color_t    tint);
+void mvn_draw_texture_npatch(mvn_texture_t *   texture,
+                             mvn_npatch_info_t nPatchInfo,
+                             mvn_frect_t       dest,
+                             mvn_fpoint_t      origin,
+                             float             rotation,
+                             mvn_color_t       tint);
 
 #ifdef __cplusplus
 }

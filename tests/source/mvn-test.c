@@ -11,9 +11,6 @@
  * Author:          Jake Larson
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "mvn-core-test.h"
 #include "mvn-file-test.h"
 #include "mvn-hashmap-test.h"
@@ -24,15 +21,19 @@
 #include "mvn-text-test.h"
 #include "mvn-texture-test.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
+
 /**
-  * \brief           Main entry point for tests
-  * \return          EXIT_SUCCESS on success, EXIT_FAILURE on failure
-  */
-int
-main(void) {
+ * \brief           Main entry point for tests
+ * \return          EXIT_SUCCESS on success, EXIT_FAILURE on failure
+ */
+int main(void)
+{
     int passed = 0;
     int failed = 0;
-    int total = 0;
+    int total  = 0;
 
     printf("Starting MVN library tests...\n");
 

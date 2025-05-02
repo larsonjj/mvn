@@ -10,14 +10,15 @@
  *
  * Author:          Jake Larson
  */
-#include <SDL3/SDL.h>
-#include <SDL3_ttf/SDL_ttf.h>
-#include <stdio.h>
-
 #include "mvn-test-utils.h"
 #include "mvn/mvn-core.h"
 #include "mvn/mvn-text.h"
 #include "mvn/mvn-types.h"
+
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <stdio.h>
+
 
 #define TEST_FONT_PATH "./assets/test-font.ttf" // Path to the test font file
 #define TEST_FONT_SIZE 16.0f
@@ -33,15 +34,15 @@ static int test_draw_text_pro(void);
  * \brief           Test loading and unloading a font
  * \return          1 on success, 0 on failure
  */
-static int
-test_unload_font(void) {
-    TTF_Font* font = NULL;
-    char msg[512];
-    const char* test_font_name = "test-font.ttf";
-    char test_font_path[512];
+static int test_unload_font(void)
+{
+    TTF_Font *  font = NULL;
+    char        msg[512];
+    const char *test_font_name = "test-font.ttf";
+    char        test_font_path[512];
 
     // Get the test assets directory from environment variable
-    const char* assets_dir = ASSET_DIR;
+    const char *assets_dir = ASSET_DIR;
     if (!assets_dir) {
         assets_dir = ""; // Fallback default path
     }
@@ -74,13 +75,13 @@ test_unload_font(void) {
  * \brief           Test loading a font with extended options (codepoints)
  * \return          1 on success, 0 on failure
  */
-static int
-test_load_font_ex(void) {
-    TTF_Font* font = NULL;
-    TTF_Font* font2 = NULL;
+static int test_load_font_ex(void)
+{
+    TTF_Font *font         = NULL;
+    TTF_Font *font2        = NULL;
     const int codepoints[] = {'A', 'B', 'C'};
-    int count = SDL_arraysize(codepoints);
-    char msg[128];
+    int       count        = SDL_arraysize(codepoints);
+    char      msg[128];
 
     // Test loading non-existent font
     font = mvn_load_font_ex("non_existent_font.ttf", TEST_FONT_SIZE, codepoints, count);
@@ -88,8 +89,8 @@ test_load_font_ex(void) {
 
     // Test loading valid font with codepoints
     font = mvn_load_font_ex(TEST_FONT_PATH, TEST_FONT_SIZE, codepoints, count);
-    SDL_snprintf(msg, sizeof(msg), "mvn_load_font_ex: Failed to load test font at %s",
-                 TEST_FONT_PATH);
+    SDL_snprintf(
+        msg, sizeof(msg), "mvn_load_font_ex: Failed to load test font at %s", TEST_FONT_PATH);
     TEST_ASSERT(font != NULL, msg);
 
     // Test loading with NULL codepoints
@@ -110,8 +111,8 @@ test_load_font_ex(void) {
  * \brief           Test setting text line spacing
  * \return          1 on success, 0 on failure
  */
-static int
-test_set_text_line_spacing(void) {
+static int test_set_text_line_spacing(void)
+{
     mvn_set_text_line_spacing(5);
     mvn_set_text_line_spacing(-2);
     mvn_set_text_line_spacing(0);
@@ -123,16 +124,18 @@ test_set_text_line_spacing(void) {
  * \brief           Test measuring text dimensions
  * \return          1 on success, 0 on failure
  */
-static int
-test_measure_text(void) {
-    TTF_Font* font = NULL;
-    int32_t width = 0;
-    int32_t width_no_spacing = 0;
-    int32_t expected_spacing_increase = 0;
-    char msg[128];
+static int test_measure_text(void)
+{
+    TTF_Font *font                      = NULL;
+    int32_t   width                     = 0;
+    int32_t   width_no_spacing          = 0;
+    int32_t   expected_spacing_increase = 0;
+    char      msg[128];
 
     font = mvn_load_font(TEST_FONT_PATH, TEST_FONT_SIZE);
-    SDL_snprintf(msg, sizeof(msg), "mvn_measure_text: Failed to load font for measurement at %s",
+    SDL_snprintf(msg,
+                 sizeof(msg),
+                 "mvn_measure_text: Failed to load font for measurement at %s",
                  TEST_FONT_PATH);
     TEST_ASSERT(font != NULL, msg);
     if (font == NULL) {
@@ -149,11 +152,14 @@ test_measure_text(void) {
     TEST_ASSERT(width > 0, "Measuring 'Hello' should return positive width");
 
     width_no_spacing = width;
-    width = mvn_measure_text(font, "Hello", 2.0f);
+    width            = mvn_measure_text(font, "Hello", 2.0f);
     TEST_ASSERT(width > width_no_spacing, "Width with spacing should be greater");
     expected_spacing_increase = (int32_t)((float)(SDL_strlen("Hello") - 1) * 2.0f);
-    SDL_snprintf(msg, sizeof(msg), "Width with spacing calculation mismatch: got %d, expected %d",
-                 width, width_no_spacing + expected_spacing_increase);
+    SDL_snprintf(msg,
+                 sizeof(msg),
+                 "Width with spacing calculation mismatch: got %d, expected %d",
+                 width,
+                 width_no_spacing + expected_spacing_increase);
     TEST_ASSERT(width == width_no_spacing + expected_spacing_increase, msg);
 
     width = mvn_measure_text(NULL, "Test", 0);
@@ -167,16 +173,16 @@ test_measure_text(void) {
  * \brief           Test drawing basic text
  * \return          1 on success, 0 on failure
  */
-static int
-test_draw_text(void) {
-    TTF_Font* font = NULL;
-    mvn_fpoint_t pos = {10.0f, 10.0f};
-    mvn_color_t color = MVN_WHITE;
-    char msg[128];
+static int test_draw_text(void)
+{
+    TTF_Font *   font  = NULL;
+    mvn_fpoint_t pos   = {10.0f, 10.0f};
+    mvn_color_t  color = MVN_WHITE;
+    char         msg[128];
 
     font = mvn_load_font(TEST_FONT_PATH, TEST_FONT_SIZE);
-    SDL_snprintf(msg, sizeof(msg), "mvn_draw_text: Failed to load font for drawing at %s",
-                 TEST_FONT_PATH);
+    SDL_snprintf(
+        msg, sizeof(msg), "mvn_draw_text: Failed to load font for drawing at %s", TEST_FONT_PATH);
     TEST_ASSERT(font != NULL, msg);
     if (font == NULL) {
         return 0;
@@ -202,17 +208,19 @@ test_draw_text(void) {
  * \brief           Test drawing text with extended parameters (rotation)
  * \return          1 on success, 0 on failure
  */
-static int
-test_draw_text_pro(void) {
-    TTF_Font* font = NULL;
-    mvn_fpoint_t pos = {50.0f, 50.0f};
-    mvn_fpoint_t origin = {0.0f, 0.0f};
-    mvn_color_t color = MVN_WHITE;
-    float rotation = 45.0f;
-    char msg[128];
+static int test_draw_text_pro(void)
+{
+    TTF_Font *   font     = NULL;
+    mvn_fpoint_t pos      = {50.0f, 50.0f};
+    mvn_fpoint_t origin   = {0.0f, 0.0f};
+    mvn_color_t  color    = MVN_WHITE;
+    float        rotation = 45.0f;
+    char         msg[128];
 
     font = mvn_load_font(TEST_FONT_PATH, TEST_FONT_SIZE);
-    SDL_snprintf(msg, sizeof(msg), "mvn_draw_text_pro: Failed to load font for drawing at %s",
+    SDL_snprintf(msg,
+                 sizeof(msg),
+                 "mvn_draw_text_pro: Failed to load font for drawing at %s",
                  TEST_FONT_PATH);
     TEST_ASSERT(font != NULL, msg);
     if (font == NULL) {
@@ -247,8 +255,8 @@ test_draw_text_pro(void) {
  * \param[out] total_tests Pointer to the total number of tests
  * \return          Number of passed tests
  */
-int
-run_text_tests(int* passed_tests, int* failed_tests, int* total_tests) {
+int run_text_tests(int *passed_tests, int *failed_tests, int *total_tests)
+{
 
     printf("\n===== TEXT TESTS =====\n\n");
 
@@ -288,11 +296,11 @@ run_text_tests(int* passed_tests, int* failed_tests, int* total_tests) {
 }
 
 #if defined(MVN_TEXT_TEST_MAIN)
-int
-main(void) {
+int main(void)
+{
     int passed = 0;
     int failed = 0;
-    int total = 0;
+    int total  = 0;
 
     run_text_tests(&passed, &failed, &total);
 

@@ -11,18 +11,20 @@
  * Author:          Jake Larson
  */
 
-#include <SDL3/SDL.h>
 #include "mvn-test-utils.h"
 #include "mvn/mvn-core.h"
 #include "mvn/mvn-string.h"
 
+#include <SDL3/SDL.h>
+
+
 /**
-  * \brief           Test the engine version function
-  * \return          1 on success, 0 on failure
-  */
-static int
-test_engine_version(void) {
-    mvn_string_t* version;
+ * \brief           Test the engine version function
+ * \return          1 on success, 0 on failure
+ */
+static int test_engine_version(void)
+{
+    mvn_string_t *version;
 
     // Get the engine version
     version = mvn_get_engine_version();
@@ -41,11 +43,11 @@ test_engine_version(void) {
 }
 
 /**
-  * \brief           Test color functionality
-  * \return          1 on success, 0 on failure
-  */
-static int
-test_colors(void) {
+ * \brief           Test color functionality
+ * \return          1 on success, 0 on failure
+ */
+static int test_colors(void)
+{
     // Test predefined colors
     mvn_color_t white = MVN_WHITE;
     mvn_color_t black = MVN_BLACK;
@@ -63,8 +65,8 @@ test_colors(void) {
  * \brief           Test core timing functions
  * \return          1 on success, 0 on failure
  */
-static int
-test_core_timing(void) {
+static int test_core_timing(void)
+{
     // Initialize MVN (assuming it's not already done by a test fixture)
     // A minimal window is needed for timing initialization in mvn_init
     if (!mvn_init(10, 10, "Timing Test", MVN_WINDOW_HIDDEN)) {
@@ -92,13 +94,13 @@ test_core_timing(void) {
 
     // --- Test mvn_get_frame_time and mvn_get_fps ---
     mvn_set_target_fps(60); // Set a target for testing
-    int frame_count = 0;
-    uint64_t loop_start_ticks = SDL_GetPerformanceCounter();
+    int      frame_count         = 0;
+    uint64_t loop_start_ticks    = SDL_GetPerformanceCounter();
     uint64_t loop_duration_ticks = SDL_GetPerformanceFrequency(); // 1 second
 
     // Run a loop for slightly over 1 second to allow FPS calculation
-    while (SDL_GetPerformanceCounter()
-           < loop_start_ticks + loop_duration_ticks + (loop_duration_ticks / 10)) {
+    while (SDL_GetPerformanceCounter() <
+           loop_start_ticks + loop_duration_ticks + (loop_duration_ticks / 10)) {
         mvn_begin_drawing();
         // Simulate some work or just continue
         mvn_end_drawing(); // This handles frame delay and FPS calculation update
@@ -116,7 +118,8 @@ test_core_timing(void) {
     int fps = mvn_get_fps();
     // Allow a generous range for FPS due to timing variations, especially on test runners
     TEST_ASSERT(fps > 0 && fps < 100, "mvn_get_fps seems unreasonable (expected ~60)");
-    // A tighter check might be: TEST_ASSERT(fps > 50 && fps < 70, "mvn_get_fps not close to target 60");
+    // A tighter check might be: TEST_ASSERT(fps > 50 && fps < 70, "mvn_get_fps not close to target
+    // 60");
 
     // Clean up MVN
     mvn_quit();
@@ -131,8 +134,8 @@ test_core_timing(void) {
  * \param[out] total_tests Pointer to the total number of tests
  * \return          Number of passed tests
  */
-int
-run_core_tests(int* passed_tests, int* failed_tests, int* total_tests) {
+int run_core_tests(int *passed_tests, int *failed_tests, int *total_tests)
+{
     printf("\n===== CORE TESTS =====\n\n");
 
     int passed_before = *passed_tests;
@@ -155,11 +158,11 @@ run_core_tests(int* passed_tests, int* failed_tests, int* total_tests) {
 }
 
 #if defined(MVN_CORE_TEST_MAIN)
-int
-main(void) {
+int main(void)
+{
     int passed = 0;
     int failed = 0;
-    int total = 0;
+    int total  = 0;
 
     run_core_tests(&passed, &failed, &total);
 
