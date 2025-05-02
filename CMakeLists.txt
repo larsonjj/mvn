@@ -77,6 +77,7 @@ target_include_directories(mvn
 if(MSVC)
     target_compile_options(mvn PRIVATE
         /W4
+        /wd4312  # Disable warning C4312 (conversion to larger size)
         $<$<BOOL:${MVN_WARNINGS_AS_ERRORS}>:/WX>)
 else()
     target_compile_options(mvn PRIVATE
