@@ -891,3 +891,30 @@ mvn_string_compare(const mvn_string_t* str1, const mvn_string_t* str2) {
     }
     return SDL_memcmp(str1->data, str2->data, str1->length) == 0;
 }
+
+/**
+ * \brief           Get the current capacity of the string
+ * \param[in]       str: String to get capacity of
+ * \return          Capacity of the string, or 0 on NULL input
+ */
+size_t
+mvn_string_capacity(const mvn_string_t* str) {
+    if (!str) {
+        return 0;
+    }
+    return str->capacity;
+}
+
+/**
+ * \brief           Clear the string (set length to 0)
+ * \param[in]       str: String to clear
+ */
+void
+mvn_string_clear(mvn_string_t* str) {
+    if (!str || !str->data) {
+        return;
+    }
+    
+    str->length = 0;
+    str->data[0] = '\0';
+}

@@ -74,6 +74,8 @@ mvn_string_t* mvn_string_trim_end(const mvn_string_t* str);
 mvn_string_t* mvn_string_trim_start(const mvn_string_t* str);
 mvn_string_t* mvn_string_substring(const mvn_string_t* str, size_t start, size_t length);
 bool mvn_string_compare(const mvn_string_t* str1, const mvn_string_t* str2);
+size_t mvn_string_capacity(const mvn_string_t* str);
+void mvn_string_clear(mvn_string_t* str);
 
 #ifdef __cplusplus
 }
