@@ -95,7 +95,7 @@ static bool test_logger_set_levels(void)
 
     /* Save the original output function to restore later */
     SDL_LogOutputFunction original_fn;
-    void *                original_userdata;
+    void                 *original_userdata;
     SDL_GetLogOutputFunction(&original_fn, &original_userdata);
 
     /* Test setting individual category levels */
@@ -129,7 +129,7 @@ static bool test_basic_logging(void)
 
     /* Save the original output function to restore later */
     SDL_LogOutputFunction original_fn;
-    void *                original_userdata;
+    void                 *original_userdata;
     SDL_GetLogOutputFunction(&original_fn, &original_userdata);
 
     /* Set our test log function */
@@ -198,7 +198,7 @@ static bool test_log_filtering(void)
 
     /* Save the original output function to restore later */
     SDL_LogOutputFunction original_fn;
-    void *                original_userdata;
+    void                 *original_userdata;
     SDL_GetLogOutputFunction(&original_fn, &original_userdata);
 
     /* Set our test log function */
@@ -263,7 +263,7 @@ static bool test_category_logging(void)
 
     /* Save the original output function to restore later */
     SDL_LogOutputFunction original_fn;
-    void *                original_userdata;
+    void                 *original_userdata;
     SDL_GetLogOutputFunction(&original_fn, &original_userdata);
 
     /* Set our test log function */
@@ -323,7 +323,7 @@ static bool test_debug_vs_release_config(void)
 
     /* Save the original output function to restore later */
     SDL_LogOutputFunction original_fn;
-    void *                original_userdata;
+    void                 *original_userdata;
     SDL_GetLogOutputFunction(&original_fn, &original_userdata);
 
     /* Set our test log function */

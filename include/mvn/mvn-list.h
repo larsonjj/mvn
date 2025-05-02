@@ -16,7 +16,7 @@ extern "C" {
  * \brief           Dynamic array list structure
  */
 typedef struct mvn_list_t {
-    void * data;      /*!< Pointer to the array of items */
+    void  *data;      /*!< Pointer to the array of items */
     size_t item_size; /*!< Size of each item in bytes */
     size_t length;    /*!< Current number of items */
     size_t capacity;  /*!< Current allocated capacity */
@@ -29,7 +29,7 @@ bool        mvn_list_push(mvn_list_t *list, const void *item);
 bool        mvn_list_pop(mvn_list_t *list, void *out_item);
 bool        mvn_list_unshift(mvn_list_t *list, const void *item);
 bool        mvn_list_shift(mvn_list_t *list, void *out_item);
-void *      mvn_list_get(const mvn_list_t *list, size_t index);
+void       *mvn_list_get(const mvn_list_t *list, size_t index);
 bool        mvn_list_set(mvn_list_t *list, size_t index, const void *item);
 mvn_list_t *mvn_list_slice(const mvn_list_t *list, size_t start, size_t end);
 mvn_list_t *mvn_list_concat(const mvn_list_t *list1, const mvn_list_t *list2);

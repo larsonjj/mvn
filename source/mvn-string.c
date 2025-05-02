@@ -553,7 +553,7 @@ mvn_string_replace_all(const mvn_string_t *str, const char *search, const char *
     }
 
     /* Perform replacements */
-    char *      dest = result->data;
+    char       *dest = result->data;
     const char *src  = str->data;
     const char *next_pos;
 

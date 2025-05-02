@@ -63,7 +63,7 @@ typedef struct mvn_npatch_info_t {
     mvn_npatch_layout_t layout; /*!< Layout of the n-patch: 3x3, 1x3 or 3x1 */
 } mvn_npatch_info_t;
 
-mvn_image_t *  mvn_load_image(const char *filename);
+mvn_image_t   *mvn_load_image(const char *filename);
 void           mvn_unload_image(mvn_image_t *surface);
 mvn_texture_t *mvn_image_to_texture(mvn_renderer_t *renderer, mvn_image_t *surface);
 mvn_texture_t *mvn_load_texture(mvn_renderer_t *renderer, const char *filename);
@@ -85,7 +85,7 @@ void mvn_draw_texture_pro(mvn_texture_t *texture,
                           mvn_fpoint_t   origin,
                           float          rotation,
                           mvn_color_t    tint);
-void mvn_draw_texture_npatch(mvn_texture_t *   texture,
+void mvn_draw_texture_npatch(mvn_texture_t    *texture,
                              mvn_npatch_info_t nPatchInfo,
                              mvn_frect_t       dest,
                              mvn_fpoint_t      origin,

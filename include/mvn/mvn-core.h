@@ -71,11 +71,11 @@ typedef uint64_t mvn_window_flags_t;
 #define MVN_WINDOW_TRANSPARENT         SDL_WINDOW_TRANSPARENT
 
 /* Core functions */
-mvn_string_t *     mvn_get_engine_version(void);
+mvn_string_t      *mvn_get_engine_version(void);
 bool               mvn_init(int width, int height, const char *title, mvn_window_flags_t flags);
 void               mvn_quit(void);
-mvn_window_t *     mvn_get_window(void);
-mvn_renderer_t *   mvn_get_renderer(void);
+mvn_window_t      *mvn_get_window(void);
+mvn_renderer_t    *mvn_get_renderer(void);
 mvn_text_engine_t *mvn_get_text_engine(void);
 bool               mvn_window_should_close(void);
 bool               mvn_begin_drawing(void);
@@ -95,7 +95,7 @@ int32_t          mvn_get_monitor_height(mvn_display_id_t monitor);
 int32_t          mvn_get_monitor_refresh_rate(mvn_display_id_t monitor);
 mvn_fpoint_t     mvn_get_window_position(void);
 mvn_fpoint_t     mvn_get_window_scale_dpi(void);
-mvn_string_t *   mvn_get_monitor_name(mvn_display_id_t monitor);
+mvn_string_t    *mvn_get_monitor_name(mvn_display_id_t monitor);
 void             mvn_set_window_icon(mvn_image_t *image);
 void             mvn_set_window_title(const char *title);
 void             mvn_set_window_position(int32_t x, int32_t y);

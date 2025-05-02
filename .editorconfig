@@ -1,0 +1,43 @@
+# MVN Game Framework EditorConfig
+# https://editorconfig.org/
+
+# top-most EditorConfig file
+root = true
+
+# Default settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+tab_width = 4
+max_line_length = 100
+
+# C/C++ specific settings
+[*.{c,h,cpp,hpp}]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+# CMake settings
+[{CMakeLists.txt,*.cmake}]
+indent_style = space
+indent_size = 4
+
+# JSON files
+[*.json]
+indent_size = 2
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+
+# Makefile needs tabs
+[Makefile]
+indent_style = tab
+
+# Patch files should be treated as is
+[*.{diff,patch}]
+trim_trailing_whitespace = false

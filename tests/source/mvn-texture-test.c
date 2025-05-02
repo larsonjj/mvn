@@ -27,7 +27,7 @@
 static int test_image_load(void)
 {
     mvn_image_t *surface         = NULL;
-    const char * test_image_name = "char-1.png";
+    const char  *test_image_name = "char-1.png";
     char         test_image_path[256];
     int          result = 1; // Default to success
 

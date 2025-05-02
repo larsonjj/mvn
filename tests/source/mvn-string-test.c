@@ -51,7 +51,7 @@ static int test_string_init_free(void)
  */
 static int test_string_from(void)
 {
-    const char *  cstr = "Hello, World!";
+    const char   *cstr = "Hello, World!";
     mvn_string_t *str  = mvn_string_from_cstr(cstr);
     TEST_ASSERT(str != NULL, "Failed to create string from C string");
     TEST_ASSERT(mvn_string_length(str) == SDL_strlen(cstr), "String length is incorrect");
@@ -85,7 +85,7 @@ static int test_string_concat_append(void)
 {
     mvn_string_t *str1  = mvn_string_from_cstr("Hello, ");
     mvn_string_t *str2  = mvn_string_from_cstr("World!");
-    const char *  cstr3 = " How are you?";
+    const char   *cstr3 = " How are you?";
 
     TEST_ASSERT(str1 != NULL && str2 != NULL, "Failed to create initial strings");
 
@@ -380,7 +380,7 @@ static int test_string_split(void)
 
     // Test split with delimiter at start/end/multiple
     mvn_string_t *str2  = mvn_string_from_cstr(",a,,b,");
-    mvn_list_t *  list2 = mvn_string_split(str2, ",");
+    mvn_list_t   *list2 = mvn_string_split(str2, ",");
     TEST_ASSERT(list2 != NULL, "split complex failed");
     TEST_ASSERT(mvn_list_length(list2) == 5,
                 "split complex list length incorrect"); // "", "a", "", "b", ""
@@ -414,7 +414,7 @@ static int test_string_split(void)
 
     // Test split with no delimiter
     mvn_string_t *str3  = mvn_string_from_cstr("noddelimiter");
-    mvn_list_t *  list3 = mvn_string_split(str3, ",");
+    mvn_list_t   *list3 = mvn_string_split(str3, ",");
     TEST_ASSERT(list3 != NULL, "split no delimiter failed");
     TEST_ASSERT(mvn_list_length(list3) == 1, "split no delimiter length incorrect");
     if (list3 && mvn_list_length(list3) == 1) {
@@ -435,7 +435,7 @@ static int test_string_split(void)
 
     // Test split empty string
     mvn_string_t *empty_str  = mvn_string_from_cstr("");
-    mvn_list_t *  empty_list = mvn_string_split(empty_str, ",");
+    mvn_list_t   *empty_list = mvn_string_split(empty_str, ",");
     TEST_ASSERT(empty_list != NULL, "split empty string failed");
     TEST_ASSERT(mvn_list_length(empty_list) == 1,
                 "split empty string length incorrect"); // Should contain one empty string

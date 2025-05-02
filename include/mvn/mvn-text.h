@@ -45,14 +45,14 @@ extern "C" {
 
 /* Function declarations */
 TTF_Font *mvn_load_font(const char *fileName, float size);
-TTF_Font *
-     mvn_load_font_ex(const char *fileName, float size, const int *codePoints, int codePointCount);
+TTF_Font      *
+mvn_load_font_ex(const char *fileName, float size, const int *codePoints, int codePointCount);
 void mvn_unload_font(TTF_Font *font);
 void mvn_set_text_line_spacing(int32_t spacing);
 int32_t mvn_measure_text(TTF_Font *font, const char *text, float spacing);
 void    mvn_draw_text(TTF_Font *font, const char *text, mvn_fpoint_t position, mvn_color_t tint);
-void    mvn_draw_text_pro(TTF_Font *   font,
-                          const char * text,
+void    mvn_draw_text_pro(TTF_Font    *font,
+                          const char  *text,
                           mvn_fpoint_t position,
                           mvn_fpoint_t origin,
                           float        rotation,

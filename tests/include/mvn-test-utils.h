@@ -53,10 +53,10 @@ extern "C" {
     do {                                                                                           \
         printf("Running test: %s\n", #test_func);                                                  \
         if (test_func()) {                                                                         \
-            printf("✅ PASSED: %s\n", #test_func);                                                  \
+            printf("✅ PASSED: %s\n", #test_func);                                                 \
             (*passed_tests)++;                                                                     \
         } else {                                                                                   \
-            printf("❌ FAILED: %s\n", #test_func);                                                  \
+            printf("❌ FAILED: %s\n", #test_func);                                                 \
             (*failed_tests)++;                                                                     \
         }                                                                                          \
     } while (0)

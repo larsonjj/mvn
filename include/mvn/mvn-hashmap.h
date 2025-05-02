@@ -18,8 +18,8 @@ extern "C" {
  * \brief           Hashmap entry structure (key-value pair)
  */
 typedef struct mvn_hmap_entry_t {
-    char *                   key;   /*!< String key (owned by the hashmap) */
-    void *                   value; /*!< Pointer to value (owned by the hashmap) */
+    char                    *key;   /*!< String key (owned by the hashmap) */
+    void                    *value; /*!< Pointer to value (owned by the hashmap) */
     struct mvn_hmap_entry_t *next;  /*!< Next entry in collision chain */
 } mvn_hmap_entry_t;
 
@@ -37,7 +37,7 @@ mvn_hmap_t *mvn_hmap_init(size_t item_size, size_t initial_capacity);
 void        mvn_hmap_free(mvn_hmap_t *hmap);
 size_t      mvn_hmap_length(const mvn_hmap_t *hmap);
 bool        mvn_hmap_set(mvn_hmap_t *hmap, const char *key, const void *value);
-void *      mvn_hmap_get(const mvn_hmap_t *hmap, const char *key);
+void       *mvn_hmap_get(const mvn_hmap_t *hmap, const char *key);
 bool        mvn_hmap_delete(mvn_hmap_t *hmap, const char *key);
 mvn_list_t *mvn_hmap_keys(const mvn_hmap_t *hmap);
 mvn_list_t *mvn_hmap_values(const mvn_hmap_t *hmap);

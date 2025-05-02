@@ -106,7 +106,7 @@ mvn_texture_t *mvn_image_to_texture(mvn_renderer_t *renderer, mvn_image_t *surfa
  */
 mvn_texture_t *mvn_load_texture(mvn_renderer_t *renderer, const char *filename)
 {
-    mvn_image_t *  surface = NULL;
+    mvn_image_t   *surface = NULL;
     mvn_texture_t *texture = NULL;
 
     // Load the image first
@@ -306,7 +306,7 @@ void mvn_draw_texture_pro(mvn_texture_t *texture,
  * \param[in]       rotation: Rotation in degrees
  * \param[in]       tint: Color tint to apply to the texture
  */
-void mvn_draw_texture_npatch(mvn_texture_t *   texture,
+void mvn_draw_texture_npatch(mvn_texture_t    *texture,
                              mvn_npatch_info_t nPatchInfo,
                              mvn_frect_t       dest,
                              mvn_fpoint_t      origin,

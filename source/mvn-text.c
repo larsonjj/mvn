@@ -166,7 +166,7 @@ int32_t mvn_measure_text(TTF_Font *font, const char *text, float spacing)
  */
 void mvn_draw_text(TTF_Font *font, const char *text, mvn_fpoint_t position, mvn_color_t tint)
 {
-    TTF_Text *         text_obj;
+    TTF_Text          *text_obj;
     mvn_text_engine_t *text_engine;
 
     if (text == NULL || text[0] == '\0' || font == NULL) {
@@ -212,15 +212,15 @@ void mvn_draw_text(TTF_Font *font, const char *text, mvn_fpoint_t position, mvn_
  * \param[in]       rotation: Rotation in degrees
  * \param[in]       tint: Color tint to apply to the text
  */
-void mvn_draw_text_pro(TTF_Font *   font,
-                       const char * text,
+void mvn_draw_text_pro(TTF_Font    *font,
+                       const char  *text,
                        mvn_fpoint_t position,
                        mvn_fpoint_t origin,
                        float        rotation,
                        mvn_color_t  tint)
 {
-    mvn_image_t *   surface;
-    mvn_texture_t * texture;
+    mvn_image_t    *surface;
+    mvn_texture_t  *texture;
     mvn_renderer_t *renderer;
     mvn_frect_t     dest;
     mvn_fpoint_t    center;
