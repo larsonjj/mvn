@@ -90,6 +90,7 @@ endif()
 # SDL
 set(SDL_TEST OFF CACHE BOOL "" FORCE)
 set(SDL_INSTALL ON CACHE BOOL "" FORCE) # Make sure installation targets are generated
+set(SDL_WINDOWS_GAMING_INPUT OFF CACHE BOOL "" FORCE) # Disable Windows Gaming Input API (requires Windows 10 SDK)
 
 include(FetchContent)
 FetchContent_Declare(
