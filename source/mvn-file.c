@@ -31,12 +31,14 @@
  * Author:          Jake Larson
  */
 
-#include <SDL3/SDL.h>
-// #include <strings.h>
 #include "mvn/mvn-file.h"
+
+#include "mvn/mvn-error.h" // Added error module
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-string.h"
 #include "mvn/mvn-utils.h"
+
+#include <SDL3/SDL.h>
 
 /**
  * \brief           Check if a file exists
@@ -45,8 +47,10 @@
  */
 bool mvn_file_exists(const char *fileName)
 {
-    if (fileName == NULL || fileName[0] == '\0') {
-        return false;
+    MVN_CHECK_NULL(fileName, "Cannot check if file exists: NULL filename");
+
+    if (fileName[0] == '\0') {
+        return mvn_set_error("Cannot check if file exists: Empty filename");
     }
 
     SDL_PathInfo info;
@@ -54,7 +58,7 @@ bool mvn_file_exists(const char *fileName)
         return info.type == SDL_PATHTYPE_FILE;
     }
 
-    return false;
+    return mvn_set_error("Failed to get path info: %s", SDL_GetError());
 }
 
 /**
@@ -64,8 +68,10 @@ bool mvn_file_exists(const char *fileName)
  */
 bool mvn_directory_exists(const char *dirPath)
 {
-    if (dirPath == NULL || dirPath[0] == '\0') {
-        return false;
+    MVN_CHECK_NULL(dirPath, "Cannot check if directory exists: NULL directory path");
+
+    if (dirPath[0] == '\0') {
+        return mvn_set_error("Cannot check if directory exists: Empty directory path");
     }
 
     SDL_PathInfo info;
@@ -73,7 +79,7 @@ bool mvn_directory_exists(const char *dirPath)
         return info.type == SDL_PATHTYPE_DIRECTORY;
     }
 
-    return false;
+    return mvn_set_error("Failed to get path info: %s", SDL_GetError());
 }
 
 /**
@@ -84,13 +90,12 @@ bool mvn_directory_exists(const char *dirPath)
  */
 bool mvn_is_file_extension(const char *fileName, const char *ext)
 {
-    if (fileName == NULL || ext == NULL) {
-        return false;
-    }
+    MVN_CHECK_NULL(fileName, "Cannot check file extension: NULL filename");
+    MVN_CHECK_NULL(ext, "Cannot check file extension: NULL extension");
 
     mvn_string_t *fileExt = mvn_get_file_extension(fileName);
     if (!fileExt) {
-        return false;
+        return mvn_set_error("Failed to get file extension");
     }
 
     bool result = false;
@@ -111,19 +116,18 @@ bool mvn_is_file_extension(const char *fileName, const char *ext)
  */
 int32_t mvn_get_file_length(const char *fileName)
 {
-    if (fileName == NULL) {
-        return -1;
-    }
+    MVN_CHECK_NULL(fileName, "Cannot get file length: NULL filename");
 
     SDL_PathInfo info;
     if (SDL_GetPathInfo(fileName, &info) && info.type == SDL_PATHTYPE_FILE) {
         if (info.size > INT32_MAX) {
-            mvn_log_warn("File size exceeds int32_t limit: %s", fileName);
+            mvn_set_error("File size exceeds int32_t limit: %s", fileName);
             return INT32_MAX;
         }
         return (int32_t)info.size;
     }
 
+    mvn_set_error("Failed to get file length for '%s': %s", fileName, SDL_GetError());
     return -1;
 }
 
@@ -136,6 +140,7 @@ int32_t mvn_get_file_length(const char *fileName)
 mvn_string_t *mvn_get_file_extension(const char *fileName)
 {
     if (fileName == NULL) {
+        mvn_set_error("Cannot get file extension: NULL filename");
         return mvn_string_from_cstr("");
     }
 
@@ -150,7 +155,11 @@ mvn_string_t *mvn_get_file_extension(const char *fileName)
         return mvn_string_from_cstr(""); // Last dot is in a directory component
     }
 
-    return mvn_string_from_cstr(dot);
+    mvn_string_t *result = mvn_string_from_cstr(dot);
+    if (!result) {
+        mvn_set_error("Failed to create string for file extension");
+    }
+    return result;
 }
 
 /**
@@ -161,6 +170,7 @@ mvn_string_t *mvn_get_file_extension(const char *fileName)
 mvn_string_t *mvn_get_file_name(const char *filePath)
 {
     if (filePath == NULL) {
+        mvn_set_error("Cannot get file name: NULL file path");
         return mvn_string_from_cstr("");
     }
 
@@ -168,11 +178,15 @@ mvn_string_t *mvn_get_file_name(const char *filePath)
     const char *slash2    = SDL_strrchr(filePath, '\\');
     const char *lastSlash = SDL_max(slash1, slash2);
 
-    if (lastSlash != NULL) {
-        return mvn_string_from_cstr(lastSlash + 1); // Skip the slash character
+    const char   *name   = (lastSlash != NULL) ? lastSlash + 1 : filePath;
+    mvn_string_t *result = mvn_string_from_cstr(name);
+
+    if (!result) {
+        mvn_set_error("Failed to create string for file name");
+        return mvn_string_from_cstr("");
     }
 
-    return mvn_string_from_cstr(filePath); // No directory component
+    return result;
 }
 
 /**
@@ -183,6 +197,7 @@ mvn_string_t *mvn_get_file_name(const char *filePath)
 mvn_string_t *mvn_get_file_name_without_ext(const char *filePath)
 {
     if (filePath == NULL) {
+        mvn_set_error("Cannot get file name without extension: NULL file path");
         return mvn_string_from_cstr("");
     }
 
@@ -206,7 +221,7 @@ mvn_string_t *mvn_get_file_name_without_ext(const char *filePath)
     // Create a new string with the calculated length
     mvn_string_t *result = mvn_string_init(length + 1);
     if (result == NULL) {
-        mvn_log_error("Failed to create string for filename without extension");
+        mvn_set_error("Failed to create string for filename without extension");
         mvn_string_free(fileName);
         mvn_string_free(extStr);
         return mvn_string_from_cstr("");
@@ -230,6 +245,7 @@ mvn_string_t *mvn_get_file_name_without_ext(const char *filePath)
 mvn_string_t *mvn_get_directory_path(const char *filePath)
 {
     if (filePath == NULL) {
+        mvn_set_error("Cannot get directory path: NULL file path");
         return mvn_string_from_cstr("");
     }
 
@@ -250,7 +266,7 @@ mvn_string_t *mvn_get_directory_path(const char *filePath)
         // Create a new string with the calculated length
         result = mvn_string_init(length + 1);
         if (result == NULL) {
-            mvn_log_error("Failed to create string for directory path");
+            mvn_set_error("Failed to create string for directory path");
             return mvn_string_from_cstr("");
         }
 
@@ -270,14 +286,17 @@ mvn_string_t *mvn_get_directory_path(const char *filePath)
  */
 mvn_string_t *mvn_get_parent_directory_path(const char *dirPath)
 {
-    if (dirPath == NULL || dirPath[0] == '\0') {
-        return mvn_string_from_cstr("");
+    MVN_CHECK_NULL(dirPath, "Cannot get parent directory: NULL directory path");
+
+    if (dirPath[0] == '\0') {
+        return mvn_set_error("Cannot get parent directory: Empty directory path"),
+               mvn_string_from_cstr("");
     }
 
     // Make a copy of the path that we can modify
     mvn_string_t *path = mvn_string_from_cstr(dirPath);
     if (path == NULL) {
-        mvn_log_error("Failed to create string for parent directory path");
+        mvn_set_error("Failed to create string for parent directory path");
         return mvn_string_from_cstr("");
     }
 
@@ -323,15 +342,15 @@ mvn_string_t *mvn_get_application_directory(void)
 {
     const char *basePath = SDL_GetBasePath();
     if (basePath == NULL) {
-        mvn_log_error("Failed to get application directory: %s", SDL_GetError());
-        return mvn_string_from_cstr("");
+        return mvn_set_error("Failed to get application directory: %s", SDL_GetError()),
+               mvn_string_from_cstr("");
     }
 
     mvn_string_t *result = mvn_string_from_cstr(basePath);
     MVN_FREE((void *)basePath);
 
     if (result == NULL) {
-        mvn_log_error("Failed to create string for application directory");
+        mvn_set_error("Failed to create string for application directory");
         return mvn_string_from_cstr("");
     }
 
@@ -345,8 +364,10 @@ mvn_string_t *mvn_get_application_directory(void)
  */
 bool mvn_is_path_file(const char *path)
 {
-    if (path == NULL || path[0] == '\0') {
-        return false;
+    MVN_CHECK_NULL(path, "Cannot check if path is a file: NULL path");
+
+    if (path[0] == '\0') {
+        return mvn_set_error("Cannot check if path is a file: Empty path");
     }
 
     SDL_PathInfo info;
@@ -354,7 +375,7 @@ bool mvn_is_path_file(const char *path)
         return info.type == SDL_PATHTYPE_FILE;
     }
 
-    return false;
+    return mvn_set_error("Failed to get path info: %s", SDL_GetError());
 }
 
 /**
@@ -364,8 +385,10 @@ bool mvn_is_path_file(const char *path)
  */
 bool mvn_is_path_directory(const char *path)
 {
-    if (path == NULL || path[0] == '\0') {
-        return false;
+    MVN_CHECK_NULL(path, "Cannot check if path is a directory: NULL path");
+
+    if (path[0] == '\0') {
+        return mvn_set_error("Cannot check if path is a directory: Empty path");
     }
 
     SDL_PathInfo info;
@@ -373,7 +396,7 @@ bool mvn_is_path_directory(const char *path)
         return info.type == SDL_PATHTYPE_DIRECTORY;
     }
 
-    return false;
+    return mvn_set_error("Failed to get path info: %s", SDL_GetError());
 }
 
 /**
@@ -383,7 +406,10 @@ bool mvn_is_path_directory(const char *path)
  */
 int64_t mvn_get_file_mod_time(const char *fileName)
 {
-    if (fileName == NULL || fileName[0] == '\0') {
+    MVN_CHECK_NULL(fileName, "Cannot get file modification time: NULL filename");
+
+    if (fileName[0] == '\0') {
+        mvn_set_error("Cannot get file modification time: Empty filename");
         return -1;
     }
 
@@ -392,7 +418,10 @@ int64_t mvn_get_file_mod_time(const char *fileName)
         if (info.type == SDL_PATHTYPE_FILE) {
             return info.modify_time;
         }
+        mvn_set_error("Path is not a file: %s", fileName);
+        return -1;
     }
 
+    mvn_set_error("Failed to get path info: %s", SDL_GetError());
     return -1;
 }

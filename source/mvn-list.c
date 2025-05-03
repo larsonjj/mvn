@@ -5,6 +5,7 @@
 
 #include "mvn/mvn-list.h"
 
+#include "mvn/mvn-error.h" // Added error module
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-utils.h"
 
@@ -28,7 +29,7 @@
 mvn_list_t *mvn_list_init(size_t item_size, size_t initial_capacity)
 {
     if (item_size == 0) {
-        mvn_log_error("Cannot create list with item_size 0");
+        mvn_set_error("Cannot create list with item_size 0");
         return NULL;
     }
 
@@ -39,14 +40,14 @@ mvn_list_t *mvn_list_init(size_t item_size, size_t initial_capacity)
 
     /* Check for potential integer overflow before allocation */
     if (initial_capacity > SIZE_MAX / item_size) {
-        mvn_log_error("Integer overflow detected when calculating initial list capacity");
+        mvn_set_error("Integer overflow detected when calculating initial list capacity");
         return NULL;
     }
 
     /* Allocate list structure */
     mvn_list_t *list = MVN_MALLOC(sizeof(mvn_list_t));
     if (!list) {
-        mvn_log_error("Failed to allocate memory for list");
+        mvn_set_error("Failed to allocate memory for list");
         return NULL;
     }
 
@@ -54,7 +55,7 @@ mvn_list_t *mvn_list_init(size_t item_size, size_t initial_capacity)
      * since we'll be overwriting all this memory anyway */
     list->data = MVN_MALLOC(initial_capacity * item_size);
     if (!list->data) {
-        mvn_log_error("Failed to allocate memory for list data");
+        mvn_set_error("Failed to allocate memory for list data");
         MVN_FREE(list);
         return NULL;
     }
@@ -106,9 +107,7 @@ size_t mvn_list_length(const mvn_list_t *list)
  */
 bool mvn_list_reserve(mvn_list_t *list, size_t capacity)
 {
-    if (!list) {
-        return false;
-    }
+    MVN_CHECK_NULL(list, "Cannot reserve capacity for NULL list");
 
     if (capacity <= list->capacity) {
         return true; /* Already have enough capacity */
@@ -125,10 +124,7 @@ bool mvn_list_reserve(mvn_list_t *list, size_t capacity)
  */
 bool mvn_list_resize(mvn_list_t *list, size_t new_capacity)
 {
-    if (!list) {
-        mvn_log_error("Cannot resize NULL list");
-        return false;
-    }
+    MVN_CHECK_NULL(list, "Cannot resize NULL list");
 
     // Check for zero capacity
     if (new_capacity == 0) {
@@ -140,8 +136,7 @@ bool mvn_list_resize(mvn_list_t *list, size_t new_capacity)
             mvn_log_debug("List resized to 0 capacity");
             return true;
         } else {
-            mvn_log_error("Attempted to resize non-empty list to zero capacity");
-            return false;
+            return mvn_set_error("Attempted to resize non-empty list to zero capacity");
         }
     }
 
@@ -161,8 +156,7 @@ bool mvn_list_resize(mvn_list_t *list, size_t new_capacity)
 
     /* Check for potential integer overflow before reallocation */
     if (new_capacity > SIZE_MAX / list->item_size) {
-        mvn_log_error("Integer overflow detected when calculating resize capacity");
-        return false;
+        return mvn_set_error("Integer overflow detected when calculating resize capacity");
     }
 
     void *new_data = MVN_REALLOC(list->data, new_capacity * list->item_size);
@@ -174,8 +168,7 @@ bool mvn_list_resize(mvn_list_t *list, size_t new_capacity)
             mvn_log_debug("List resized to 0 capacity (realloc returned NULL)");
             return true;
         }
-        mvn_log_error("Failed to resize list to capacity %zu", new_capacity);
-        return false;
+        return mvn_set_error("Failed to resize list to capacity %zu", new_capacity);
     }
 
     list->data     = new_data;
@@ -210,7 +203,13 @@ static bool mvn_list_ensure_capacity(mvn_list_t *list)
  */
 void *mvn_list_get(const mvn_list_t *list, size_t index)
 {
-    if (!list || index >= list->length) {
+    if (!list) {
+        mvn_set_error("Cannot get item from NULL list");
+        return NULL;
+    }
+
+    if (index >= list->length) {
+        mvn_set_error("List index %zu out of bounds (length: %zu)", index, list->length);
         return NULL;
     }
 
@@ -226,8 +225,12 @@ void *mvn_list_get(const mvn_list_t *list, size_t index)
  */
 bool mvn_list_set(mvn_list_t *list, size_t index, const void *item)
 {
-    if (!list || !item || index >= list->length) {
-        return false;
+    MVN_CHECK_NULL(list, "Cannot set item in NULL list");
+    MVN_CHECK_NULL(item, "Cannot set NULL item in list");
+
+    if (index >= list->length) {
+        return mvn_set_error(
+            "List index %zu out of bounds for set (length: %zu)", index, list->length);
     }
 
     void *dest = (char *)list->data + (index * list->item_size);
@@ -243,10 +246,8 @@ bool mvn_list_set(mvn_list_t *list, size_t index, const void *item)
  */
 bool mvn_list_push(mvn_list_t *list, const void *item)
 {
-    if (!list || !item) {
-        mvn_log_error("Invalid parameters for list push");
-        return false;
-    }
+    MVN_CHECK_NULL(list, "Cannot push to NULL list");
+    MVN_CHECK_NULL(item, "Cannot push NULL item to list");
 
     if (!mvn_list_ensure_capacity(list)) {
         return false;
@@ -268,8 +269,11 @@ bool mvn_list_push(mvn_list_t *list, const void *item)
  */
 bool mvn_list_push_batch(mvn_list_t *list, const void *items, size_t count)
 {
-    if (!list || !items || count == 0) {
-        return false;
+    MVN_CHECK_NULL(list, "Cannot push batch to NULL list");
+    MVN_CHECK_NULL(items, "Cannot push NULL items batch to list");
+
+    if (count == 0) {
+        return true; // Nothing to do, but not an error
     }
 
     /* Ensure we have enough space */
@@ -299,8 +303,10 @@ bool mvn_list_push_batch(mvn_list_t *list, const void *items, size_t count)
  */
 bool mvn_list_pop(mvn_list_t *list, void *out_item)
 {
-    if (!list || list->length == 0) {
-        return false;
+    MVN_CHECK_NULL(list, "Cannot pop from NULL list");
+
+    if (list->length == 0) {
+        return mvn_set_error("Cannot pop from empty list");
     }
 
     list->length--;
@@ -321,10 +327,8 @@ bool mvn_list_pop(mvn_list_t *list, void *out_item)
  */
 bool mvn_list_unshift(mvn_list_t *list, const void *item)
 {
-    if (!list || !item) {
-        mvn_log_error("Invalid parameters for list unshift");
-        return false;
-    }
+    MVN_CHECK_NULL(list, "Cannot unshift to NULL list");
+    MVN_CHECK_NULL(item, "Cannot unshift NULL item to list");
 
     if (!mvn_list_ensure_capacity(list)) {
         return false;
@@ -354,8 +358,10 @@ bool mvn_list_unshift(mvn_list_t *list, const void *item)
  */
 bool mvn_list_shift(mvn_list_t *list, void *out_item)
 {
-    if (!list || list->length == 0) {
-        return false;
+    MVN_CHECK_NULL(list, "Cannot shift from NULL list");
+
+    if (list->length == 0) {
+        return mvn_set_error("Cannot shift from empty list");
     }
 
     /* Copy first item to output if requested */
@@ -384,7 +390,7 @@ bool mvn_list_shift(mvn_list_t *list, void *out_item)
 mvn_list_t *mvn_list_slice(const mvn_list_t *list, size_t start, size_t end)
 {
     if (!list) {
-        mvn_log_error("Cannot slice NULL list");
+        mvn_set_error("Cannot slice NULL list");
         return NULL;
     }
 
@@ -395,7 +401,7 @@ mvn_list_t *mvn_list_slice(const mvn_list_t *list, size_t start, size_t end)
 
     /* Validate indices */
     if (start > list->length || start > end) {
-        mvn_log_error(
+        mvn_set_error(
             "Invalid slice indices: start=%zu, end=%zu, length=%zu", start, end, list->length);
         return NULL;
     }
@@ -427,13 +433,20 @@ mvn_list_t *mvn_list_slice(const mvn_list_t *list, size_t start, size_t end)
  */
 mvn_list_t *mvn_list_concat(const mvn_list_t *list1, const mvn_list_t *list2)
 {
-    if (!list1 || !list2) {
-        mvn_log_error("Cannot concatenate NULL lists");
+    if (!list1) {
+        mvn_set_error("First list cannot be NULL for concat operation");
+        return NULL;
+    }
+
+    if (!list2) {
+        mvn_set_error("Second list cannot be NULL for concat operation");
         return NULL;
     }
 
     if (list1->item_size != list2->item_size) {
-        mvn_log_error("Cannot concatenate lists with different item sizes");
+        mvn_set_error("Cannot concatenate lists with different item sizes: %zu vs %zu",
+                      list1->item_size,
+                      list2->item_size);
         return NULL;
     }
 
@@ -470,7 +483,7 @@ mvn_list_t *mvn_list_concat(const mvn_list_t *list1, const mvn_list_t *list2)
 mvn_list_t *mvn_list_clone(const mvn_list_t *list)
 {
     if (!list) {
-        mvn_log_error("Cannot clone NULL list");
+        mvn_set_error("Cannot clone NULL list");
         return NULL;
     }
 
@@ -496,10 +509,7 @@ mvn_list_t *mvn_list_clone(const mvn_list_t *list)
  */
 bool mvn_list_reverse(mvn_list_t *list)
 {
-    if (!list) {
-        mvn_log_error("Cannot reverse NULL list");
-        return false;
-    }
+    MVN_CHECK_NULL(list, "Cannot reverse NULL list");
 
     if (list->length <= 1) {
         return true; /* Nothing to do */
@@ -512,8 +522,7 @@ bool mvn_list_reverse(mvn_list_t *list)
     if (list->item_size > sizeof(temp_storage)) {
         temp = MVN_MALLOC(list->item_size);
         if (!temp) {
-            mvn_log_error("Failed to allocate memory for list reverse operation");
-            return false;
+            return mvn_set_error("Failed to allocate memory for list reverse operation");
         }
     }
 
@@ -541,10 +550,8 @@ bool mvn_list_reverse(mvn_list_t *list)
  */
 bool mvn_list_sort(mvn_list_t *list, mvn_list_compare_fn compare)
 {
-    if (!list || !compare) {
-        mvn_log_error("Invalid parameters for list sort");
-        return false;
-    }
+    MVN_CHECK_NULL(list, "Cannot sort NULL list");
+    MVN_CHECK_NULL(compare, "Cannot sort with NULL comparison function");
 
     if (list->length <= 1) {
         return true; /* Nothing to do */
@@ -564,8 +571,13 @@ bool mvn_list_sort(mvn_list_t *list, mvn_list_compare_fn compare)
  */
 mvn_list_t *mvn_list_filter(const mvn_list_t *list, mvn_list_filter_fn filter, void *user_data)
 {
-    if (!list || !filter) {
-        mvn_log_error("Invalid parameters for list filter");
+    if (!list) {
+        mvn_set_error("Cannot filter NULL list");
+        return NULL;
+    }
+
+    if (!filter) {
+        mvn_set_error("Cannot filter with NULL filter function");
         return NULL;
     }
 
@@ -614,9 +626,7 @@ mvn_list_t *mvn_list_filter(const mvn_list_t *list, mvn_list_filter_fn filter, v
  */
 bool mvn_list_clear(mvn_list_t *list)
 {
-    if (!list) {
-        return false;
-    }
+    MVN_CHECK_NULL(list, "Cannot clear NULL list");
 
     list->length = 0;
     return true;
@@ -629,9 +639,7 @@ bool mvn_list_clear(mvn_list_t *list)
  */
 bool mvn_list_trim(mvn_list_t *list)
 {
-    if (!list) {
-        return false;
-    }
+    MVN_CHECK_NULL(list, "Cannot trim NULL list");
 
     if (list->length == 0) {
         /* Special case: if empty, reset to default capacity */

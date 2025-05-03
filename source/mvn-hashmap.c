@@ -5,6 +5,7 @@
 
 #include "mvn/mvn-hashmap.h"
 
+#include "mvn/mvn-error.h"
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-utils.h"
 
@@ -58,7 +59,7 @@ static mvn_hmap_entry_t *create_entry(const char *key, const void *value, size_t
 
     mvn_hmap_entry_t *entry = MVN_MALLOC(sizeof(mvn_hmap_entry_t));
     if (!entry) {
-        mvn_log_error("Failed to allocate memory for hashmap entry");
+        mvn_set_error("Failed to allocate memory for hashmap entry");
         return NULL;
     }
 
@@ -66,7 +67,7 @@ static mvn_hmap_entry_t *create_entry(const char *key, const void *value, size_t
     size_t key_len = SDL_strlen(key) + 1;
     entry->key     = MVN_MALLOC(key_len);
     if (!entry->key) {
-        mvn_log_error("Failed to allocate memory for hashmap entry key");
+        mvn_set_error("Failed to allocate memory for hashmap entry key");
         MVN_FREE(entry);
         return NULL;
     }
@@ -75,7 +76,7 @@ static mvn_hmap_entry_t *create_entry(const char *key, const void *value, size_t
     /* Copy value */
     entry->value = MVN_MALLOC(value_size);
     if (!entry->value) {
-        mvn_log_error("Failed to allocate memory for hashmap entry value");
+        mvn_set_error("Failed to allocate memory for hashmap entry value");
         MVN_FREE(entry->key);
         MVN_FREE(entry);
         return NULL;
@@ -109,22 +110,24 @@ static void free_entry(mvn_hmap_entry_t *entry)
  */
 static bool resize_hashmap(mvn_hmap_t *hmap, size_t new_capacity)
 {
-    if (!hmap || new_capacity < hmap->length) {
-        return false;
+    if (!hmap) {
+        return mvn_set_error("Cannot resize NULL hashmap");
+    }
+
+    if (new_capacity < hmap->length) {
+        return mvn_set_error("New hashmap capacity is too small");
     }
 
     /* Check for potential integer overflow before allocation */
     if (new_capacity > SIZE_MAX / sizeof(mvn_hmap_entry_t *)) {
-        mvn_log_error("Integer overflow detected when calculating hashmap resize capacity");
-        return false;
+        return mvn_set_error("Integer overflow detected when calculating hashmap resize capacity");
     }
 
     /* Allocate new buckets array */
     mvn_hmap_entry_t **new_buckets =
         (mvn_hmap_entry_t **)MVN_CALLOC(new_capacity, sizeof(mvn_hmap_entry_t *));
     if (!new_buckets) {
-        mvn_log_error("Failed to allocate memory for hashmap resizing");
-        return false;
+        return mvn_set_error("Failed to allocate memory for hashmap resizing");
     }
 
     /* Rehash all entries into new buckets */
@@ -163,7 +166,7 @@ static bool resize_hashmap(mvn_hmap_t *hmap, size_t new_capacity)
 mvn_hmap_t *mvn_hmap_init(size_t item_size, size_t initial_capacity)
 {
     if (item_size == 0) {
-        mvn_log_error("Cannot create hashmap with item_size 0");
+        mvn_set_error("Cannot create hashmap with item_size 0");
         return NULL;
     }
 
@@ -174,21 +177,21 @@ mvn_hmap_t *mvn_hmap_init(size_t item_size, size_t initial_capacity)
 
     /* Check for potential integer overflow before allocating buckets */
     if (initial_capacity > SIZE_MAX / sizeof(mvn_hmap_entry_t *)) {
-        mvn_log_error("Integer overflow detected when calculating initial hashmap capacity");
+        mvn_set_error("Integer overflow detected when calculating initial hashmap capacity");
         return NULL;
     }
 
     /* Allocate hashmap structure */
     mvn_hmap_t *hmap = MVN_MALLOC(sizeof(mvn_hmap_t));
     if (!hmap) {
-        mvn_log_error("Failed to allocate memory for hashmap");
+        mvn_set_error("Failed to allocate memory for hashmap");
         return NULL;
     }
 
     /* Allocate buckets array (initialized to NULL) */
     hmap->buckets = (mvn_hmap_entry_t **)MVN_CALLOC(initial_capacity, sizeof(mvn_hmap_entry_t *));
     if (!hmap->buckets) {
-        mvn_log_error("Failed to allocate memory for hashmap buckets");
+        mvn_set_error("Failed to allocate memory for hashmap buckets");
         MVN_FREE(hmap);
         return NULL;
     }
@@ -251,17 +254,15 @@ size_t mvn_hmap_length(const mvn_hmap_t *hmap)
  */
 bool mvn_hmap_set(mvn_hmap_t *hmap, const char *key, const void *value)
 {
-    if (!hmap || !key || !value) {
-        mvn_log_error("Invalid parameters for hashmap set operation");
-        return false;
-    }
+    MVN_CHECK_NULL(hmap, "Cannot set value in NULL hashmap");
+    MVN_CHECK_NULL(key, "Cannot set value with NULL key");
+    MVN_CHECK_NULL(value, "Cannot set NULL value in hashmap");
 
     /* Check if we need to resize */
     if (hmap->length > (size_t)((double)hmap->bucket_count * MVN_HMAP_LOAD_FACTOR)) {
         size_t new_capacity = hmap->bucket_count * MVN_HMAP_GROWTH_FACTOR;
         if (!resize_hashmap(hmap, new_capacity)) {
-            mvn_log_error("Failed to resize hashmap during set operation");
-            return false;
+            return mvn_set_error("Failed to resize hashmap during set operation");
         }
     }
 
@@ -282,7 +283,7 @@ bool mvn_hmap_set(mvn_hmap_t *hmap, const char *key, const void *value)
     /* Create new entry */
     mvn_hmap_entry_t *new_entry = create_entry(key, value, hmap->item_size);
     if (!new_entry) {
-        return false;
+        return false; // Error already set by create_entry
     }
 
     /* Insert at the beginning of the linked list */
@@ -301,7 +302,13 @@ bool mvn_hmap_set(mvn_hmap_t *hmap, const char *key, const void *value)
  */
 void *mvn_hmap_get(const mvn_hmap_t *hmap, const char *key)
 {
-    if (!hmap || !key) {
+    if (!hmap) {
+        mvn_set_error("Cannot get value from NULL hashmap");
+        return NULL;
+    }
+
+    if (!key) {
+        mvn_set_error("Cannot get value with NULL key");
         return NULL;
     }
 
@@ -318,6 +325,7 @@ void *mvn_hmap_get(const mvn_hmap_t *hmap, const char *key)
     }
 
     /* Key not found */
+    mvn_set_error("Key '%s' not found in hashmap", key);
     return NULL;
 }
 
@@ -329,9 +337,8 @@ void *mvn_hmap_get(const mvn_hmap_t *hmap, const char *key)
  */
 bool mvn_hmap_delete(mvn_hmap_t *hmap, const char *key)
 {
-    if (!hmap || !key) {
-        return false;
-    }
+    MVN_CHECK_NULL(hmap, "Cannot delete from NULL hashmap");
+    MVN_CHECK_NULL(key, "Cannot delete NULL key from hashmap");
 
     /* Calculate bucket index */
     size_t index = hash_string(key) % hmap->bucket_count;
@@ -339,7 +346,7 @@ bool mvn_hmap_delete(mvn_hmap_t *hmap, const char *key)
     /* Handle first entry in bucket */
     mvn_hmap_entry_t *entry = hmap->buckets[index];
     if (!entry) {
-        return false; /* Bucket is empty */
+        return mvn_set_error("Key '%s' not found in hashmap", key); /* Bucket is empty */
     }
 
     if (SDL_strcmp(entry->key, key) == 0) {
@@ -366,7 +373,7 @@ bool mvn_hmap_delete(mvn_hmap_t *hmap, const char *key)
     }
 
     /* Key not found */
-    return false;
+    return mvn_set_error("Key '%s' not found in hashmap", key);
 }
 
 /**
@@ -376,14 +383,12 @@ bool mvn_hmap_delete(mvn_hmap_t *hmap, const char *key)
  */
 mvn_list_t *mvn_hmap_keys(const mvn_hmap_t *hmap)
 {
-    if (!hmap) {
-        return NULL;
-    }
+    MVN_CHECK_NULL(hmap, "Cannot get keys from NULL hashmap");
 
     /* Create a list to hold all keys */
     mvn_list_t *keys = mvn_list_init(sizeof(char *), hmap->length);
     if (!keys) {
-        mvn_log_error("Failed to create list for hashmap keys");
+        mvn_set_error("Failed to create list for hashmap keys");
         return NULL;
     }
 
@@ -394,7 +399,7 @@ mvn_list_t *mvn_hmap_keys(const mvn_hmap_t *hmap)
             /* Copy the key string */
             char *key_copy = SDL_strdup(entry->key);
             if (!key_copy) {
-                mvn_log_error("Failed to copy key for hashmap keys list");
+                mvn_set_error("Failed to copy key for hashmap keys list");
                 // Free previously added keys before freeing the list
                 for (size_t j = 0; j < mvn_list_length(keys); ++j) {
                     char **item = (char **)mvn_list_get(keys, j);
@@ -408,7 +413,7 @@ mvn_list_t *mvn_hmap_keys(const mvn_hmap_t *hmap)
 
             /* Add to list */
             if (!mvn_list_push(keys, (const void *)&key_copy)) {
-                mvn_log_error("Failed to add key to hashmap keys list");
+                mvn_set_error("Failed to add key to hashmap keys list");
                 MVN_FREE(key_copy); // Free the key that failed to be added
                 // Free previously added keys before freeing the list
                 for (size_t j = 0; j < mvn_list_length(keys); ++j) {
@@ -435,14 +440,12 @@ mvn_list_t *mvn_hmap_keys(const mvn_hmap_t *hmap)
  */
 mvn_list_t *mvn_hmap_values(const mvn_hmap_t *hmap)
 {
-    if (!hmap) {
-        return NULL;
-    }
+    MVN_CHECK_NULL(hmap, "Cannot get values from NULL hashmap");
 
     /* Create a list to hold all values */
     mvn_list_t *values = mvn_list_init(hmap->item_size, hmap->length);
     if (!values) {
-        mvn_log_error("Failed to create list for hashmap values");
+        mvn_set_error("Failed to create list for hashmap values");
         return NULL;
     }
 
@@ -452,7 +455,7 @@ mvn_list_t *mvn_hmap_values(const mvn_hmap_t *hmap)
         while (entry) {
             /* Add value to list */
             if (!mvn_list_push(values, entry->value)) {
-                mvn_log_error("Failed to add value to hashmap values list");
+                mvn_set_error("Failed to add value to hashmap values list");
                 mvn_list_free(values);
                 return NULL;
             }
