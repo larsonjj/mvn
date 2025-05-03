@@ -1,85 +1,123 @@
 name: Web Build
 
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+    push:
+        branches: [main]
+    workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+    contents: read
+    pages: write
+    id-token: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
 
-    steps:
-      - uses: actions/checkout@v4
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Setup Emscripten
-        uses: mymindstorm/setup-emsdk@v14
+            - name: Setup Emscripten
+              uses: mymindstorm/setup-emsdk@v14
 
-      - name: Configure CMake
-        run: |
-          emcmake cmake -B ${{github.workspace}}/build-web \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DMVN_BUILD_EXAMPLES=ON \
-            -DMVN_BUILD_TESTS=OFF \
-            -DMVN_CI=ON
+            - name: Configure CMake
+              run: |
+                  emcmake cmake -B ${{github.workspace}}/build-web \
+                    -DCMAKE_BUILD_TYPE=Release \
+                    -DMVN_BUILD_EXAMPLES=ON \
+                    -DMVN_BUILD_TESTS=OFF \
+                    -DMVN_CI=ON
 
-      - name: Build
-        run: |
-          cmake --build ${{github.workspace}}/build-web --config Release --target mvn_example_empty
+            - name: Build
+              run: |
+                  cmake --build ${{github.workspace}}/build-web --config Release
 
-      - name: Prepare Web Files
-        run: |
-          mkdir -p dist
-          # Copy all generated files (the HTML file already uses minshell.html template)
-          cp ${{github.workspace}}/build-web/examples/mvn_example_empty.* dist/
-          cp ${{github.workspace}}/build-web/examples/mvn_example_empty.wasm dist/ || echo "No .wasm file found"
-          cp ${{github.workspace}}/build-web/examples/mvn_example_empty.data dist/ || echo "No .data file found"
+            - name: Prepare Web Files
+              run: |
+                  mkdir -p dist
 
-          # If there are any additional assets not preloaded, copy them
-          if [ -d "${{github.workspace}}/assets" ]; then
-            mkdir -p dist/assets
-            cp -r ${{github.workspace}}/assets/* dist/assets/
-          fi
+                  # Find all example files and copy them to dist
+                  find ${{github.workspace}}/build-web/examples -type f -name "mvn_example_*.html" -o -name "mvn_example_*.js" -o -name "mvn_example_*.wasm" -o -name "mvn_example_*.data" | xargs -I{} cp {} dist/ || echo "Some files may not exist"
 
-          # Create an index.html that redirects to the actual example
-          cat > dist/index.html << EOL
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <meta http-equiv="refresh" content="0;url=mvn_example_empty.html">
-            <title>MVN Game Framework</title>
-          </head>
-          <body>
-            <p>Redirecting to <a href="mvn_example_empty.html">MVN Example</a>...</p>
-          </body>
-          </html>
-          EOL
+                  # If there are any additional assets not preloaded, copy them
+                  if [ -d "${{github.workspace}}/assets" ]; then
+                    mkdir -p dist/assets
+                    cp -r ${{github.workspace}}/assets/* dist/assets/
+                  fi
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+                  # Create an index.html that lists all examples
+                  cat > dist/index.html << EOL
+                  <!DOCTYPE html>
+                  <html>
+                  <head>
+                    <meta charset="utf-8">
+                    <title>MVN Game Framework - Examples</title>
+                    <style>
+                      body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+                      h1 { color: #333; }
+                      ul { list-style-type: none; padding: 0; }
+                      li { margin: 10px 0; }
+                      a { color: #0366d6; text-decoration: none; }
+                      a:hover { text-decoration: underline; }
+                    </style>
+                  </head>
+                  <body>
+                    <h1>MVN Game Framework Examples</h1>
+                    <ul id="examples-list">
+                    </ul>
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: "dist"
+                    <script>
+                      // Find all HTML files that match the pattern and create links
+                      const exampleFiles = [];
+                      const xhr = new XMLHttpRequest();
+                      xhr.open('GET', './', true);
+                      xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                          const parser = new DOMParser();
+                          const htmlDoc = parser.parseFromString(xhr.responseText, 'text/html');
+                          const links = htmlDoc.querySelectorAll('a');
+                          links.forEach(link => {
+                            const href = link.getAttribute('href');
+                            if (href && href.match(/mvn_example_.*\.html/)) {
+                              exampleFiles.push(href);
+                            }
+                          });
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+                          // Sort the files
+                          exampleFiles.sort();
 
-  build-for-web:
-    needs: build
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+                          // Create the list items
+                          const list = document.getElementById('examples-list');
+                          exampleFiles.forEach(file => {
+                            const name = file.replace('mvn_example_', '').replace('.html', '');
+                            const displayName = name.charAt(0).toUpperCase() + name.slice(1).replace(/_/g, ' ');
+
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = file;
+                            a.textContent = displayName;
+                            li.appendChild(a);
+                            list.appendChild(li);
+                          });
+                        }
+                      };
+                      xhr.send();
+                    </script>
+                  </body>
+                  </html>
+                  EOL
+
+            - name: Setup Pages
+              uses: actions/configure-pages@v5
+
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: "dist"
+
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
