@@ -147,7 +147,7 @@ static int test_get_file_mod_time(void)
         TEST_ASSERT_FMT(
             time1 >= 0, "mvn_get_file_mod_time returned negative for existing file: %ld", time1);
 
-        SDL_Delay(2000); // Wait 2 seconds to ensure timestamp changes
+        SDL_Delay(5000); // Wait 2 seconds to ensure timestamp changes
         SDL_IOStream *file_mod = SDL_IOFromFile(TEMP_FILE_PATH, "a");
         if (file_mod != NULL) {
             const char *mod_content = " modified";
@@ -161,7 +161,7 @@ static int test_get_file_mod_time(void)
             }
 
             // Add a delay to ensure the file system records the modification time
-            SDL_Delay(1000);
+            SDL_Delay(5000);
 
             long time2 = mvn_get_file_mod_time(TEMP_FILE_PATH);
             TEST_ASSERT_FMT(time2 >= time1,
