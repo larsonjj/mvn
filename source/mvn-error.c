@@ -18,6 +18,7 @@ bool mvn_set_error(const char *fmt, ...)
 {
     va_list ap;
     char   *error_copy;
+    void   *old_value;
 
     va_start(ap, fmt);
     SDL_vsnprintf(error_buffer, sizeof(error_buffer), fmt, ap);
@@ -29,10 +30,18 @@ bool mvn_set_error(const char *fmt, ...)
         return false;
     }
 
+    // Get the old value first to avoid potential race conditions
+    old_value = SDL_GetTLS(&error_tls_id);
+
     // SDL3 initializes the TLS ID automatically if needed
     if (!SDL_SetTLS(&error_tls_id, error_copy, SDL_free)) {
         SDL_free(error_copy);
         return false;
+    }
+
+    // Free old value if there was one
+    if (old_value != NULL) {
+        SDL_free(old_value);
     }
 
     // Also log the error at DEBUG level
@@ -49,5 +58,13 @@ const char *mvn_get_error(void)
 
 void mvn_clear_error(void)
 {
-    SDL_SetTLS(&error_tls_id, NULL, NULL);
+    void *old_value = SDL_GetTLS(&error_tls_id);
+
+    // Set TLS to NULL while keeping the destructor
+    SDL_SetTLS(&error_tls_id, NULL, SDL_free);
+
+    // Free old value manually since SDL won't call the destructor for NULL
+    if (old_value != NULL) {
+        SDL_free(old_value);
+    }
 }
