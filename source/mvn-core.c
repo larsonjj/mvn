@@ -33,7 +33,8 @@
 
 #include "mvn/mvn-core.h"
 
-#include "mvn/mvn-file.h" // IWYU pragma: keep
+#include "mvn/mvn-error.h" // Added error module
+#include "mvn/mvn-file.h"  // IWYU pragma: keep
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-string.h"
 #include "mvn/mvn-types.h"
@@ -80,8 +81,7 @@ bool mvn_init(int width, int height, const char *title, mvn_window_flags_t flags
 {
     // Initialize SDL first - needed for video and other features
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
-        mvn_log_error("SDL initialization failed: %s", SDL_GetError());
-        return false;
+        return mvn_set_error("SDL initialization failed: %s", SDL_GetError());
     }
 
     // Add default high DPI flag if no flags provided
@@ -95,40 +95,34 @@ bool mvn_init(int width, int height, const char *title, mvn_window_flags_t flags
     // Create the window with specified flags
     g_window = SDL_CreateWindow(title, width, height, flags);
     if (!g_window) {
-        mvn_log_error("Window creation failed: %s", SDL_GetError());
         SDL_Quit();
-        return false;
+        return mvn_set_error("Window creation failed: %s", SDL_GetError());
     }
 
     // Create renderer for window
     g_renderer = SDL_CreateRenderer(g_window, NULL);
     if (!g_renderer) {
-        mvn_log_error("Renderer creation failed: %s", SDL_GetError());
         SDL_DestroyWindow(g_window);
         SDL_Quit();
-        return false;
+        return mvn_set_error("Renderer creation failed: %s", SDL_GetError());
     }
 
     // Initialize SDL_ttf
     if (!TTF_WasInit() && !TTF_Init()) {
-        mvn_log_error("Failed to initialize SDL_ttf: %s", SDL_GetError());
-        // Clean up SDL resources before returning
         SDL_DestroyRenderer(g_renderer);
         SDL_DestroyWindow(g_window);
         SDL_Quit();
-        return false;
+        return mvn_set_error("Failed to initialize SDL_ttf: %s", SDL_GetError());
     }
 
     // Create the renderer text engine
     g_text_engine = TTF_CreateRendererTextEngine(mvn_get_renderer());
     if (!g_text_engine) {
-        mvn_log_error("Failed to create renderer text engine: %s", SDL_GetError());
-        // Clean up SDL resources before returning
         TTF_Quit();
         SDL_DestroyRenderer(g_renderer);
         SDL_DestroyWindow(g_window);
         SDL_Quit();
-        return false;
+        return mvn_set_error("Failed to create renderer text engine: %s", SDL_GetError());
     }
 
     // Initialize timing variables
@@ -232,10 +226,7 @@ bool mvn_window_should_close(void)
  */
 bool mvn_begin_drawing(void)
 {
-    if (g_renderer == NULL) {
-        mvn_log_error("Cannot begin drawing: g_renderer is NULL");
-        return false;
-    }
+    MVN_CHECK_NULL(g_renderer, "Cannot begin drawing: Renderer not initialized");
 
     // Calculate delta time from the previous frame
     uint64_t frame_start_time = SDL_GetPerformanceCounter();
@@ -253,21 +244,16 @@ bool mvn_begin_drawing(void)
  */
 bool mvn_clear_background(mvn_color_t color)
 {
-    if (g_renderer == NULL) {
-        mvn_log_error("Cannot clear background: g_renderer is NULL");
-        return false;
-    }
+    MVN_CHECK_NULL(g_renderer, "Cannot clear background: Renderer not initialized");
 
-    // Set the g_renderer draw color
+    // Set the renderer draw color
     if (!SDL_SetRenderDrawColor(g_renderer, color.r, color.g, color.b, color.a)) {
-        mvn_log_error("Failed to set render color: %s", SDL_GetError());
-        return false;
+        return mvn_set_error("Failed to set render color: %s", SDL_GetError());
     }
 
-    // Clear the entire g_renderer with the set color
+    // Clear the entire renderer with the set color
     if (!SDL_RenderClear(g_renderer)) {
-        mvn_log_error("Failed to clear g_renderer: %s", SDL_GetError());
-        return false;
+        return mvn_set_error("Failed to clear renderer: %s", SDL_GetError());
     }
 
     return true;
@@ -279,12 +265,9 @@ bool mvn_clear_background(mvn_color_t color)
  */
 bool mvn_end_drawing(void)
 {
-    if (g_renderer == NULL) {
-        mvn_log_error("Cannot end drawing: g_renderer is NULL");
-        return false;
-    }
+    MVN_CHECK_NULL(g_renderer, "Cannot end drawing: Renderer not initialized");
 
-    // Present the g_renderer contents to the screen
+    // Present the renderer contents to the screen
     SDL_RenderPresent(g_renderer);
 
     // --- Accurate Frame Limiting ---
@@ -340,18 +323,14 @@ bool mvn_end_drawing(void)
 bool mvn_toggle_fullscreen(void)
 {
     mvn_window_t *window = mvn_get_window();
-    if (window == NULL) {
-        mvn_log_error("Cannot toggle fullscreen: No window available");
-        return false;
-    }
+    MVN_CHECK_NULL(window, "Cannot toggle fullscreen: No window available");
 
     // Check current fullscreen state
     bool is_fullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN;
 
     // Toggle fullscreen state
     if (SDL_SetWindowFullscreen(window, !is_fullscreen)) {
-        mvn_log_error("Failed to toggle fullscreen mode: %s", SDL_GetError());
-        return false;
+        return mvn_set_error("Failed to toggle fullscreen mode: %s", SDL_GetError());
     }
 
     return true;
@@ -365,10 +344,7 @@ bool mvn_toggle_fullscreen(void)
 bool mvn_toggle_borderless_windowed(void)
 {
     mvn_window_t *window = mvn_get_window();
-    if (window == NULL) {
-        mvn_log_error("Cannot toggle borderless windowed mode: No window available");
-        return false;
-    }
+    MVN_CHECK_NULL(window, "Cannot toggle borderless windowed mode: No window available");
 
     SDL_WindowFlags flags         = SDL_GetWindowFlags(window);
     bool            is_borderless = flags & SDL_WINDOW_BORDERLESS;
@@ -377,15 +353,13 @@ bool mvn_toggle_borderless_windowed(void)
     // If in fullscreen, exit fullscreen first
     if (is_fullscreen) {
         if (SDL_SetWindowFullscreen(window, false)) {
-            mvn_log_error("Failed to exit fullscreen mode: %s", SDL_GetError());
-            return false;
+            return mvn_set_error("Failed to exit fullscreen mode: %s", SDL_GetError());
         }
     }
 
     // Toggle borderless state
     if (SDL_SetWindowBordered(window, is_borderless)) {
-        mvn_log_error("Failed to toggle window border: %s", SDL_GetError());
-        return false;
+        return mvn_set_error("Failed to toggle window border: %s", SDL_GetError());
     }
 
     // If switching to borderless, resize to match monitor
@@ -409,20 +383,15 @@ bool mvn_toggle_borderless_windowed(void)
 bool mvn_maximize_window(void)
 {
     mvn_window_t *window = mvn_get_window();
-    if (window == NULL) {
-        mvn_log_error("Cannot maximize window: No window available");
-        return false;
-    }
+    MVN_CHECK_NULL(window, "Cannot maximize window: No window available");
 
     // Check if window is resizable
     if (!(SDL_GetWindowFlags(window) & SDL_WINDOW_RESIZABLE)) {
-        mvn_log_error("Cannot maximize window: Window is not resizable");
-        return false;
+        return mvn_set_error("Cannot maximize window: Window is not resizable");
     }
 
     if (SDL_MaximizeWindow(window)) {
-        mvn_log_error("Failed to maximize window: %s", SDL_GetError());
-        return false;
+        return mvn_set_error("Failed to maximize window: %s", SDL_GetError());
     }
 
     return true;
@@ -435,14 +404,10 @@ bool mvn_maximize_window(void)
 bool mvn_minimize_window(void)
 {
     mvn_window_t *window = mvn_get_window();
-    if (window == NULL) {
-        mvn_log_error("Cannot minimize window: No window available");
-        return false;
-    }
+    MVN_CHECK_NULL(window, "Cannot minimize window: No window available");
 
     if (SDL_MinimizeWindow(window)) {
-        mvn_log_error("Failed to minimize window: %s", SDL_GetError());
-        return false;
+        return mvn_set_error("Failed to minimize window: %s", SDL_GetError());
     }
 
     return true;
@@ -455,14 +420,10 @@ bool mvn_minimize_window(void)
 bool mvn_restore_window(void)
 {
     mvn_window_t *window = mvn_get_window();
-    if (window == NULL) {
-        mvn_log_error("Cannot restore window: No window available");
-        return false;
-    }
+    MVN_CHECK_NULL(window, "Cannot restore window: No window available");
 
     if (SDL_RestoreWindow(window)) {
-        mvn_log_error("Failed to restore window: %s", SDL_GetError());
-        return false;
+        return mvn_set_error("Failed to restore window: %s", SDL_GetError());
     }
 
     return true;
@@ -476,7 +437,7 @@ mvn_display_id_t mvn_get_current_monitor(void)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot get current monitor: No window available");
+        mvn_set_error("Cannot get current monitor: No window available");
         return 0;
     }
 
@@ -494,13 +455,13 @@ mvn_fpoint_t mvn_get_monitor_position(mvn_display_id_t monitor)
     mvn_fpoint_t position = {0, 0};
 
     if (monitor <= 0) {
-        mvn_log_error("Invalid monitor ID: %d", monitor);
+        mvn_set_error("Invalid monitor ID: %d", monitor);
         return position;
     }
 
     SDL_Rect bounds;
     if (SDL_GetDisplayBounds((SDL_DisplayID)monitor, &bounds) != 0) {
-        mvn_log_error("Failed to get monitor position: %s", SDL_GetError());
+        mvn_set_error("Failed to get monitor position: %s", SDL_GetError());
         return position;
     }
 
@@ -518,13 +479,13 @@ mvn_fpoint_t mvn_get_monitor_position(mvn_display_id_t monitor)
 int32_t mvn_get_monitor_width(mvn_display_id_t monitor)
 {
     if (monitor <= 0) {
-        mvn_log_error("Invalid monitor ID: %d", monitor);
+        mvn_set_error("Invalid monitor ID: %d", monitor);
         return 0;
     }
 
     SDL_Rect bounds;
     if (SDL_GetDisplayBounds((SDL_DisplayID)monitor, &bounds) != 0) {
-        mvn_log_error("Failed to get monitor width: %s", SDL_GetError());
+        mvn_set_error("Failed to get monitor width: %s", SDL_GetError());
         return 0;
     }
 
@@ -539,13 +500,13 @@ int32_t mvn_get_monitor_width(mvn_display_id_t monitor)
 int32_t mvn_get_monitor_height(mvn_display_id_t monitor)
 {
     if (monitor <= 0) {
-        mvn_log_error("Invalid monitor ID: %d", monitor);
+        mvn_set_error("Invalid monitor ID: %d", monitor);
         return 0;
     }
 
     SDL_Rect bounds;
     if (SDL_GetDisplayBounds((SDL_DisplayID)monitor, &bounds) != 0) {
-        mvn_log_error("Failed to get monitor height: %s", SDL_GetError());
+        mvn_set_error("Failed to get monitor height: %s", SDL_GetError());
         return 0;
     }
 
@@ -560,12 +521,12 @@ void mvn_set_window_icon(mvn_image_t *image)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot set window icon: No window available");
+        mvn_set_error("Cannot set window icon: No window available");
         return;
     }
 
     if (image == NULL) {
-        mvn_log_error("Cannot set window icon: Invalid image");
+        mvn_set_error("Cannot set window icon: Invalid image");
         return;
     }
 
@@ -580,12 +541,12 @@ void mvn_set_window_title(const char *title)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot set window title: No window available");
+        mvn_set_error("Cannot set window title: No window available");
         return;
     }
 
     if (title == NULL) {
-        mvn_log_error("Cannot set window title: Invalid title");
+        mvn_set_error("Cannot set window title: Invalid title");
         return;
     }
 
@@ -601,14 +562,14 @@ void mvn_set_window_position(int32_t x, int32_t y)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot set window position: No window available");
+        mvn_set_error("Cannot set window position: No window available");
         return;
     }
 
     // In SDL3, SDL_SetWindowPosition is asynchronous and may not take effect immediately
     // The actual positioning depends on the window manager and may be constrained
     if (SDL_SetWindowPosition(window, x, y) != 0) {
-        mvn_log_error("Failed to set window position: %s", SDL_GetError());
+        mvn_set_error("Failed to set window position: %s", SDL_GetError());
     }
 }
 
@@ -620,19 +581,19 @@ void mvn_set_window_monitor(mvn_display_id_t monitor)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot set window monitor: No window available");
+        mvn_set_error("Cannot set window monitor: No window available");
         return;
     }
 
     if (monitor == 0) {
-        mvn_log_error("Cannot set window monitor: Invalid monitor ID");
+        mvn_set_error("Cannot set window monitor: Invalid monitor ID");
         return;
     }
 
     // Get the monitor's bounds to position the window on it
     SDL_Rect bounds;
     if (SDL_GetDisplayBounds(monitor, &bounds) != 0) {
-        mvn_log_error("Failed to get monitor bounds: %s", SDL_GetError());
+        mvn_set_error("Failed to get monitor bounds: %s", SDL_GetError());
         return;
     }
 
@@ -647,7 +608,7 @@ void mvn_set_window_monitor(mvn_display_id_t monitor)
 
     // Position the window on the monitor
     if (SDL_SetWindowPosition(window, x, y) != 0) {
-        mvn_log_error("Failed to set window position: %s", SDL_GetError());
+        mvn_set_error("Failed to set window position: %s", SDL_GetError());
     }
 }
 
@@ -661,7 +622,7 @@ void mvn_set_window_min_size(int32_t width, int32_t height)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot set window minimum size: No window available");
+        mvn_set_error("Cannot set window minimum size: No window available");
         return;
     }
 
@@ -683,7 +644,7 @@ void mvn_set_window_max_size(int32_t width, int32_t height)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot set window maximum size: No window available");
+        mvn_set_error("Cannot set window maximum size: No window available");
         return;
     }
 
@@ -705,13 +666,13 @@ void mvn_set_window_size(int32_t width, int32_t height)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot set window size: No window available");
+        mvn_set_error("Cannot set window size: No window available");
         return;
     }
 
     // In SDL3, window size changes are asynchronous
     if (SDL_SetWindowSize(window, width, height) != 0) {
-        mvn_log_error("Failed to set window size: %s", SDL_GetError());
+        mvn_set_error("Failed to set window size: %s", SDL_GetError());
     }
 }
 
@@ -724,10 +685,7 @@ void mvn_set_window_size(int32_t width, int32_t height)
 bool mvn_set_window_opacity(float opacity)
 {
     mvn_window_t *window = mvn_get_window();
-    if (window == NULL) {
-        mvn_log_error("Cannot set window opacity: No window available");
-        return false;
-    }
+    MVN_CHECK_NULL(window, "Cannot set window opacity: No window available");
 
     // Clamp opacity value between 0.0 and 1.0
     if (opacity < 0.0f) {
@@ -742,8 +700,7 @@ bool mvn_set_window_opacity(float opacity)
     }
 
     if (!SDL_SetWindowOpacity(window, opacity)) {
-        mvn_log_error("Failed to set window opacity: %s", SDL_GetError());
-        return false;
+        return mvn_set_error("Failed to set window opacity: %s", SDL_GetError());
     }
 
     return true;
@@ -756,7 +713,7 @@ void mvn_set_window_focused(void)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot set window focus: No window available");
+        mvn_set_error("Cannot set window focus: No window available");
         return;
     }
 
@@ -771,13 +728,13 @@ int32_t mvn_get_screen_width(void)
 {
     mvn_display_id_t display = SDL_GetPrimaryDisplay();
     if (display == 0) {
-        mvn_log_error("Failed to get primary display: %s", SDL_GetError());
+        mvn_set_error("Failed to get primary display: %s", SDL_GetError());
         return 0;
     }
 
     SDL_Rect bounds;
     if (SDL_GetDisplayBounds(display, &bounds) != 0) {
-        mvn_log_error("Failed to get display bounds: %s", SDL_GetError());
+        mvn_set_error("Failed to get display bounds: %s", SDL_GetError());
         return 0;
     }
 
@@ -792,13 +749,13 @@ int32_t mvn_get_screen_height(void)
 {
     mvn_display_id_t display = SDL_GetPrimaryDisplay();
     if (display == 0) {
-        mvn_log_error("Failed to get primary display: %s", SDL_GetError());
+        mvn_set_error("Failed to get primary display: %s", SDL_GetError());
         return 0;
     }
 
     SDL_Rect bounds;
     if (SDL_GetDisplayBounds(display, &bounds) != 0) {
-        mvn_log_error("Failed to get display bounds: %s", SDL_GetError());
+        mvn_set_error("Failed to get display bounds: %s", SDL_GetError());
         return 0;
     }
 
@@ -813,14 +770,14 @@ int32_t mvn_get_render_width(void)
 {
     mvn_renderer_t *renderer = mvn_get_renderer();
     if (renderer == NULL) {
-        mvn_log_error("Cannot get render width: No renderer available");
+        mvn_set_error("Cannot get render width: No renderer available");
         return 0;
     }
 
     int width;
     int height;
     if (!SDL_GetCurrentRenderOutputSize(renderer, &width, &height)) {
-        mvn_log_error("Failed to get render output size: %s", SDL_GetError());
+        mvn_set_error("Failed to get render output size: %s", SDL_GetError());
         return 0;
     }
 
@@ -835,14 +792,14 @@ int32_t mvn_get_render_height(void)
 {
     mvn_renderer_t *renderer = mvn_get_renderer();
     if (renderer == NULL) {
-        mvn_log_error("Cannot get render height: No renderer available");
+        mvn_set_error("Cannot get render height: No renderer available");
         return 0;
     }
 
     int width;
     int height;
     if (!SDL_GetCurrentRenderOutputSize(renderer, &width, &height)) {
-        mvn_log_error("Failed to get render output size: %s", SDL_GetError());
+        mvn_set_error("Failed to get render output size: %s", SDL_GetError());
         return 0;
     }
 
@@ -859,7 +816,7 @@ int32_t mvn_get_monitor_count(void)
     SDL_DisplayID *displays = SDL_GetDisplays(&count);
 
     if (displays == NULL) {
-        mvn_log_error("Failed to get displays: %s", SDL_GetError());
+        mvn_set_error("Failed to get displays: %s", SDL_GetError());
         return 0;
     }
 
@@ -875,14 +832,14 @@ int32_t mvn_get_monitor_count(void)
 int32_t mvn_get_monitor_refresh_rate(mvn_display_id_t monitor)
 {
     if (monitor == 0) {
-        mvn_log_error("Cannot get monitor refresh rate: Invalid monitor ID");
+        mvn_set_error("Cannot get monitor refresh rate: Invalid monitor ID");
         return 0;
     }
 
     // Get the current display mode
     const SDL_DisplayMode *mode = SDL_GetCurrentDisplayMode(monitor);
     if (mode == NULL) {
-        mvn_log_error("Failed to get current display mode: %s", SDL_GetError());
+        mvn_set_error("Failed to get current display mode: %s", SDL_GetError());
         return 0;
     }
 
@@ -900,7 +857,7 @@ mvn_fpoint_t mvn_get_window_position(void)
     mvn_window_t *window   = mvn_get_window();
 
     if (window == NULL) {
-        mvn_log_error("Cannot get window position: No window available");
+        mvn_set_error("Cannot get window position: No window available");
         return position;
     }
 
@@ -923,7 +880,7 @@ mvn_fpoint_t mvn_get_window_scale_dpi(void)
     mvn_window_t *window = mvn_get_window();
 
     if (window == NULL) {
-        mvn_log_error("Cannot get window scale DPI: No window available");
+        mvn_set_error("Cannot get window scale DPI: No window available");
         return scale;
     }
 
@@ -943,13 +900,13 @@ mvn_fpoint_t mvn_get_window_scale_dpi(void)
 mvn_string_t *mvn_get_monitor_name(mvn_display_id_t monitor)
 {
     if (monitor == 0) {
-        mvn_log_error("Cannot get monitor name: Invalid monitor ID");
+        mvn_set_error("Cannot get monitor name: Invalid monitor ID");
         return NULL;
     }
 
     const char *name = SDL_GetDisplayName(monitor);
     if (name == NULL) {
-        mvn_log_error("Failed to get monitor name: %s", SDL_GetError());
+        mvn_set_error("Failed to get monitor name: %s", SDL_GetError());
         return NULL;
     }
 
@@ -988,12 +945,12 @@ void mvn_enable_cursor(void)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot enable cursor: No window available");
+        mvn_set_error("Cannot enable cursor: No window available");
         return;
     }
 
     if (SDL_SetWindowRelativeMouseMode(window, false)) {
-        mvn_log_error("Failed to enable cursor: %s", SDL_GetError());
+        mvn_set_error("Failed to enable cursor: %s", SDL_GetError());
     }
 }
 
@@ -1004,12 +961,12 @@ void mvn_disable_cursor(void)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot disable cursor: No window available");
+        mvn_set_error("Cannot disable cursor: No window available");
         return;
     }
 
     if (SDL_SetWindowRelativeMouseMode(window, true)) {
-        mvn_log_error("Failed to disable cursor: %s", SDL_GetError());
+        mvn_set_error("Failed to disable cursor: %s", SDL_GetError());
     }
 }
 
@@ -1021,7 +978,7 @@ bool mvn_is_cursor_on_screen(void)
 {
     mvn_window_t *window = mvn_get_window();
     if (window == NULL) {
-        mvn_log_error("Cannot check if cursor is on screen: No window available");
+        mvn_set_error("Cannot check if cursor is on screen: No window available");
         return false;
     }
 
@@ -1032,7 +989,7 @@ bool mvn_is_cursor_on_screen(void)
 
     // Get window size in pixels
     if (SDL_GetWindowSizeInPixels(window, &window_w, &window_h)) {
-        mvn_log_error("Failed to get window size: %s", SDL_GetError());
+        mvn_set_error("Failed to get window size: %s", SDL_GetError());
         return false;
     }
 
