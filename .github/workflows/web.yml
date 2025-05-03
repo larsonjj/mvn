@@ -25,7 +25,7 @@ jobs:
 
             - name: Configure CMake
               run: |
-                  emcmake cmake -B ${{github.workspace}}/build-web \
+                  emcmake cmake -B ${{github.workspace}}/build/web \
                     -DCMAKE_BUILD_TYPE=Release \
                     -DMVN_BUILD_EXAMPLES=ON \
                     -DMVN_BUILD_TESTS=OFF \
@@ -33,23 +33,23 @@ jobs:
 
             - name: Build
               run: |
-                  cmake --build ${{github.workspace}}/build-web --config Release
+                  cmake --build ${{github.workspace}}/build/web --config Release
 
             - name: Prepare Web Files
               run: |
                   mkdir -p dist
 
                   # Find all example files and copy them to dist
-                  find ${{github.workspace}}/build-web/examples -type f -name "mvn_example_*.html" -o -name "mvn_example_*.js" -o -name "mvn_example_*.wasm" -o -name "mvn_example_*.data" | xargs -I{} cp {} dist/ || echo "Some files may not exist"
+                  find ${{github.workspace}}/build/web/examples -type f -name "mvn_example_*.html" -o -name "mvn_example_*.js" -o -name "mvn_example_*.wasm" -o -name "mvn_example_*.data" | xargs -I{} cp {} build/web/dist/ || echo "Some files may not exist"
 
                   # If there are any additional assets not preloaded, copy them
                   if [ -d "${{github.workspace}}/assets" ]; then
-                    mkdir -p dist/assets
-                    cp -r ${{github.workspace}}/assets/* dist/assets/
+                    mkdir -p build/web/dist/assets
+                    cp -r ${{github.workspace}}/assets/* build/web/dist/assets/
                   fi
 
                   # Create an index.html that lists all examples
-                  cat > dist/index.html << EOL
+                  cat > build/web/dist/index.html << EOL
                   <!DOCTYPE html>
                   <html>
                   <head>
