@@ -724,7 +724,6 @@ int run_string_tests(int *passed_tests, int *failed_tests, int *total_tests)
     return *passed_tests - passed_before;
 }
 
-#if defined(MVN_STRING_TEST_MAIN)
 int main(void)
 {
     int passed = 0;
@@ -738,4 +737,3 @@ int main(void)
 
     return (failed > 0) ? 1 : 0;
 }
-#endif

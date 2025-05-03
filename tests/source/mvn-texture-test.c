@@ -27,7 +27,7 @@
 static int test_image_load(void)
 {
     mvn_image_t *surface         = NULL;
-    const char  *test_image_name = "char-1.png";
+    const char * test_image_name = "char-1.png";
     char         test_image_path[256];
     int          result = 1; // Default to success
 
@@ -80,7 +80,6 @@ int run_texture_tests(int *passed_tests, int *failed_tests, int *total_tests)
     return *passed_tests - passed_before;
 }
 
-#if defined(MVN_TEXTURES_TEST_MAIN)
 int main(void)
 {
     int passed = 0;
@@ -94,4 +93,3 @@ int main(void)
 
     return (failed > 0) ? 1 : 0;
 }
-#endif

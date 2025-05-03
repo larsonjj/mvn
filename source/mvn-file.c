@@ -381,7 +381,7 @@ bool mvn_is_path_directory(const char *path)
  * \param[in]       fileName: Path to the file
  * \return          Modification time as a Unix timestamp, -1 on failure
  */
-long mvn_get_file_mod_time(const char *fileName)
+int64_t mvn_get_file_mod_time(const char *fileName)
 {
     if (fileName == NULL || fileName[0] == '\0') {
         return -1;
@@ -390,7 +390,7 @@ long mvn_get_file_mod_time(const char *fileName)
     SDL_PathInfo info;
     if (SDL_GetPathInfo(fileName, &info)) {
         if (info.type == SDL_PATHTYPE_FILE) {
-            return (long)info.modify_time;
+            return info.modify_time;
         }
     }
 

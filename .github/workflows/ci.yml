@@ -34,7 +34,7 @@ jobs:
 
             - name: Test
               working-directory: ${{github.workspace}}/build/linux
-              run: ctest -C ${{matrix.build_type}} --output-on-failure -R mvn_test_all
+              run: ctest -C ${{matrix.build_type}} --output-on-failure
 
     build-macos:
         runs-on: macos-latest

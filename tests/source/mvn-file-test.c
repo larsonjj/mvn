@@ -16,6 +16,7 @@
 #include "mvn/mvn-string.h"
 
 #include <SDL3/SDL.h>
+#include <inttypes.h> // For PRId64 macro
 
 #define TEMP_DIR_NAME  "mvn_test_temp_dir"
 #define TEMP_FILE_NAME "mvn_test_temp_file.txt"
@@ -143,9 +144,11 @@ static int test_get_file_mod_time(void)
     bool dir_exists  = mvn_is_path_directory(TEMP_DIR_NAME);
 
     if (file_exists) {
-        long time1 = mvn_get_file_mod_time(TEMP_FILE_PATH);
-        TEST_ASSERT_FMT(
-            time1 >= 0, "mvn_get_file_mod_time returned negative for existing file: %ld", time1);
+        // Change uint64_t to int64_t and update format specifier
+        int64_t time1 = mvn_get_file_mod_time(TEMP_FILE_PATH);
+        TEST_ASSERT_FMT(time1 >= 0,
+                        "mvn_get_file_mod_time returned negative for existing file: %" PRId64,
+                        time1);
 
         SDL_Delay(1000); // Delay to ensure timestamp changes
         SDL_IOStream *file_mod = SDL_IOFromFile(TEMP_FILE_PATH, "a");
@@ -163,9 +166,10 @@ static int test_get_file_mod_time(void)
             // Add a delay to ensure the file system records the modification time
             SDL_Delay(1000);
 
-            long time2 = mvn_get_file_mod_time(TEMP_FILE_PATH);
+            // Change long to int64_t and update format specifier
+            int64_t time2 = mvn_get_file_mod_time(TEMP_FILE_PATH);
             TEST_ASSERT_FMT(time2 >= time1,
-                            "Modification time did not increase after modification: %ld",
+                            "Modification time did not increase after modification: %" PRId64,
                             time2);
         } else {
             TEST_ASSERT(false, "Failed to reopen temp file for modification");
@@ -174,7 +178,8 @@ static int test_get_file_mod_time(void)
         TEST_ASSERT(false, "Could not create temp file, skipping mod time tests");
     }
 
-    long non_existent_time = mvn_get_file_mod_time("non_existent_file_for_time_test");
+    // Change long to int64_t
+    int64_t non_existent_time = mvn_get_file_mod_time("non_existent_file_for_time_test");
     TEST_ASSERT(non_existent_time == -1,
                 "mvn_get_file_mod_time did not return -1 for non-existent file");
 
@@ -221,7 +226,6 @@ int run_file_tests(int *passed_tests, int *failed_tests, int *total_tests)
     return *passed_tests - passed_before;
 }
 
-#if defined(MVN_FILE_TEST_MAIN)
 int main(void)
 {
     int passed = 0;
@@ -235,4 +239,3 @@ int main(void)
 
     return (failed > 0) ? 1 : 0;
 }
-#endif

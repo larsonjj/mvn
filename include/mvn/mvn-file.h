@@ -54,7 +54,7 @@ mvn_string_t *mvn_get_parent_directory_path(const char *dirPath);
 mvn_string_t *mvn_get_application_directory(void);
 bool          mvn_is_path_file(const char *path);
 bool          mvn_is_path_directory(const char *path);
-long          mvn_get_file_mod_time(const char *fileName);
+int64_t       mvn_get_file_mod_time(const char *fileName);
 
 #ifdef __cplusplus
 }
