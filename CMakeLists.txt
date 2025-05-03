@@ -79,6 +79,10 @@ if(MSVC)
         /W4
         /wd4312  # Disable warning C4312 (conversion to larger size)
         $<$<BOOL:${MVN_WARNINGS_AS_ERRORS}>:/WX>)
+
+    if(NOT CMAKE_GENERATOR STREQUAL "Ninja")
+        target_compile_options(mvn PRIVATE /MP)
+    endif()
 else()
     target_compile_options(mvn PRIVATE
         -Wall -Wextra -Wpedantic

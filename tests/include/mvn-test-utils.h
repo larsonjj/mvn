@@ -21,6 +21,17 @@ extern "C" {
         }                                                                                          \
     } while (0)
 
+// Assertion macro with formatted message
+#define TEST_ASSERT_FMT(condition, format, ...)                                                    \
+    do {                                                                                           \
+        if (!(condition)) {                                                                        \
+            printf("FAILED: ");                                                                    \
+            printf(format, ##__VA_ARGS__);                                                         \
+            printf("\nLine: %d\n", __LINE__);                                                      \
+            return 0;                                                                              \
+        }                                                                                          \
+    } while (0)
+
 // Floating point comparison macros
 #define TEST_ASSERT_FLOAT_EQ(actual, expected, message)                                            \
     do {                                                                                           \
