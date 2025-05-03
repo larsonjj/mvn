@@ -37,9 +37,9 @@ jobs:
 
             - name: Prepare Web Files
               run: |
-                  mkdir -p dist
+                  mkdir -p build/web/dist
 
-                  # Find all example files and copy them to dist
+                  # Find all example files and copy them to build/web/dist
                   find ${{github.workspace}}/build/web/examples -type f -name "mvn_example_*.html" -o -name "mvn_example_*.js" -o -name "mvn_example_*.wasm" -o -name "mvn_example_*.data" | xargs -I{} cp {} build/web/dist/ || echo "Some files may not exist"
 
                   # If there are any additional assets not preloaded, copy them
