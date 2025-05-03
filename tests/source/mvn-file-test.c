@@ -161,10 +161,12 @@ static int test_get_file_mod_time(void)
             }
 
             // Add a delay to ensure the file system records the modification time
-            SDL_Delay(100);
+            SDL_Delay(1000);
 
             long time2 = mvn_get_file_mod_time(TEMP_FILE_PATH);
-            TEST_ASSERT(time2 >= time1, "Modification time did not increase after modification");
+            TEST_ASSERT_FMT(time2 >= time1,
+                            "Modification time did not increase after modification: %ld",
+                            time2);
         } else {
             TEST_ASSERT(false, "Failed to reopen temp file for modification");
         }
