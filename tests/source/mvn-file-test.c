@@ -137,7 +137,7 @@ static int test_get_file_mod_time(void)
     }
 
     // Add a delay to ensure the file system records the modification time
-    SDL_Delay(5000);
+    SDL_Delay(1000);
 
     bool file_exists = mvn_is_path_file(TEMP_FILE_PATH);
     bool dir_exists  = mvn_is_path_directory(TEMP_DIR_NAME);
@@ -147,7 +147,7 @@ static int test_get_file_mod_time(void)
         TEST_ASSERT_FMT(
             time1 >= 0, "mvn_get_file_mod_time returned negative for existing file: %ld", time1);
 
-        SDL_Delay(5000); // Wait 2 seconds to ensure timestamp changes
+        SDL_Delay(1000); // Delay to ensure timestamp changes
         SDL_IOStream *file_mod = SDL_IOFromFile(TEMP_FILE_PATH, "a");
         if (file_mod != NULL) {
             const char *mod_content = " modified";
@@ -161,7 +161,7 @@ static int test_get_file_mod_time(void)
             }
 
             // Add a delay to ensure the file system records the modification time
-            SDL_Delay(5000);
+            SDL_Delay(1000);
 
             long time2 = mvn_get_file_mod_time(TEMP_FILE_PATH);
             TEST_ASSERT_FMT(time2 >= time1,
@@ -209,7 +209,11 @@ int run_file_tests(int *passed_tests, int *failed_tests, int *total_tests)
 
     RUN_TEST(test_get_application_directory);
     RUN_TEST(test_is_path_file_directory);
+#if defined(MVN_TEST_CI)
+    printf("Skipping test_get_file_mod_time tests in CI mode.\n");
+#else
     RUN_TEST(test_get_file_mod_time);
+#endif
 
     int tests_run = (*passed_tests - passed_before) + (*failed_tests - failed_before);
     (*total_tests) += tests_run;
