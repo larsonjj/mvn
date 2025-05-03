@@ -41,6 +41,7 @@ set(MVN_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/source/mvn-list.c
     ${CMAKE_CURRENT_SOURCE_DIR}/source/mvn-string.c
     ${CMAKE_CURRENT_SOURCE_DIR}/source/mvn-hashmap.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/source/mvn-error.c
     # Add other source files here as they are created
 )
 
@@ -56,6 +57,7 @@ set(MVN_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/mvn/mvn-list.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/mvn/mvn-string.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/mvn/mvn-hashmap.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/mvn/mvn-error.h
     # Add other header files here as they are created
 )
 

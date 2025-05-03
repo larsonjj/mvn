@@ -41,6 +41,7 @@ set(MVN_TEST_MODULES
     hashmap
     texture
     text
+    error
 )
 
 # Build all test executables

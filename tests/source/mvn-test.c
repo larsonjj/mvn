@@ -12,6 +12,7 @@
  */
 
 #include "mvn-core-test.h"
+#include "mvn-error-test.h"
 #include "mvn-file-test.h"
 #include "mvn-hashmap-test.h"
 #include "mvn-list-test.h"
@@ -44,6 +45,7 @@ int main(void)
     run_string_tests(&passed, &failed, &total);
     run_logger_tests(&passed, &failed, &total);
     run_text_tests(&passed, &failed, &total);
+    run_error_tests(&passed, &failed, &total);
 
     // Ensure running file operations last as they can interfere with other tests
     run_file_tests(&passed, &failed, &total);
