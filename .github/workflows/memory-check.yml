@@ -1,29 +1,51 @@
 name: Memory Check
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
 jobs:
-  valgrind:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    valgrind:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y valgrind libgl1-mesa-dev xorg-dev
+            - name: Install dependencies
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y valgrind libgl1-mesa-dev xorg-dev
 
-      - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Debug -DMVN_BUILD_TESTS=ON -DMVN_CI=ON
+            - name: Configure CMake
+              run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Debug -DMVN_BUILD_TESTS=ON -DMVN_BUILD_EXAMPLES=ON -DMVN_CI=ON
 
-      - name: Build
-        run: cmake --build ${{github.workspace}}/build --config Debug
+            - name: Build
+              run: cmake --build ${{github.workspace}}/build --config Debug
 
-      - name: Run tests with Valgrind
-        working-directory: ${{github.workspace}}/build/tests
-        run: |
-          valgrind --leak-check=full --error-exitcode=1 ./mvn_test_all
+            - name: Run tests with Valgrind
+              working-directory: ${{github.workspace}}/build/tests
+              run: |
+                  valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./mvn_test_all
+
+            - name: Run examples with Valgrind (if applicable)
+              working-directory: ${{github.workspace}}/build/examples
+              run: |
+                  for example in mvn_example_*; do
+                    if [ -x "$example" ]; then
+                      echo "Running Valgrind on $example"
+                      # Run for a short time since examples might be interactive
+                      timeout 5 valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./$example || echo "Example timed out, which is expected for interactive programs"
+                    fi
+                  done
+
+            - name: Generate XML report
+              working-directory: ${{github.workspace}}/build/tests
+              run: |
+                  valgrind --leak-check=full --show-leak-kinds=all --xml=yes --xml-file=valgrind-results.xml ./mvn_test_all || true
+
+            - name: Upload Valgrind results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: valgrind-results
+                  path: ${{github.workspace}}/build/tests/valgrind-results.xml

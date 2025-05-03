@@ -52,7 +52,7 @@ jobs:
 
             - name: Test
               working-directory: ${{github.workspace}}/build/macos
-              run: ctest -C ${{matrix.build_type}} --output-on-failure -R mvn_test_all
+              run: ctest -C ${{matrix.build_type}} --output-on-failure
 
     build-windows:
         runs-on: windows-latest
@@ -71,4 +71,4 @@ jobs:
 
             - name: Test
               working-directory: ${{github.workspace}}/build/windows
-              run: ctest -C ${{matrix.build_type}} --output-on-failure -R mvn_test_all
+              run: ctest -C ${{matrix.build_type}} --output-on-failure

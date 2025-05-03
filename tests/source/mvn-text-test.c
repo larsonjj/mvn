@@ -35,7 +35,7 @@ static int test_draw_text_pro(void);
  */
 static int test_unload_font(void)
 {
-    TTF_Font *  font = NULL;
+    TTF_Font   *font = NULL;
     char        msg[512];
     const char *test_font_name = "test-font.ttf";
     char        test_font_path[512];
@@ -174,7 +174,7 @@ static int test_measure_text(void)
  */
 static int test_draw_text(void)
 {
-    TTF_Font *   font  = NULL;
+    TTF_Font    *font  = NULL;
     mvn_fpoint_t pos   = {10.0f, 10.0f};
     mvn_color_t  color = MVN_WHITE;
     char         msg[128];
@@ -209,7 +209,7 @@ static int test_draw_text(void)
  */
 static int test_draw_text_pro(void)
 {
-    TTF_Font *   font     = NULL;
+    TTF_Font    *font     = NULL;
     mvn_fpoint_t pos      = {50.0f, 50.0f};
     mvn_fpoint_t origin   = {0.0f, 0.0f};
     mvn_color_t  color    = MVN_WHITE;
