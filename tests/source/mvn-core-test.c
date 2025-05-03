@@ -66,8 +66,8 @@ static int test_colors(void)
  */
 static int test_core_timing(void)
 {
-    // Initialize MVN (assuming it's not already done by a test fixture)
-    // A minimal window is needed for timing initialization in mvn_init
+    // Note: A minimal window is needed for timing initialization
+    // This test focuses on timing features, not window functionality
     if (!mvn_init(10, 10, "Timing Test", MVN_WINDOW_HIDDEN)) {
         TEST_ASSERT(false, "mvn_init failed for timing test");
         return 0; // Cannot proceed if init fails

@@ -21,6 +21,7 @@
 #include "mvn-test-utils.h"
 #include "mvn-text-test.h"
 #include "mvn-texture-test.h"
+#include "mvn-window-test.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,6 +40,7 @@ int main(void)
 
     // Run all test suites
     run_core_tests(&passed, &failed, &total);
+    run_window_tests(&passed, &failed, &total);
     run_texture_tests(&passed, &failed, &total);
     run_hashmap_tests(&passed, &failed, &total);
     run_list_tests(&passed, &failed, &total);

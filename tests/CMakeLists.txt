@@ -42,6 +42,7 @@ set(MVN_TEST_MODULES
     texture
     text
     error
+    window
 )
 
 # Build all test executables

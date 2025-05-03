@@ -34,7 +34,9 @@
 #ifndef MVN_H
 #define MVN_H
 
-#include "mvn/mvn-core.h" // IWYU pragma: keep
+#include "mvn/mvn-core.h"   // IWYU pragma: keep
+#include "mvn/mvn-error.h"  // IWYU pragma: keep
+#include "mvn/mvn-window.h" // IWYU pragma: keep
 
 #ifdef __cplusplus
 extern "C" {
