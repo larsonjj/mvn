@@ -137,7 +137,7 @@ static int test_get_file_mod_time(void)
     }
 
     // Add a delay to ensure the file system records the modification time
-    SDL_Delay(100);
+    SDL_Delay(5000);
 
     bool file_exists = mvn_is_path_file(TEMP_FILE_PATH);
     bool dir_exists  = mvn_is_path_directory(TEMP_DIR_NAME);
