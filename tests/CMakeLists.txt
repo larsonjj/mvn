@@ -30,27 +30,29 @@ function(mvn_add_test_executable target source)
     )
 endfunction()
 
-##### INDIVIDUAL TESTS CONFIG #####
-mvn_add_test_executable(mvn_test_core source/mvn-core-test.c)
-mvn_add_test_executable(mvn_test_file source/mvn-file-test.c)
-mvn_add_test_executable(mvn_test_string source/mvn-string-test.c)
-mvn_add_test_executable(mvn_test_logger source/mvn-logger-test.c)
-mvn_add_test_executable(mvn_test_list source/mvn-list-test.c)
-mvn_add_test_executable(mvn_test_hashmap source/mvn-hashmap-test.c)
-mvn_add_test_executable(mvn_test_textures source/mvn-texture-test.c)
-mvn_add_test_executable(mvn_test_text source/mvn-text-test.c)
+##### TEST CONFIGURATION #####
+# List of all test modules
+set(MVN_TEST_MODULES
+    core
+    file
+    string
+    logger
+    list
+    hashmap
+    texture
+    text
+)
+
+# Build all test executables
+set(MVN_TEST_TARGETS)
+foreach(MODULE ${MVN_TEST_MODULES})
+    set(TARGET_NAME mvn_test_${MODULE})
+    list(APPEND MVN_TEST_TARGETS ${TARGET_NAME})
+    mvn_add_test_executable(${TARGET_NAME} source/mvn-${MODULE}-test.c)
+endforeach()
 
 # Create a meta-target that depends on all test executables
-add_custom_target(mvn_test_build_all DEPENDS
-    mvn_test_core
-    mvn_test_file
-    mvn_test_string
-    mvn_test_logger
-    mvn_test_list
-    mvn_test_hashmap
-    mvn_test_textures
-    mvn_test_text
-)
+add_custom_target(mvn_test_build_all DEPENDS ${MVN_TEST_TARGETS})
 
 # Make this meta-target part of the default build
 set_target_properties(mvn_test_build_all PROPERTIES EXCLUDE_FROM_ALL FALSE)
@@ -59,12 +61,7 @@ set_target_properties(mvn_test_build_all PROPERTIES EXCLUDE_FROM_ALL FALSE)
 add_dependencies(mvn_test_build_all mvn)
 
 ##### TESTS #####
-# add_test(NAME mvn_test_all COMMAND mvn_test_all)
-add_test(NAME mvn_test_core COMMAND mvn_test_core)
-add_test(NAME mvn_test_file COMMAND mvn_test_file)
-add_test(NAME mvn_test_string COMMAND mvn_test_string)
-add_test(NAME mvn_test_logger COMMAND mvn_test_logger)
-add_test(NAME mvn_test_list COMMAND mvn_test_list)
-add_test(NAME mvn_test_hashmap COMMAND mvn_test_hashmap)
-add_test(NAME mvn_test_textures COMMAND mvn_test_textures)
-add_test(NAME mvn_test_text COMMAND mvn_test_text)
+# Register all tests with CTest
+foreach(TARGET ${MVN_TEST_TARGETS})
+    add_test(NAME ${TARGET} COMMAND ${TARGET})
+endforeach()
