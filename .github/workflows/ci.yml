@@ -1,73 +1,74 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        build_type: [Debug, Release]
-    steps:
-      - uses: actions/checkout@v4
+    build-linux:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                build_type: [Debug, Release]
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgl1-mesa-dev xorg-dev
+            - name: Install Dependencies
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y libgl1-mesa-dev xorg-dev
 
-      - name: Start xvfb
-        run: |
-          sudo apt-get install -y xvfb
-          export DISPLAY=:99
-          nohup Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+            - name: Start xvfb
+              run: |
+                  sudo apt-get install -y xvfb
+                  export DISPLAY=:99
+                  nohup Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
-      - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build/linux -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DMVN_BUILD_TESTS=ON -DMVN_CI=ON
+            - name: Configure CMake
+              run: cmake -B ${{github.workspace}}/build/linux -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DMVN_BUILD_TESTS=ON -DMVN_CI=ON
 
-      - name: Build
-        run: cmake --build ${{github.workspace}}/build/linux --config ${{matrix.build_type}}
+            - name: Build
+              run: cmake --build ${{github.workspace}}/build/linux --config ${{matrix.build_type}}
 
-      - name: Test
-        working-directory: ${{github.workspace}}/build/linux
-        run: ctest -C ${{matrix.build_type}} --output-on-failure -R mvn_test_all
+            - name: Test
+              working-directory: ${{github.workspace}}/build/linux
+              run: ctest -C ${{matrix.build_type}} --output-on-failure -R mvn_test_all
 
-  build-macos:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        build_type: [Debug, Release]
-    steps:
-      - uses: actions/checkout@v4
+    build-macos:
+        runs-on: macos-latest
+        strategy:
+            matrix:
+                build_type: [Debug, Release]
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build/macos -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DMVN_BUILD_TESTS=ON -DMVN_CI=ON
+            - name: Configure CMake
+              run: cmake -B ${{github.workspace}}/build/macos -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DMVN_BUILD_TESTS=ON -DMVN_CI=ON
 
-      - name: Build
-        run: cmake --build ${{github.workspace}}/build/macos --config ${{matrix.build_type}}
+            - name: Build
+              run: cmake --build ${{github.workspace}}/build/macos --config ${{matrix.build_type}}
 
-      - name: Test
-        working-directory: ${{github.workspace}}/build/macos
-        run: ctest -C ${{matrix.build_type}} --output-on-failure -R mvn_test_all
+            - name: Test
+              working-directory: ${{github.workspace}}/build/macos
+              run: ctest -C ${{matrix.build_type}} --output-on-failure -R mvn_test_all
 
-  build-windows:
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        build_type: [Debug, Release]
-    steps:
-      - uses: actions/checkout@v4
+    build-windows:
+        runs-on: windows-latest
+        strategy:
+            matrix:
+                build_type: [Debug, Release]
+                target: [Windows]
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build/windows -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DMVN_BUILD_TESTS=ON -DMVN_CI=ON
+            - name: Configure CMake
+              run: cmake -B ${{github.workspace}}/build/windows -DCMAKE_SYSTEM_NAME=${{ matrix.target }} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DMVN_BUILD_TESTS=ON -DMVN_CI=ON
 
-      - name: Build
-        run: cmake --build ${{github.workspace}}/build/windows --config ${{matrix.build_type}}
+            - name: Build
+              run: cmake --build ${{github.workspace}}/build/windows --config ${{matrix.build_type}}
 
-      - name: Test
-        working-directory: ${{github.workspace}}/build/windows
-        run: ctest -C ${{matrix.build_type}} --output-on-failure -R mvn_test_all
+            - name: Test
+              working-directory: ${{github.workspace}}/build/windows
+              run: ctest -C ${{matrix.build_type}} --output-on-failure -R mvn_test_all
