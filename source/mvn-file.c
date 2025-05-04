@@ -47,7 +47,10 @@
  */
 bool mvn_file_exists(const char *fileName)
 {
-    MVN_CHECK_NULL(fileName, "Cannot check if file exists: NULL filename");
+    if (fileName == NULL) {
+        mvn_set_error("Cannot check if file exists: NULL filename");
+        return false;
+    }
 
     if (fileName[0] == '\0') {
         return mvn_set_error("Cannot check if file exists: Empty filename");
@@ -68,7 +71,10 @@ bool mvn_file_exists(const char *fileName)
  */
 bool mvn_directory_exists(const char *dirPath)
 {
-    MVN_CHECK_NULL(dirPath, "Cannot check if directory exists: NULL directory path");
+    if (dirPath == NULL) {
+        mvn_set_error("Cannot check if directory exists: NULL directory path");
+        return false;
+    }
 
     if (dirPath[0] == '\0') {
         return mvn_set_error("Cannot check if directory exists: Empty directory path");
@@ -90,8 +96,15 @@ bool mvn_directory_exists(const char *dirPath)
  */
 bool mvn_is_file_extension(const char *fileName, const char *ext)
 {
-    MVN_CHECK_NULL(fileName, "Cannot check file extension: NULL filename");
-    MVN_CHECK_NULL(ext, "Cannot check file extension: NULL extension");
+    if (fileName == NULL) {
+        mvn_set_error("Cannot check file extension: NULL filename");
+        return false;
+    }
+
+    if (ext == NULL) {
+        mvn_set_error("Cannot check file extension: NULL extension");
+        return false;
+    }
 
     mvn_string_t *fileExt = mvn_get_file_extension(fileName);
     if (!fileExt) {
@@ -116,7 +129,10 @@ bool mvn_is_file_extension(const char *fileName, const char *ext)
  */
 int32_t mvn_get_file_length(const char *fileName)
 {
-    MVN_CHECK_NULL(fileName, "Cannot get file length: NULL filename");
+    if (fileName == NULL) {
+        mvn_set_error("Cannot get file length: NULL filename");
+        return -1;
+    }
 
     SDL_PathInfo info;
     if (SDL_GetPathInfo(fileName, &info) && info.type == SDL_PATHTYPE_FILE) {
@@ -286,11 +302,14 @@ mvn_string_t *mvn_get_directory_path(const char *filePath)
  */
 mvn_string_t *mvn_get_parent_directory_path(const char *dirPath)
 {
-    MVN_CHECK_NULL(dirPath, "Cannot get parent directory: NULL directory path");
+    if (dirPath == NULL) {
+        mvn_set_error("Cannot get parent directory: NULL directory path");
+        return mvn_string_from_cstr("");
+    }
 
     if (dirPath[0] == '\0') {
-        return mvn_set_error("Cannot get parent directory: Empty directory path"),
-               mvn_string_from_cstr("");
+        mvn_set_error("Cannot get parent directory: Empty directory path");
+        return mvn_string_from_cstr("");
     }
 
     // Make a copy of the path that we can modify
@@ -364,7 +383,10 @@ mvn_string_t *mvn_get_application_directory(void)
  */
 bool mvn_is_path_file(const char *path)
 {
-    MVN_CHECK_NULL(path, "Cannot check if path is a file: NULL path");
+    if (path == NULL) {
+        mvn_set_error("Cannot check if path is a file: NULL path");
+        return false;
+    }
 
     if (path[0] == '\0') {
         return mvn_set_error("Cannot check if path is a file: Empty path");
@@ -385,7 +407,10 @@ bool mvn_is_path_file(const char *path)
  */
 bool mvn_is_path_directory(const char *path)
 {
-    MVN_CHECK_NULL(path, "Cannot check if path is a directory: NULL path");
+    if (path == NULL) {
+        mvn_set_error("Cannot check if path is a directory: NULL path");
+        return false;
+    }
 
     if (path[0] == '\0') {
         return mvn_set_error("Cannot check if path is a directory: Empty path");
@@ -406,7 +431,10 @@ bool mvn_is_path_directory(const char *path)
  */
 int64_t mvn_get_file_mod_time(const char *fileName)
 {
-    MVN_CHECK_NULL(fileName, "Cannot get file modification time: NULL filename");
+    if (fileName == NULL) {
+        mvn_set_error("Cannot get file modification time: NULL filename");
+        return -1;
+    }
 
     if (fileName[0] == '\0') {
         mvn_set_error("Cannot get file modification time: Empty filename");

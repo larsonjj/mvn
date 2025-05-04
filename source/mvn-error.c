@@ -45,7 +45,7 @@ bool mvn_set_error(const char *fmt, ...)
     }
 
     // Also log the error at DEBUG level
-    mvn_log_debug("Error set: %s", error_buffer);
+    mvn_log_error("Error set: %s", error_buffer);
 
     return false; // Return false for convenient usage in return statements
 }

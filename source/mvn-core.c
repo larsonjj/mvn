@@ -82,7 +82,8 @@ bool mvn_init(int width, int height, const char *title, mvn_window_flags_t flags
 {
     // Initialize SDL first - needed for video and other features
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
-        return mvn_set_error("SDL initialization failed: %s", SDL_GetError());
+        mvn_set_error("SDL initialization failed: %s", SDL_GetError());
+        return false;
     }
 
     // Add default high DPI flag if no flags provided
@@ -95,17 +96,19 @@ bool mvn_init(int width, int height, const char *title, mvn_window_flags_t flags
 
     // Create the window with specified flags
     g_window = SDL_CreateWindow(title, width, height, flags);
-    if (!g_window) {
+    if (g_window == NULL) {
         SDL_Quit();
-        return mvn_set_error("Window creation failed: %s", SDL_GetError());
+        mvn_set_error("Window creation failed: %s", SDL_GetError());
+        return false;
     }
 
     // Create renderer for window
     g_renderer = SDL_CreateRenderer(g_window, NULL);
-    if (!g_renderer) {
+    if (g_renderer == NULL) {
         SDL_DestroyWindow(g_window);
         SDL_Quit();
-        return mvn_set_error("Renderer creation failed: %s", SDL_GetError());
+        mvn_set_error("Renderer creation failed: %s", SDL_GetError());
+        return false;
     }
 
     // Initialize SDL_ttf
@@ -113,17 +116,19 @@ bool mvn_init(int width, int height, const char *title, mvn_window_flags_t flags
         SDL_DestroyRenderer(g_renderer);
         SDL_DestroyWindow(g_window);
         SDL_Quit();
-        return mvn_set_error("Failed to initialize SDL_ttf: %s", SDL_GetError());
+        mvn_set_error("Failed to initialize SDL_ttf: %s", SDL_GetError());
+        return false;
     }
 
     // Create the renderer text engine
     g_text_engine = TTF_CreateRendererTextEngine(mvn_get_renderer());
-    if (!g_text_engine) {
+    if (g_text_engine == NULL) {
         TTF_Quit();
         SDL_DestroyRenderer(g_renderer);
         SDL_DestroyWindow(g_window);
         SDL_Quit();
-        return mvn_set_error("Failed to create renderer text engine: %s", SDL_GetError());
+        mvn_set_error("Failed to create renderer text engine: %s", SDL_GetError());
+        return false;
     }
 
     // Initialize timing variables
@@ -173,6 +178,10 @@ void mvn_quit(void)
  */
 mvn_renderer_t *mvn_get_renderer(void)
 {
+    if (g_renderer == NULL) {
+        mvn_set_error("Renderer not initialized - call mvn_init() first");
+        return NULL;
+    }
     return g_renderer;
 }
 
@@ -182,6 +191,10 @@ mvn_renderer_t *mvn_get_renderer(void)
  */
 mvn_text_engine_t *mvn_get_text_engine(void)
 {
+    if (g_text_engine == NULL) {
+        mvn_set_error("Text engine not initialized - call mvn_init() first");
+        return NULL;
+    }
     return g_text_engine;
 }
 
@@ -191,6 +204,11 @@ mvn_text_engine_t *mvn_get_text_engine(void)
  */
 bool mvn_window_should_close(void)
 {
+    if (g_window == NULL) {
+        mvn_set_error("Cannot check window state: Window not initialized");
+        return false;
+    }
+
     SDL_Event event;
     bool      should_close = false;
 
@@ -218,7 +236,10 @@ bool mvn_window_should_close(void)
  */
 bool mvn_begin_drawing(void)
 {
-    MVN_CHECK_NULL(g_renderer, "Cannot begin drawing: Renderer not initialized");
+    if (g_renderer == NULL) {
+        mvn_set_error("Cannot begin drawing: Renderer not initialized");
+        return false;
+    }
 
     // Calculate delta time from the previous frame
     uint64_t frame_start_time = SDL_GetPerformanceCounter();
@@ -236,16 +257,21 @@ bool mvn_begin_drawing(void)
  */
 bool mvn_clear_background(mvn_color_t color)
 {
-    MVN_CHECK_NULL(g_renderer, "Cannot clear background: Renderer not initialized");
+    if (g_renderer == NULL) {
+        mvn_set_error("Cannot clear background: Renderer not initialized");
+        return false;
+    }
 
     // Set the renderer draw color
-    if (!SDL_SetRenderDrawColor(g_renderer, color.r, color.g, color.b, color.a)) {
-        return mvn_set_error("Failed to set render color: %s", SDL_GetError());
+    if (SDL_SetRenderDrawColor(g_renderer, color.r, color.g, color.b, color.a) == false) {
+        mvn_set_error("Failed to set render color: %s", SDL_GetError());
+        return false;
     }
 
     // Clear the entire renderer with the set color
-    if (!SDL_RenderClear(g_renderer)) {
-        return mvn_set_error("Failed to clear renderer: %s", SDL_GetError());
+    if (SDL_RenderClear(g_renderer) == false) {
+        mvn_set_error("Failed to clear renderer: %s", SDL_GetError());
+        return false;
     }
 
     return true;
@@ -257,7 +283,10 @@ bool mvn_clear_background(mvn_color_t color)
  */
 bool mvn_end_drawing(void)
 {
-    MVN_CHECK_NULL(g_renderer, "Cannot end drawing: Renderer not initialized");
+    if (g_renderer == NULL) {
+        mvn_set_error("Cannot end drawing: Renderer not initialized");
+        return false;
+    }
 
     // Present the renderer contents to the screen
     SDL_RenderPresent(g_renderer);
@@ -327,6 +356,10 @@ void mvn_set_target_fps(int fps)
  */
 float mvn_get_frame_time(void)
 {
+    if (g_performance_frequency == 0) {
+        mvn_set_error("Cannot get frame time: Framework not initialized");
+        return 0.0f;
+    }
     return (float)g_delta_time;
 }
 
@@ -337,7 +370,8 @@ float mvn_get_frame_time(void)
 double mvn_get_time(void)
 {
     if (g_performance_frequency == 0) {
-        return 0.0; // Avoid division by zero if not initialized
+        mvn_set_error("Cannot get time: Framework not initialized");
+        return 0.0;
     }
     uint64_t current_time = SDL_GetPerformanceCounter();
     return (double)(current_time - g_start_time) / (double)g_performance_frequency;
@@ -349,5 +383,9 @@ double mvn_get_time(void)
  */
 int mvn_get_fps(void)
 {
+    if (g_performance_frequency == 0) {
+        mvn_set_error("Cannot get FPS: Framework not initialized");
+        return 0;
+    }
     return g_current_fps;
 }

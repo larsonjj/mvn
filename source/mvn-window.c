@@ -60,7 +60,9 @@ mvn_window_t *mvn_get_window(void)
 bool mvn_toggle_fullscreen(void)
 {
     mvn_window_t *window = mvn_get_window();
-    MVN_CHECK_NULL(window, "Cannot toggle fullscreen: No window available");
+    if (window == NULL) {
+        return mvn_set_error("Cannot toggle fullscreen: No window available");
+    }
 
     // Check current fullscreen state
     bool is_fullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN;
@@ -81,7 +83,9 @@ bool mvn_toggle_fullscreen(void)
 bool mvn_toggle_borderless_windowed(void)
 {
     mvn_window_t *window = mvn_get_window();
-    MVN_CHECK_NULL(window, "Cannot toggle borderless windowed mode: No window available");
+    if (window == NULL) {
+        return mvn_set_error("Cannot toggle borderless windowed mode: No window available");
+    }
 
     SDL_WindowFlags flags         = SDL_GetWindowFlags(window);
     bool            is_borderless = flags & SDL_WINDOW_BORDERLESS;
@@ -120,7 +124,9 @@ bool mvn_toggle_borderless_windowed(void)
 bool mvn_maximize_window(void)
 {
     mvn_window_t *window = mvn_get_window();
-    MVN_CHECK_NULL(window, "Cannot maximize window: No window available");
+    if (window == NULL) {
+        return mvn_set_error("Cannot maximize window: No window available");
+    }
 
     // Check if window is resizable
     if (!(SDL_GetWindowFlags(window) & SDL_WINDOW_RESIZABLE)) {
@@ -141,7 +147,9 @@ bool mvn_maximize_window(void)
 bool mvn_minimize_window(void)
 {
     mvn_window_t *window = mvn_get_window();
-    MVN_CHECK_NULL(window, "Cannot minimize window: No window available");
+    if (window == NULL) {
+        return mvn_set_error("Cannot minimize window: No window available");
+    }
 
     if (SDL_MinimizeWindow(window)) {
         return mvn_set_error("Failed to minimize window: %s", SDL_GetError());
@@ -157,7 +165,9 @@ bool mvn_minimize_window(void)
 bool mvn_restore_window(void)
 {
     mvn_window_t *window = mvn_get_window();
-    MVN_CHECK_NULL(window, "Cannot restore window: No window available");
+    if (window == NULL) {
+        return mvn_set_error("Cannot restore window: No window available");
+    }
 
     if (SDL_RestoreWindow(window)) {
         return mvn_set_error("Failed to restore window: %s", SDL_GetError());
@@ -421,7 +431,9 @@ void mvn_set_window_size(int32_t width, int32_t height)
 bool mvn_set_window_opacity(float opacity)
 {
     mvn_window_t *window = mvn_get_window();
-    MVN_CHECK_NULL(window, "Cannot set window opacity: No window available");
+    if (window == NULL) {
+        return mvn_set_error("Cannot set window opacity: No window available");
+    }
 
     // Clamp opacity value between 0.0 and 1.0
     if (opacity < 0.0f) {

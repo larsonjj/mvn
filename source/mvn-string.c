@@ -5,6 +5,7 @@
 
 #include "mvn/mvn-string.h"
 
+#include "mvn/mvn-error.h" // Add this include
 #include "mvn/mvn-list.h"
 #include "mvn/mvn-logger.h"
 #include "mvn/mvn-utils.h"
@@ -32,7 +33,8 @@ static bool is_whitespace(char character);
  */
 mvn_string_t *mvn_string_clone(const mvn_string_t *str)
 {
-    if (!str) {
+    if (str == NULL) {
+        mvn_set_error("Cannot clone NULL string");
         return NULL;
     }
 
@@ -80,16 +82,16 @@ mvn_string_t *mvn_string_init(size_t initial_capacity)
 
     /* Allocate string structure */
     mvn_string_t *str = MVN_MALLOC(sizeof(mvn_string_t));
-    if (!str) {
-        mvn_log_error("Failed to allocate memory for string");
+    if (str == NULL) {
+        mvn_set_error("Failed to allocate memory for string");
         return NULL;
     }
 
     /* Allocate data array */
     str->data = MVN_MALLOC(initial_capacity);
     if (!str->data) {
-        mvn_log_error("Failed to allocate memory for string data");
         MVN_FREE(str);
+        mvn_set_error("Failed to allocate memory for string data");
         return NULL;
     }
 
@@ -110,6 +112,7 @@ mvn_string_t *mvn_string_init(size_t initial_capacity)
 mvn_string_t *mvn_string_from_cstr(const char *cstr)
 {
     if (!cstr) {
+        mvn_log_debug("NULL C string provided to mvn_string_from_cstr, treating as empty string");
         cstr = EMPTY_STRING;
     }
 
@@ -153,8 +156,8 @@ void mvn_string_free(mvn_string_t *str)
  */
 static bool mvn_string_ensure_capacity(mvn_string_t *str, size_t needed_capacity)
 {
-    if (!str) {
-        mvn_log_error("NULL string provided to ensure_capacity");
+    if (str == NULL) {
+        mvn_set_error("Cannot ensure capacity: NULL string");
         return false;
     }
 
@@ -178,8 +181,8 @@ static bool mvn_string_ensure_capacity(mvn_string_t *str, size_t needed_capacity
  */
 static bool mvn_string_resize(mvn_string_t *str, size_t new_capacity)
 {
-    if (!str) {
-        mvn_log_error("NULL string provided to resize");
+    if (str == NULL) {
+        mvn_set_error("Cannot resize: NULL string");
         return false;
     }
 
@@ -190,8 +193,7 @@ static bool mvn_string_resize(mvn_string_t *str, size_t new_capacity)
 
     char *new_data = MVN_REALLOC(str->data, new_capacity);
     if (!new_data) {
-        mvn_log_error("Failed to resize string to capacity %zu", new_capacity);
-        return false;
+        return mvn_set_error("Failed to resize string to capacity %zu", new_capacity);
     }
 
     str->data     = new_data;
@@ -208,7 +210,8 @@ static bool mvn_string_resize(mvn_string_t *str, size_t new_capacity)
  */
 size_t mvn_string_length(const mvn_string_t *str)
 {
-    if (!str) {
+    if (str == NULL) {
+        mvn_set_error("Cannot get length of NULL string");
         return 0;
     }
     return str->length;
@@ -267,7 +270,13 @@ mvn_string_t *mvn_string_concat(const mvn_string_t *str1, const mvn_string_t *st
  */
 bool mvn_string_append(mvn_string_t *str, const char *cstr)
 {
-    if (!str || !cstr) {
+    if (str == NULL) {
+        mvn_set_error("Cannot append to NULL string");
+        return false;
+    }
+
+    if (cstr == NULL) {
+        mvn_set_error("Cannot append NULL C string");
         return false;
     }
 
@@ -295,7 +304,13 @@ bool mvn_string_append(mvn_string_t *str, const char *cstr)
  */
 bool mvn_string_ends_with(const mvn_string_t *str, const char *suffix)
 {
-    if (!str || !suffix) {
+    if (str == NULL) {
+        mvn_set_error("Cannot check if NULL string ends with suffix");
+        return false;
+    }
+
+    if (suffix == NULL) {
+        mvn_set_error("Cannot check if string ends with NULL suffix");
         return false;
     }
 
@@ -319,7 +334,13 @@ bool mvn_string_ends_with(const mvn_string_t *str, const char *suffix)
  */
 bool mvn_string_starts_with(const mvn_string_t *str, const char *prefix)
 {
-    if (!str || !prefix) {
+    if (str == NULL) {
+        mvn_set_error("Cannot check if NULL string starts with prefix");
+        return false;
+    }
+
+    if (prefix == NULL) {
+        mvn_set_error("Cannot check if string starts with NULL prefix");
         return false;
     }
 
@@ -343,7 +364,13 @@ bool mvn_string_starts_with(const mvn_string_t *str, const char *prefix)
  */
 bool mvn_string_includes(const mvn_string_t *str, const char *substr)
 {
-    if (!str || !substr) {
+    if (str == NULL) {
+        mvn_set_error("Cannot check if NULL string includes substring");
+        return false;
+    }
+
+    if (substr == NULL) {
+        mvn_set_error("Cannot check if string includes NULL substring");
         return false;
     }
 
@@ -363,7 +390,8 @@ bool mvn_string_includes(const mvn_string_t *str, const char *substr)
  */
 mvn_string_t *mvn_string_pad_end(const mvn_string_t *str, size_t target_length, char pad_char)
 {
-    if (!str) {
+    if (str == NULL) {
+        mvn_set_error("Cannot pad NULL string");
         return NULL;
     }
 
@@ -399,7 +427,8 @@ mvn_string_t *mvn_string_pad_end(const mvn_string_t *str, size_t target_length, 
  */
 mvn_string_t *mvn_string_pad_start(const mvn_string_t *str, size_t target_length, char pad_char)
 {
-    if (!str) {
+    if (str == NULL) {
+        mvn_set_error("Cannot pad NULL string");
         return NULL;
     }
 
@@ -434,10 +463,12 @@ mvn_string_t *mvn_string_pad_start(const mvn_string_t *str, size_t target_length
  */
 mvn_string_t *mvn_string_repeat(const mvn_string_t *str, size_t count)
 {
-    // Explicitly handle NULL input string first
-    if (!str) {
+    if (str == NULL) {
+        mvn_set_error("Cannot repeat NULL string");
         return NULL;
     }
+
+    // Rest of function remains the same (keep the count==0 check)
 
     // Handle count == 0
     if (count == 0) {
@@ -476,7 +507,18 @@ mvn_string_t *mvn_string_repeat(const mvn_string_t *str, size_t count)
 mvn_string_t *
 mvn_string_replace(const mvn_string_t *str, const char *search, const char *replacement)
 {
-    if (!str || !search || !replacement) {
+    if (str == NULL) {
+        mvn_set_error("Cannot replace in NULL string");
+        return NULL;
+    }
+
+    if (search == NULL) {
+        mvn_set_error("Cannot search for NULL pattern");
+        return NULL;
+    }
+
+    if (replacement == NULL) {
+        mvn_set_error("Cannot replace with NULL string");
         return NULL;
     }
 
@@ -522,6 +564,21 @@ mvn_string_replace(const mvn_string_t *str, const char *search, const char *repl
 mvn_string_t *
 mvn_string_replace_all(const mvn_string_t *str, const char *search, const char *replacement)
 {
+    if (str == NULL) {
+        mvn_set_error("Cannot replace all in NULL string");
+        return NULL;
+    }
+
+    if (search == NULL) {
+        mvn_set_error("Cannot search for NULL pattern");
+        return NULL;
+    }
+
+    if (replacement == NULL) {
+        mvn_set_error("Cannot replace with NULL string");
+        return NULL;
+    }
+
     if (!str || !search || !replacement) {
         return NULL;
     }
@@ -587,13 +644,19 @@ mvn_string_replace_all(const mvn_string_t *str, const char *search, const char *
  */
 struct mvn_list_t *mvn_string_split(const mvn_string_t *str, const char *delimiter)
 {
-    if (!str || !delimiter) {
+    if (str == NULL) {
+        mvn_set_error("Cannot split NULL string");
+        return NULL;
+    }
+
+    if (delimiter == NULL) {
+        mvn_set_error("Cannot split string with NULL delimiter");
         return NULL;
     }
 
     struct mvn_list_t *list = mvn_list_init(sizeof(mvn_string_t *), 0);
     if (!list) {
-        mvn_log_error("Failed to create list for string split");
+        mvn_set_error("Failed to create list for string split");
         return NULL;
     }
 
@@ -657,7 +720,8 @@ struct mvn_list_t *mvn_string_split(const mvn_string_t *str, const char *delimit
  */
 mvn_string_t *mvn_string_to_lowercase(const mvn_string_t *str)
 {
-    if (!str) {
+    if (str == NULL) {
+        mvn_set_error("Cannot convert NULL string to lowercase");
         return NULL;
     }
 
@@ -683,7 +747,8 @@ mvn_string_t *mvn_string_to_lowercase(const mvn_string_t *str)
  */
 mvn_string_t *mvn_string_to_uppercase(const mvn_string_t *str)
 {
-    if (!str) {
+    if (str == NULL) {
+        mvn_set_error("Cannot convert NULL string to uppercase");
         return NULL;
     }
 
@@ -720,6 +785,11 @@ static bool is_whitespace(char character)
  */
 mvn_string_t *mvn_string_trim(const mvn_string_t *str)
 {
+    if (str == NULL) {
+        mvn_set_error("Cannot trim NULL string");
+        return NULL;
+    }
+
     if (!str) {
         return NULL;
     }
@@ -766,6 +836,11 @@ mvn_string_t *mvn_string_trim(const mvn_string_t *str)
  */
 mvn_string_t *mvn_string_trim_end(const mvn_string_t *str)
 {
+    if (str == NULL) {
+        mvn_set_error("Cannot trim end of NULL string");
+        return NULL;
+    }
+
     if (!str) {
         return NULL;
     }
@@ -805,6 +880,11 @@ mvn_string_t *mvn_string_trim_end(const mvn_string_t *str)
  */
 mvn_string_t *mvn_string_trim_start(const mvn_string_t *str)
 {
+    if (str == NULL) {
+        mvn_set_error("Cannot trim start of NULL string");
+        return NULL;
+    }
+
     if (!str) {
         return NULL;
     }
@@ -846,15 +926,15 @@ mvn_string_t *mvn_string_trim_start(const mvn_string_t *str)
  */
 mvn_string_t *mvn_string_substring(const mvn_string_t *str, size_t start, size_t length)
 {
-    if (!str) {
+    if (str == NULL) {
+        mvn_set_error("Cannot get substring of NULL string");
         return NULL;
     }
 
     /* Validate indices */
     if (start > str->length) {
-        mvn_log_error(
-            "Invalid substring start index: start=%zu, string_length=%zu", start, str->length);
-        // Return empty string for invalid start past the end
+        mvn_set_error(
+            "Invalid substring start index: %zu exceeds string length of %zu", start, str->length);
         return mvn_string_init(0);
     }
 
@@ -888,9 +968,16 @@ mvn_string_t *mvn_string_substring(const mvn_string_t *str, size_t start, size_t
  */
 bool mvn_string_compare(const mvn_string_t *str1, const mvn_string_t *str2)
 {
-    if (str1 == NULL || str2 == NULL) {
+    if (str1 == NULL) {
+        mvn_set_error("Cannot compare NULL first string");
         return false;
     }
+
+    if (str2 == NULL) {
+        mvn_set_error("Cannot compare NULL second string");
+        return false;
+    }
+
     if (str1->length != str2->length) {
         return false;
     }
@@ -904,7 +991,8 @@ bool mvn_string_compare(const mvn_string_t *str1, const mvn_string_t *str2)
  */
 size_t mvn_string_capacity(const mvn_string_t *str)
 {
-    if (!str) {
+    if (str == NULL) {
+        mvn_set_error("Cannot get capacity of NULL string");
         return 0;
     }
     return str->capacity;
@@ -916,7 +1004,13 @@ size_t mvn_string_capacity(const mvn_string_t *str)
  */
 void mvn_string_clear(mvn_string_t *str)
 {
-    if (!str || !str->data) {
+    if (str == NULL) {
+        mvn_set_error("Cannot clear NULL string");
+        return;
+    }
+
+    if (str->data == NULL) {
+        mvn_set_error("Cannot clear string with NULL data");
         return;
     }
 

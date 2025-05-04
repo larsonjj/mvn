@@ -254,9 +254,20 @@ size_t mvn_hmap_length(const mvn_hmap_t *hmap)
  */
 bool mvn_hmap_set(mvn_hmap_t *hmap, const char *key, const void *value)
 {
-    MVN_CHECK_NULL(hmap, "Cannot set value in NULL hashmap");
-    MVN_CHECK_NULL(key, "Cannot set value with NULL key");
-    MVN_CHECK_NULL(value, "Cannot set NULL value in hashmap");
+    if (hmap == NULL) {
+        mvn_set_error("Cannot set value in NULL hashmap");
+        return false;
+    }
+
+    if (key == NULL) {
+        mvn_set_error("Cannot set value with NULL key");
+        return false;
+    }
+
+    if (value == NULL) {
+        mvn_set_error("Cannot set NULL value in hashmap");
+        return false;
+    }
 
     /* Check if we need to resize */
     if (hmap->length > (size_t)((double)hmap->bucket_count * MVN_HMAP_LOAD_FACTOR)) {
@@ -337,8 +348,15 @@ void *mvn_hmap_get(const mvn_hmap_t *hmap, const char *key)
  */
 bool mvn_hmap_delete(mvn_hmap_t *hmap, const char *key)
 {
-    MVN_CHECK_NULL(hmap, "Cannot delete from NULL hashmap");
-    MVN_CHECK_NULL(key, "Cannot delete NULL key from hashmap");
+    if (hmap == NULL) {
+        mvn_set_error("Cannot delete from NULL hashmap");
+        return false;
+    }
+
+    if (key == NULL) {
+        mvn_set_error("Cannot delete NULL key from hashmap");
+        return false;
+    }
 
     /* Calculate bucket index */
     size_t index = hash_string(key) % hmap->bucket_count;
@@ -383,7 +401,10 @@ bool mvn_hmap_delete(mvn_hmap_t *hmap, const char *key)
  */
 mvn_list_t *mvn_hmap_keys(const mvn_hmap_t *hmap)
 {
-    MVN_CHECK_NULL(hmap, "Cannot get keys from NULL hashmap");
+    if (hmap == NULL) {
+        mvn_set_error("Cannot get keys from NULL hashmap");
+        return NULL;
+    }
 
     /* Create a list to hold all keys */
     mvn_list_t *keys = mvn_list_init(sizeof(char *), hmap->length);
@@ -440,7 +461,10 @@ mvn_list_t *mvn_hmap_keys(const mvn_hmap_t *hmap)
  */
 mvn_list_t *mvn_hmap_values(const mvn_hmap_t *hmap)
 {
-    MVN_CHECK_NULL(hmap, "Cannot get values from NULL hashmap");
+    if (hmap == NULL) {
+        mvn_set_error("Cannot get values from NULL hashmap");
+        return NULL;
+    }
 
     /* Create a list to hold all values */
     mvn_list_t *values = mvn_list_init(hmap->item_size, hmap->length);
