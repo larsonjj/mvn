@@ -12,18 +12,6 @@
     },
     {
       "file": "docs/code-style.md"
-    },
-    {
-      "file": "docs/sdl3-migration.md"
-    },
-    {
-      "file": "docs/sdl3_image-migration.md"
-    },
-    {
-      "file": "docs/sdl3_ttf-migration.md"
-    },
-    {
-      "file": "docs/flecs4-migration.md"
     }
   ],
   "[markdown]": {
