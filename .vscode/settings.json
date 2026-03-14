@@ -6,16 +6,7 @@
   "search.exclude": {
     "build/": true
   },
-  "github.copilot.chat.codeGeneration.instructions": [
-    {
-      "file": "README.md"
-    },
-    {
-      "file": "docs/code-style.md"
-    }
-  ],
   "[markdown]": {
-    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
     "editor.formatOnSave": true
   },
   "cmake.configureOnOpen": true,
